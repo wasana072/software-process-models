@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 1: Foundations of Software Engineering & SDLC</title>
+    
+    <!-- Google Fonts (Kanit & Sarabun) -->
+    <link rel="preconnect" href="[suspicious link removed]">
+    <link rel="preconnect" href="[suspicious link removed]" crossorigin>
+    <link href="[suspicious link removed]" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-accent: #0284c7;
+            --secondary-accent: #6d28d9;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border-color: #e2e8f0;
+            --badge-bg: #e0f2fe;
+            --badge-text: #0369a1;
+            --badge-border: #bae6fd;
+            --visual-bg: #f1f5f9;
+            --visual-border: #cbd5e1;
+            --cta-bg: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+            --cta-border: #86efac;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        /* Nav & Back Link */
+        .nav-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-accent);
+            text-decoration: none;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: transform 0.2s ease;
+        }
+
+        .back-link:hover {
+            transform: translateX(-4px);
+        }
+
+        /* Main Header */
+        header {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+        }
+
+        .module-tag {
+            display: inline-block;
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            border: 1px solid var(--badge-border);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: 'Kanit', sans-serif;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-family: 'Kanit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.3;
+            margin-bottom: 0.75rem;
+        }
+
+        .header-subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        /* Content Sections */
+        .topic-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .topic-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .topic-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 0.75rem;
+        }
+
+        .topic-number {
+            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+            color: #ffffff;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 700;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        h2 {
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Bullet Points List */
+        .bullet-list {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .bullet-list li {
+            position: relative;
+            padding-left: 1.75rem;
+            margin-bottom: 0.85rem;
+            font-size: 1rem;
+            color: var(--text-main);
+        }
+
+        .bullet-list li::before {
+            content: "•";
+            color: var(--primary-accent);
+            font-size: 1.5rem;
+            position: absolute;
+            left: 0.4rem;
+            top: -0.2rem;
+        }
+
+        .highlight-text {
+            color: var(--primary-accent);
+            font-weight: 600;
+        }
+
+        /* Visual Graphic Idea Box */
+        .visual-box {
+            background-color: var(--visual-bg);
+            border: 1px dashed var(--visual-border);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .visual-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #0369a1;
+            margin-bottom: 0.5rem;
+        }
+
+        .visual-desc {
+            font-size: 0.925rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Workshop Call to Action Section */
+        .workshop-card {
+            background: var(--cta-bg);
+            border: 2px solid var(--cta-border);
+            border-radius: 16px;
+            padding: 2.25rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .workshop-card h2 {
+            color: #15803d;
+            margin-bottom: 1rem;
+        }
+
+        .case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.25rem 0;
+        }
+
+        .case-box {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+        }
+
+        .case-box h4 {
+            font-family: 'Kanit', sans-serif;
+            color: #166534;
+            margin-bottom: 0.4rem;
+            font-size: 1rem;
+        }
+
+        .deliverable-list {
+            margin-left: 1.25rem;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .deliverable-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Navigation Header -->
+        <nav class="nav-header">
+            <a href="index.html" class="back-link">&larr; กลับหน้าหลัก Software Process Models</a>
+        </nav>
+
+        <!-- Page Main Title -->
+        <header>
+            <span class="module-tag">Module 01</span>
+            <h1>Foundations of Software Engineering & SDLC</h1>
+            <p class="header-subtitle">เนื้อหาบทเรียน เอกสารประกอบการสอน และกิจกรรมปฏิบัติการ สำหรับนักศึกษาปริญญาตรี</p>
+        </header>
+
+        <!-- Main Content Sections -->
+        <main>
+
+            <!-- Topic 1 -->
+            <section class="topic-card">
+                <div class="topic-header">
+                    <div class="topic-number">1</div>
+                    <h2>นิยามและความสำคัญของ Software Process & Modeling</h2>
+                </div>
+                
+                <ul class="bullet-list">
+                    <li><span class="highlight-text">Software Process:</span> ชุดกิจกรรม (Activities), บทบาทหน้าที่ (Roles), และผลลัพธ์ (Artifacts) ที่เรียงต่อกันอย่างมีระบบ เพื่อสร้าง ปรับปรุง และดูแลรักษาผลิตภัณฑ์ซอฟต์แวร์</li>
+                    <li><span class="highlight-text">Software Process Modeling:</span> การสร้างแบบจำลองของกระบวนการเพื่อช่วยในการทำความเข้าใจ วิเคราะห์ ประเมินความเสี่ยง และปรับปรุงการทำงานอย่างต่อเนื่อง</li>
+                    <li><span class="highlight-text">Why Process Matters:</span> เป็นกลไกสำคัญในการควบคุมคุณภาพ (Quality), ต้นทุนการผลิต (Cost), และระยะเวลาส่งมอบ (Schedule) ตามสามเหลี่ยมบริหารโครงการ (Triple Constraint)</li>
+                    <li><span class="highlight-text">The Engineering Paradox:</span> ซอฟต์แวร์คุณภาพดีไม่ได้เกิดจากความขยันเฉพาะบุคคล แต่เกิดจากกระบวนการพัฒนาที่มีประสิทธิภาพและซ้ำเดิมได้ (Repeatable & Scalable)</li>
+                </ul>
+
+                <div class="visual-box">
+                    <div class="visual-title">💡 Visual / Graphic Idea</div>
+                    <div class="visual-desc">
+                        <strong>แผนภาพ Input-Process-Output (IPO Diagram):</strong> แสดงความเชื่อมโยงโดยฝั่งซ้ายเป็น Business Requirements & Constraints นำเข้าสู่กล่องประมวลผล "Software Process Model" (ที่มีองค์ประกอบ People, Tools, Procedures) และส่งมอบผลลัพธ์ปลายทางเป็น High-Quality Software & Artifacts
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-card">
+                <div class="topic-header">
+                    <div class="topic-number">2</div>
+                    <h2>วงจรชีวิตการพัฒนาซอฟต์แวร์ (SDLC Core Phases)</h2>
+                </div>
+                
+                <ul class="bullet-list">
+                    <li><strong>1. Requirements Engineering:</strong> การรวบรวม วิเคราะห์ และจัดทำเอกสารข้อกำหนดความต้องการระบบ</li>
+                    <li><strong>2. System & Software Design:</strong> การออกแบบสถาปัตยกรรมระบบ (Architecture), โครงสร้างฐานข้อมูล (ERD), และ UI/UX (Wireframes/Prototypes)</li>
+                    <li><strong>3. Implementation (Coding):</strong> การพัฒนาโปรแกรมตามข้อกำหนด การเขียน Unit Test และการทำ Code Refactoring</li>
+                    <li><strong>4. Verification & Validation (Testing):</strong> การตรวจสอบความถูกต้อง 
+                        <br>&bull; <em>Verification:</em> "Are we building the product right?" (ตรงตามสเปกหรือไม่)
+                        <br>&bull; <em>Validation:</em> "Are we building the right product?" (ตอบโจทย์ผู้ใช้จริงหรือไม่)
+                    </li>
+                    <li><strong>5. Deployment & Maintenance:</strong> การนำระบบขึ้นใช้งานบน Production Environment การติดตามผล และการบำรุงรักษาระบบ</li>
+                </ul>
+
+                <div class="visual-box">
+                    <div class="visual-title">💡 Visual / Graphic Idea</div>
+                    <div class="visual-desc">
+                        <strong>แผนภาพวงกลม 5 ขั้นตอน (Circular SDLC Flow Diagram):</strong> แสดงสายงานพัฒนาที่เป็นวงรอบต่อเนื่อง พร้อมลูกศรเชื่อมโยงการย้อนกลับ (Feedback Loop) จากเฟส Testing และ Deployment กลับไปยังเฟส Requirements/Design เพื่อปรับปรุงแก้ไข
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-card">
+                <div class="topic-header">
+                    <div class="topic-number">3</div>
+                    <h2>ผลลัพธ์ในแต่ละขั้นตอน (Software Process Artifacts)</h2>
+                </div>
+                
+                <ul class="bullet-list">
+                    <li><span class="highlight-text">Requirements Artifacts:</span> เอกสารข้อกำหนดระบบ Software Requirements Specification (SRS), User Stories, Use Case Diagrams</li>
+                    <li><span class="highlight-text">Design Artifacts:</span> แผนผัง Architecture Diagram, Database Schema (ERD), API Specifications (OpenAPI / Swagger)</li>
+                    <li><span class="highlight-text">Implementation Artifacts:</span> Source Code (Clean Code), Unit Test Suite, Developer Documentation</li>
+                    <li><span class="highlight-text">Testing & Deployment Artifacts:</span> Test Cases, Test Summary Reports, Dockerfile, และ CI/CD Pipeline Configuration</li>
+                    <li><span class="highlight-text">ความสำคัญของ Artifacts:</span> ช่วยสร้างสื่อกลางความเข้าใจในทีม ลดความเสี่ยงเมื่อเปลี่ยนสมาชิกในทีม และใช้เป็นหลักฐานยืนยันความสมบูรณ์ในแต่ละเฟส</li>
+                </ul>
+
+                <div class="visual-box">
+                    <div class="visual-title">💡 Visual / Graphic Idea</div>
+                    <div class="visual-desc">
+                        <strong>ตาราง Matrix Artifacts Mapping:</strong> ตารางเปรียบเทียบ 2 คอลัมน์ ฝั่งซ้ายเป็นขั้นตอน SDLC พร้อมไอคอนประจำเฟส ฝั่งขวาเป็นรายการไฟล์/เอกสาร Artifacts เชิงรูปธรรมที่ต้องส่งมอบในเฟสนั้นๆ
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-card">
+                <div class="topic-header">
+                    <div class="topic-number">4</div>
+                    <h2>การเลือก Process Model (Context-Driven Model Selection)</h2>
+                </div>
+                
+                <ul class="bullet-list">
+                    <li><span class="highlight-text">หลักการ "No Silver Bullet":</span> ไม่มี Process Model ใดที่สมบูรณ์แบบที่สุดสำหรับทุกโครงการ การเลือกต้องพิจารณาจากบริบทเป็นหลัก</li>
+                    <li><strong>Traditional Models (Waterfall, V-Model):</strong> เหมาะกับโครงการที่ Requirements ชัดเจน ความเสี่ยงสูง และไม่เปลี่ยนบ่อย (เช่น ระบบการบิน, ระบบการแพทย์)</li>
+                    <li><strong>Iterative & Incremental Models:</strong> แบ่งส่งมอบงานเป็นงวดๆ เพื่อลดความเสี่ยงจากการส่งมอบแบบ Big Bang</li>
+                    <li><strong>Agile Process (Scrum, Kanban):</strong> เหมาะกับโครงการที่มีความเปลี่ยนแปลงสูง ต้องการความเร็ว (Time-to-Market) และรับ Feedback จากผู้ใช้ต่อเนื่อง</li>
+                    <li><strong>เกณฑ์การตัดสินใจ:</strong> ขนาดทีม, ความซับซ้อนของเทคโนโลยี, ระดับความชัดเจนของโจทย์, และระดับการมีส่วนร่วมของลูกค้า</li>
+                </ul>
+
+                <div class="visual-box">
+                    <div class="visual-title">💡 Visual / Graphic Idea</div>
+                    <div class="visual-desc">
+                        <strong>แผนภาพ Radar Chart / Decision Matrix:</strong> เปรียบเทียบ 3 รูปแบบโมเดล (Traditional, Iterative, Agile) ตาม 4 มิติหลัก ได้แก่ Requirement Stability, Project Scale, Risk Tolerance, และ Customer Involvement
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 (Call to Action / Workshop) -->
+            <section class="workshop-card">
+                <div class="topic-header" style="border-bottom-color: #bbf7d0;">
+                    <div class="topic-number" style="background: #166534;">5</div>
+                    <h2>กิจกรรมปิดท้าย (Call to Action): Workshop 1</h2>
+                </div>
+                
+                <h3 style="font-family: 'Kanit', sans-serif; font-size: 1.15rem; color: #15803d; margin-bottom: 0.5rem;">
+                    "SDLC Mapping & Case Study Breakdown"
+                </h3>
+                <p style="font-size: 0.975rem; color: #166534;">
+                    ให้นักศึกษาจับกลุ่ม (3-4 คน) ประยุกต์ใช้ความรู้เรื่อง SDLC เลือกกรณีศึกษา 1 โจทย์ แล้วทำการวิเคราะห์ร่วมกับการตั้งค่า GitHub Projects
+                </p>
+
+                <div class="case-grid">
+                    <div class="case-box">
+                        <h4>Case A: Food Delivery App</h4>
+                        <p style="font-size: 0.875rem; color: var(--text-muted);">ระบบสั่งอาหารและติดตามไรเดอร์แบบ Real-time (มีความเปลี่ยนแปลงสูง)</p>
+                    </div>
+                    <div class="case-box">
+                        <h4>Case B: Smart Farm IoT</h4>
+                        <p style="font-size: 0.875rem; color: var(--text-muted);">ระบบ IoT ควบคุมฟาร์มอัจฉริยะ (Hardware-Software Hybrid)</p>
+                    </div>
+                </div>
+
+                <h4 style="font-family: 'Kanit', sans-serif; color: #15803d; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1rem;">
+                    🎯 สิ่งที่ต้องส่งมอบในชั่วโมง (Group Deliverables):
+                </h4>
+                <ol class="deliverable-list">
+                    <li>เอกสารสรุปเหตุผลในการเลือก Process Model ที่เหมาะสมกับโจทย์</li>
+                    <li>รายการแผนผัง SDLC Artifacts ที่ต้องสร้างตลอดโครงการ</li>
+                    <li>ลิงก์ GitHub Project Board ที่สร้าง 3 User Stories แรกพร้อมสำหรับเริ่ม Sprint 1</li>
+                </ol>
+
+                <div class="visual-box" style="background: rgba(255, 255, 255, 0.7); border-color: #86efac; margin-top: 1.25rem;">
+                    <div class="visual-title" style="color: #15803d;">💡 Visual / Graphic Idea</div>
+                    <div class="visual-desc">
+                        <strong>Activity Card & Checklist Graphic:</strong> ภาพการ์ดโจทย์กิจกรรมคู่กับไอคอน Rocket และภาพจำลอง Kanban Board บน GitHub Projects พร้อมเครื่องหมาย Checkbox 3 ข้อของผลงานที่ต้องส่ง
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; Software Process Modeling Course — Computer Science & Software Engineering</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>
