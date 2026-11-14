@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software Process Models</title>
+    
+    <!-- Google Fonts (Kanit & Sarabun) -->
+    <link rel="preconnect" href="[suspicious link removed]">
+    <link rel="preconnect" href="[suspicious link removed]" crossorigin>
+    <link href="[suspicious link removed]" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.75);
+            --card-hover-bg: rgba(51, 65, 85, 0.9);
+            --primary-accent: #38bdf8;
+            --secondary-accent: #a855f7;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 1rem 2rem 1rem;
+            margin-bottom: 2rem;
+            background: radial-gradient(circle at center, rgba(56, 189, 248, 0.12) 0%, transparent 70%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-family: 'Kanit', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #38bdf8, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.5px;
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .module-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary-accent), var(--secondary-accent));
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            background: var(--card-hover-bg);
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 14px 28px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .module-card:hover::before {
+            opacity: 1;
+        }
+
+        .badge {
+            align-self: flex-start;
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--primary-accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: 'Kanit', sans-serif;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+
+        .module-card h2 {
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.3rem;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .module-card p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary-accent);
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .card-footer span.arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .module-card:hover .card-footer span.arrow {
+            transform: translateX(6px);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 2.1rem;
+            }
+            .module-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Software Process Models</h1>
+            <p class="subtitle">ศูนย์รวมเอกสารประกอบการสอน สไลด์บรรยาย และกิจกรรมการเรียนรู้ รายวิชาการจำลองแบบและกระบวนการพัฒนาซอฟต์แวร์</p>
+        </header>
+
+        <main class="module-grid">
+            
+            <!-- Module 1 -->
+            <a href="module1.html" class="module-card">
+                <div>
+                    <div class="badge">Module 01</div>
+                    <h2>Foundations of Software Engineering & SDLC</h2>
+                    <p>พื้นฐานกระบวนการทางวิศวกรรมซอฟต์แวร์ วงจรชีวิตการพัฒนา (SDLC Core Phases) และการบริหารจัดการ Artifacts ในแต่ละขั้นตอน</p>
+                </div>
+                <div class="card-footer">
+                    <span>เปิดสไลด์เรียนรู้</span>
+                    <span class="arrow">&rarr;</span>
+                </div>
+            </a>
+
+            <!-- Module 2 -->
+            <a href="module2.html" class="module-card">
+                <div>
+                    <div class="badge">Module 02</div>
+                    <h2>Traditional Software Process Models & Their Limitations</h2>
+                    <p>โมเดลแบบดั้งเดิม Waterfall Model, V-Model และการวิเคราะห์ข้อจำกัดทางปฏิบัติในอุตสาหกรรมยุคใหม่</p>
+                </div>
+                <div class="card-footer">
+                    <span>เปิดสไลด์เรียนรู้</span>
+                    <span class="arrow">&rarr;</span>
+                </div>
+            </a>
+
+            <!-- Module 3 -->
+            <a href="module3.html" class="module-card">
+                <div>
+                    <div class="badge">Module 03</div>
+                    <h2>Iterative & Incremental Process Models</h2>
+                    <p>แนวคิดการพัฒนาแบบทำซ้ำและเพิ่มพูน Prototyping Models และ Spiral Model เพื่อลดความเสี่ยงโครงการ</p>
+                </div>
+                <div class="card-footer">
+                    <span>เปิดสไลด์เรียนรู้</span>
+                    <span class="arrow">&rarr;</span>
+                </div>
+            </a>
+
+            <!-- Module 4 -->
+            <a href="module4.html" class="module-card">
+                <div>
+                    <div class="badge">Module 04</div>
+                    <h2>Agile Process Frameworks: Scrum & Kanban</h2>
+                    <p>กรอบการทำงานแบบอไจล์: สครัมและคันบัง การประยุกต์ใช้ Sprint, User Stories และ Definition of Done (DoD)</p>
+                </div>
+                <div class="card-footer">
+                    <span>เปิดสไลด์เรียนรู้</span>
+                    <span class="arrow">&rarr;</span>
+                </div>
+            </a>
+
+            <!-- Module 5 -->
+            <a href="module5.html" class="module-card">
+                <div>
+                    <div class="badge">Module 05</div>
+                    <h2>Software House Simulation & Modern Engineering Tooling</h2>
+                    <p>การจำลองสภาพแวดล้อม Software House การบริหารงานด้วย GitHub Projects, Issue Tracking, CI/CD และ Code Review</p>
+                </div>
+                <div class="card-footer">
+                    <span>เปิดสไลด์เรียนรู้</span>
+                    <span class="arrow">&rarr;</span>
+                </div>
+            </a>
+
+        </main>
+
+        <footer>
+            <p>&copy; Software Process Modeling Course — Computer Science & Software Engineering</p>
+        </footer>
+    </div>
+
+</body>
+</html>
