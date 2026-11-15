@@ -1,444 +1,2415 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Module 1: Foundations of Software Engineering & SDLC</title>
-    
-    <!-- Google Fonts (Kanit & Sarabun) -->
-    <link rel="preconnect" href="[suspicious link removed]">
-    <link rel="preconnect" href="[suspicious link removed]" crossorigin>
-    <link href="[suspicious link removed]" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --primary-accent: #0284c7;
-            --secondary-accent: #6d28d9;
-            --text-main: #0f172a;
-            --text-muted: #475569;
-            --border-color: #e2e8f0;
-            --badge-bg: #e0f2fe;
-            --badge-text: #0369a1;
-            --badge-border: #bae6fd;
-            --visual-bg: #f1f5f9;
-            --visual-border: #cbd5e1;
-            --cta-bg: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
-            --cta-border: #86efac;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.06);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="narrative">
+  <meta name="design-style" content="carbon">
+  <title>Module 1: พื้นฐานวิศวกรรมซอฟต์แวร์และวงจรชีวิตการพัฒนาระบบ (SDLC)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+      /* Page and surfaces (Carbon light) */
+      --background: #ffffff;
+      --surface-container-low: #f4f4f4;
+      --surface-container: #f4f4f4;
+      --surface-container-high: #e0e0e0;
 
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding: 2rem 1rem;
-            line-height: 1.7;
-        }
+      /* Ink */
+      --on-surface: #161616;
+      --on-surface-variant: #525252;
 
-        .container {
-            max-width: 960px;
-            margin: 0 auto;
-        }
+      /* Rules */
+      --outline: #8d8d8d;
+      --outline-variant: #e0e0e0;
 
-        /* Nav & Back Link */
-        .nav-header {
-            margin-bottom: 1.5rem;
-        }
+      /* Accents */
+      --primary: #0f62fe;
+      --primary-hover: #0353e9;
+      --on-primary: #ffffff;
+      --primary-container: #d0e2ff;
+      --on-primary-container: #161616;
+      --secondary: #6f6f6f;
+      --tertiary: #198038;
+      --tertiary-container: #defbe6;
+      --error: #da1e28;
+      --error-container: #fff1f1;
+      --on-error: #ffffff;
 
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary-accent);
-            text-decoration: none;
-            font-family: 'Kanit', sans-serif;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: transform 0.2s ease;
-        }
+      /* Data series */
+      --data-1: #0f62fe;
+      --data-2: #6929c4;
+      --data-3: #005d5d;
+      --data-4: #9f1853;
+      --data-context: #8d8d8d;
 
-        .back-link:hover {
-            transform: translateX(-4px);
-        }
+      /* Fonts */
+      --font-headline: 'Noto Sans Thai', 'IBM Plex Sans', sans-serif;
+      --font-body: 'Noto Sans Thai', 'IBM Plex Sans', sans-serif;
+      --font-label: 'Noto Sans Thai', 'IBM Plex Mono', monospace;
+      --font-mono: 'IBM Plex Mono', 'Noto Sans Thai', monospace;
 
-        /* Main Header */
-        header {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 2.5rem 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-sm);
-            position: relative;
-            overflow: hidden;
-        }
+      /* Shape */
+      --rounded: 0.125rem;
+      --rounded-lg: 0.25rem;
+      --rounded-full: 0.75rem;
 
-        header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
-        }
+      /* Style effects */
+      --shadow-1: 0 2px 6px rgb(0 0 0 / 0.1);
+      --shadow-2: 0 4px 12px rgb(0 0 0 / 0.12);
+      --rule: 1px solid var(--outline-variant);
+      --field-rule: 1px solid var(--outline);
+      --indicator: 2px solid var(--primary);
+      --indicator-success: 3px solid var(--tertiary);
+      --indicator-error: 3px solid var(--error);
+      --indicator-info: 3px solid var(--primary);
 
-        .module-tag {
-            display: inline-block;
-            background: var(--badge-bg);
-            color: var(--badge-text);
-            border: 1px solid var(--badge-border);
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            font-family: 'Kanit', sans-serif;
-            margin-bottom: 1rem;
-        }
+      /* Shared semantic tokens */
+      --positive: #198038;
+      --warning: #8a6100;
+      --warning-container: #fcf4d6;
+      --focus: var(--primary);
 
-        h1 {
-            font-family: 'Kanit', sans-serif;
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: var(--text-main);
-            line-height: 1.3;
-            margin-bottom: 0.75rem;
-        }
+      /* Type scale (Narrative) */
+      --display-size: clamp(2.125rem, 1.35rem + 2.6vw, 3.25rem);
+      --headline-size: clamp(1.5rem, 1.15rem + 1.3vw, 2.125rem);
+      --subhead-size: clamp(1.125rem, 1.02rem + 0.45vw, 1.375rem);
+      --body-size: clamp(1rem, 0.96rem + 0.18vw, 1.0625rem);
+      --label-size: 0.75rem;
 
-        .header-subtitle {
-            color: var(--text-muted);
-            font-size: 1.05rem;
-        }
+      /* Spacing scale (4pt base) */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
 
-        /* Content Sections */
-        .topic-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-sm);
-            transition: box-shadow 0.3s ease;
-        }
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
 
-        .topic-card:hover {
-            box-shadow: var(--shadow-md);
-        }
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
 
-        .topic-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.25rem;
-            border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 0.75rem;
-        }
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
 
-        .topic-number {
-            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
-            color: #ffffff;
-            font-family: 'Kanit', sans-serif;
-            font-weight: 700;
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
 
-        h2 {
-            font-family: 'Kanit', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: var(--text-main);
-        }
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
 
-        /* Bullet Points List */
-        .bullet-list {
-            list-style: none;
-            margin-bottom: 1.5rem;
-        }
+    /* Page layout */
+    .page-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-lg);
+    }
 
-        .bullet-list li {
-            position: relative;
-            padding-left: 1.75rem;
-            margin-bottom: 0.85rem;
-            font-size: 1rem;
-            color: var(--text-main);
-        }
+    .doc-header {
+      border-bottom: var(--rule);
+      padding-bottom: var(--space-xl);
+      margin-bottom: var(--space-xl);
+    }
 
-        .bullet-list li::before {
-            content: "•";
-            color: var(--primary-accent);
-            font-size: 1.5rem;
-            position: absolute;
-            left: 0.4rem;
-            top: -0.2rem;
-        }
+    .meta-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
 
-        .highlight-text {
-            color: var(--primary-accent);
-            font-weight: 600;
-        }
+    .mono-code {
+      font-family: var(--font-mono);
+      font-size: var(--label-size);
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+    }
 
-        /* Visual Graphic Idea Box */
-        .visual-box {
-            background-color: var(--visual-bg);
-            border: 1px dashed var(--visual-border);
-            border-radius: 12px;
-            padding: 1.25rem 1.5rem;
-            margin-top: 1rem;
-        }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      height: 24px;
+      padding: 0 var(--space-sm);
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border-radius: var(--rounded-full);
+      font-size: var(--label-size);
+      font-weight: 500;
+      line-height: 1;
+    }
 
-        .visual-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: 'Kanit', sans-serif;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: #0369a1;
-            margin-bottom: 0.5rem;
-        }
+    .tag--neutral {
+      background: var(--surface-container-high);
+      color: var(--on-surface);
+    }
 
-        .visual-desc {
-            font-size: 0.925rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
+    .tag--positive {
+      background: var(--tertiary-container);
+      color: var(--on-surface);
+    }
 
-        /* Workshop Call to Action Section */
-        .workshop-card {
-            background: var(--cta-bg);
-            border: 2px solid var(--cta-border);
-            border-radius: 16px;
-            padding: 2.25rem 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-md);
-        }
+    .headline-display {
+      font-family: var(--font-headline);
+      font-size: var(--display-size);
+      font-weight: 300;
+      line-height: 1.18;
+      letter-spacing: 0;
+      margin: 0 0 var(--space-md) 0;
+      max-width: 24ch;
+    }
 
-        .workshop-card h2 {
-            color: #15803d;
-            margin-bottom: 1rem;
-        }
+    .headline-display strong {
+      font-weight: 600;
+    }
 
-        .case-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
-            margin: 1.25rem 0;
-        }
+    .lede {
+      font-size: var(--subhead-size);
+      color: var(--on-surface-variant);
+      max-width: 65ch;
+      margin: 0 0 var(--space-lg) 0;
+      line-height: 1.55;
+    }
 
-        .case-box {
-            background: rgba(255, 255, 255, 0.85);
-            border: 1px solid #bbf7d0;
-            border-radius: 10px;
-            padding: 1rem 1.25rem;
-        }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+      gap: var(--space-md);
+      margin-top: var(--space-lg);
+    }
 
-        .case-box h4 {
-            font-family: 'Kanit', sans-serif;
-            color: #166534;
-            margin-bottom: 0.4rem;
-            font-size: 1rem;
-        }
+    .layer {
+      background: var(--surface-container);
+      border-radius: 0;
+      padding: var(--space-md);
+    }
 
-        .deliverable-list {
-            margin-left: 1.25rem;
-            font-size: 0.95rem;
-            color: var(--text-main);
-        }
+    .layer .layer {
+      background: var(--surface-container-high);
+    }
 
-        .deliverable-list li {
-            margin-bottom: 0.5rem;
-        }
+    .key-tile {
+      border-bottom: var(--indicator);
+    }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border-color);
-            color: var(--text-muted);
-            font-size: 0.875rem;
-        }
-    </style>
+    .label-th {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 600;
+      color: var(--on-surface-variant);
+      letter-spacing: 0;
+      text-transform: none;
+      margin-bottom: var(--space-xs);
+      display: block;
+    }
+
+    .key-value {
+      font-family: var(--font-mono);
+      font-weight: 300;
+      font-size: 1.75rem;
+      line-height: 1.2;
+      color: var(--on-surface);
+      margin: var(--space-xs) 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .helper-text {
+      font-size: 0.875rem;
+      color: var(--on-surface-variant);
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    /* Two-column documentation grid */
+    .page-grid {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: var(--space-xl);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0;
+      align-items: start;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Sidebar TOC */
+    .doc-aside {
+      border-right: var(--rule);
+      padding-right: var(--space-lg);
+    }
+
+    .aside-title {
+      font-size: var(--label-size);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--on-surface-variant);
+      margin: 0 0 var(--space-sm) 0;
+    }
+
+    .side-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 var(--space-lg) 0;
+    }
+
+    .side-nav li + li {
+      border-top: var(--rule);
+    }
+
+    .side-nav a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-sm);
+      color: var(--on-surface-variant);
+      font-size: 0.9375rem;
+      border-left: 2px solid transparent;
+      min-height: 44px;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+    }
+
+    .side-nav a:hover {
+      background: var(--surface-container);
+      color: var(--on-surface);
+      text-decoration: none;
+    }
+
+    .side-nav a.is-active {
+      border-left: var(--indicator);
+      color: var(--on-surface);
+      font-weight: 600;
+      background: var(--surface-container);
+    }
+
+    .mobile-jump-nav {
+      display: none;
+      margin-bottom: var(--space-lg);
+      padding: var(--space-sm) 0;
+      border-top: var(--rule);
+      border-bottom: var(--rule);
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+    }
+
+    .mobile-jump-nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 var(--space-sm);
+      background: var(--surface-container);
+      color: var(--on-surface);
+      font-size: 0.875rem;
+    }
+
+    /* Main content sections */
+    .doc-main {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2xl);
+    }
+
+    .lecture-section {
+      padding-bottom: var(--space-xl);
+      border-bottom: var(--rule);
+    }
+
+    .lecture-section:last-of-type {
+      border-bottom: 0;
+    }
+
+    .section-head {
+      border-bottom: var(--rule);
+      padding-bottom: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+
+    .section-kicker {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--primary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .section-title {
+      font-family: var(--font-headline);
+      font-size: var(--headline-size);
+      font-weight: 300;
+      line-height: 1.22;
+      margin: 0;
+    }
+
+    .section-title strong {
+      font-weight: 600;
+    }
+
+    .sub-title {
+      font-family: var(--font-headline);
+      font-size: var(--subhead-size);
+      font-weight: 600;
+      line-height: 1.3;
+      margin: var(--space-lg) 0 var(--space-sm) 0;
+      color: var(--on-surface);
+    }
+
+    .prose {
+      max-width: 65ch;
+      margin: 0 0 var(--space-md) 0;
+      color: var(--on-surface);
+    }
+
+    .prose strong {
+      font-weight: 600;
+    }
+
+    /* Grids */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+      gap: var(--space-md);
+      margin: var(--space-md) 0;
+    }
+
+    .split-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+      margin: var(--space-md) 0;
+    }
+
+    .split-grid--equal {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Notifications & Callouts */
+    .notice {
+      background: var(--surface-container);
+      border-left: var(--indicator-info);
+      padding: var(--space-md);
+      margin: var(--space-md) 0;
+    }
+
+    .notice--success {
+      border-left: var(--indicator-success);
+    }
+
+    .notice--error {
+      border-left: var(--indicator-error);
+    }
+
+    .notice-title {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-weight: 600;
+      margin: 0 0 var(--space-xs) 0;
+    }
+
+    /* Hairline list */
+    .ruled-list {
+      list-style: none;
+      padding: 0;
+      margin: var(--space-md) 0;
+    }
+
+    .ruled-list > li {
+      padding: var(--space-sm) 0;
+    }
+
+    .ruled-list > li + li {
+      border-top: var(--rule);
+    }
+
+    /* Cost ratio visual */
+    .ratio-bar {
+      display: flex;
+      height: 36px;
+      width: 100%;
+      margin: var(--space-sm) 0;
+      background: var(--surface-container-high);
+    }
+
+    .ratio-seg {
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-sm);
+      font-family: var(--font-mono);
+      font-size: var(--label-size);
+      font-weight: 500;
+      color: var(--on-primary);
+    }
+
+    .ratio-seg--dev {
+      width: 60%;
+      background: var(--data-1);
+    }
+
+    .ratio-seg--test {
+      width: 40%;
+      background: var(--data-2);
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+      margin: var(--space-md) 0;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: 0;
+      border: 1px solid transparent;
+      font-weight: 400;
+      cursor: pointer;
+      background: var(--primary);
+      color: var(--on-primary);
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn--secondary {
+      background: transparent;
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .btn--secondary:hover:not(:disabled) {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+
+    .btn--ghost {
+      background: var(--surface-container);
+      color: var(--on-surface);
+      border-color: var(--outline-variant);
+    }
+
+    .btn--ghost:hover:not(:disabled) {
+      background: var(--surface-container-high);
+    }
+
+    .btn--danger {
+      background: transparent;
+      color: var(--error);
+      border-color: var(--error);
+    }
+
+    .btn--danger:hover:not(:disabled) {
+      background: var(--error-container);
+    }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      border-bottom: var(--rule);
+      margin: var(--space-md) 0;
+    }
+
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      background: transparent;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      font-weight: 400;
+      transition: color var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out);
+    }
+
+    .tab-btn:hover {
+      color: var(--on-surface);
+      background: var(--surface-container);
+    }
+
+    .tab-btn.is-active {
+      color: var(--on-surface);
+      font-weight: 600;
+      border-bottom: var(--indicator);
+    }
+
+    /* Tables */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin: var(--space-md) 0;
+      border-top: var(--rule);
+      border-bottom: var(--rule);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9375rem;
+    }
+
+    th {
+      background: var(--surface-container-high);
+      color: var(--on-surface);
+      font-weight: 600;
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--outline);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: var(--space-sm) var(--space-md);
+      border-top: var(--rule);
+      vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) {
+      background: var(--surface-container);
+    }
+
+    tbody tr.is-selected {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+
+    .num-col {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* SDLC Interactive Phase Grid */
+    .sdlc-diagram-wrap {
+      background: var(--surface-container);
+      padding: var(--space-md);
+      margin: var(--space-md) 0;
+    }
+
+    .sdlc-node-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+
+    .sdlc-node {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+      padding: var(--space-sm) var(--space-md);
+      min-height: 76px;
+      background: var(--background);
+      border: 1px solid var(--outline-variant);
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+
+    .sdlc-node:hover {
+      background: var(--surface-container-high);
+    }
+
+    .sdlc-node.is-active {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border-color: var(--primary);
+      border-bottom: var(--indicator);
+    }
+
+    .sdlc-node-num {
+      font-family: var(--font-mono);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      margin-bottom: var(--space-xs);
+    }
+
+    .sdlc-node.is-active .sdlc-node-num {
+      color: var(--on-primary-container);
+      font-weight: 600;
+    }
+
+    .sdlc-node-title {
+      font-weight: 600;
+      font-size: 0.9375rem;
+      line-height: 1.3;
+    }
+
+    /* Form Controls */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+      gap: var(--space-md);
+      align-items: end;
+      margin: var(--space-md) 0;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .field-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--on-surface-variant);
+    }
+
+    .field-input, .field-select, .field-textarea {
+      width: 100%;
+      background: var(--surface-container);
+      border: 0;
+      border-bottom: var(--field-rule);
+      border-radius: 0;
+      padding: var(--space-sm) var(--space-md);
+      min-height: 44px;
+      color: var(--on-surface);
+    }
+
+    .field-select {
+      padding-right: var(--space-xl);
+    }
+
+    .field-textarea {
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .field-input:focus, .field-select:focus, .field-textarea:focus {
+      outline: 2px solid var(--focus);
+      outline-offset: -2px;
+      background: var(--background);
+    }
+
+    /* Checkbox rows */
+    .check-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      margin: var(--space-sm) 0;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      padding: var(--space-sm);
+      background: var(--background);
+      border: var(--rule);
+      cursor: pointer;
+      min-height: 44px;
+    }
+
+    .check-item input[type="checkbox"],
+    .check-item input[type="radio"] {
+      width: 20px;
+      height: 20px;
+      margin: 2px 0 0 0;
+      accent-color: var(--primary);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    /* Collapsible details */
+    details.carbon-details {
+      background: var(--surface-container);
+      border-top: var(--rule);
+      border-bottom: var(--rule);
+      margin: var(--space-md) 0;
+    }
+
+    details.carbon-details summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md);
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+      list-style: none;
+    }
+
+    details.carbon-details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.carbon-details[open] summary {
+      border-bottom: var(--rule);
+      background: var(--surface-container-high);
+    }
+
+    .details-body {
+      padding: var(--space-md);
+    }
+
+    /* Chart container */
+    .chart-box {
+      position: relative;
+      width: 100%;
+      min-height: 320px;
+      height: 320px;
+      background: var(--background);
+      padding: var(--space-md);
+      border: var(--rule);
+    }
+
+    /* Quiz styles */
+    .quiz-card {
+      background: var(--surface-container);
+      padding: var(--space-md);
+      margin-bottom: var(--space-md);
+      border-left: 3px solid var(--outline);
+    }
+
+    .quiz-card.is-correct {
+      border-left: var(--indicator-success);
+    }
+
+    .quiz-card.is-wrong {
+      border-left: var(--indicator-error);
+    }
+
+    .quiz-feedback {
+      margin-top: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--background);
+      font-size: 0.9375rem;
+    }
+
+    /* Progress bar */
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: var(--surface-container-high);
+      margin: var(--space-xs) 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width var(--dur-short) var(--ease-out);
+    }
+
+    /* Footer */
+    .doc-footer {
+      margin-top: var(--space-2xl);
+      padding-top: var(--space-lg);
+      border-top: var(--rule);
+      color: var(--on-surface-variant);
+      font-size: 0.875rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 900px) {
+      .page-grid {
+        grid-template-columns: 1fr;
+      }
+      .doc-aside {
+        display: none;
+      }
+      .mobile-jump-nav {
+        display: flex;
+      }
+      .split-grid,
+      .split-grid--equal {
+        grid-template-columns: 1fr;
+      }
+      .sdlc-node-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        padding: var(--space-md);
+      }
+      .page-grid {
+        grid-template-columns: 1fr;
+      }
+      aside {
+        display: none;
+      }
+      .sdlc-node-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="page-shell">
+    <!-- Document Header -->
+    <header class="doc-header">
+      <div class="meta-strip">
+        <span class="mono-code">CS-SE // MODULE 01</span>
+        <span class="tag">ระดับปริญญาตรี วิทยาการคอมพิวเตอร์</span>
+        <span class="tag tag--neutral">Lecture &amp; Hands-on Workshop</span>
+        <span class="tag tag--positive" id="header-progress-badge">ความคืบหน้า: 0%</span>
+      </div>
 
-    <div class="container">
-        
-        <!-- Navigation Header -->
-        <nav class="nav-header">
-            <a href="index.html" class="back-link">&larr; กลับหน้าหลัก Software Process Models</a>
-        </nav>
+      <h1 class="headline-display">
+        Module 1: <strong>พื้นฐานวิศวกรรมซอฟต์แวร์</strong>และวงจรชีวิตการพัฒนาระบบ (SDLC)
+      </h1>
 
-        <!-- Page Main Title -->
-        <header>
-            <span class="module-tag">Module 01</span>
-            <h1>Foundations of Software Engineering & SDLC</h1>
-            <p class="header-subtitle">เนื้อหาบทเรียน เอกสารประกอบการสอน และกิจกรรมปฏิบัติการ สำหรับนักศึกษาปริญญาตรี</p>
-        </header>
+      <p class="lede">
+        ทำความเข้าใจความแตกต่างระหว่างการเขียนโปรแกรมกับการสร้างระบบซอฟต์แวร์ระดับมืออาชีพ
+        โครงสร้างของวงจรชีวิตการพัฒนาซอฟต์แวร์ (SDLC) เอกสารและผลผลิตในกระบวนการ
+        หลักการเลือก Process Model ให้เหมาะกับบริบทโครงงาน พร้อมปฏิบัติการวิเคราะห์กรณีศึกษาจริง
+      </p>
 
-        <!-- Main Content Sections -->
-        <main>
+      <div class="kpi-strip">
+        <div class="layer key-tile">
+          <span class="label-th">กิจกรรมพื้นฐานร่วมกัน</span>
+          <div class="key-value">4</div>
+          <p class="helper-text">Specification · Development · Validation · Evolution</p>
+        </div>
+        <div class="layer key-tile">
+          <span class="label-th">ระยะของ SDLC เต็มรูปแบบ</span>
+          <div class="key-value">8</div>
+          <p class="helper-text">ตั้งแต่ Conception จนถึง Maintenance และ Retirement</p>
+        </div>
+        <div class="layer key-tile">
+          <span class="label-th">สัดส่วนต้นทุนโดยประมาณ</span>
+          <div class="key-value">60 / 40</div>
+          <p class="helper-text">Development ~60% · Testing ~40% (ไม่รวม Evolution)</p>
+        </div>
+        <div class="layer key-tile">
+          <span class="label-th">คุณลักษณะซอฟต์แวร์ที่ดี</span>
+          <div class="key-value">4</div>
+          <p class="helper-text">Maintainability · Dependability · Efficiency · Acceptability</p>
+        </div>
+      </div>
+    </header>
 
-            <!-- Topic 1 -->
-            <section class="topic-card">
-                <div class="topic-header">
-                    <div class="topic-number">1</div>
-                    <h2>นิยามและความสำคัญของ Software Process & Modeling</h2>
-                </div>
-                
-                <ul class="bullet-list">
-                    <li><span class="highlight-text">Software Process:</span> ชุดกิจกรรม (Activities), บทบาทหน้าที่ (Roles), และผลลัพธ์ (Artifacts) ที่เรียงต่อกันอย่างมีระบบ เพื่อสร้าง ปรับปรุง และดูแลรักษาผลิตภัณฑ์ซอฟต์แวร์</li>
-                    <li><span class="highlight-text">Software Process Modeling:</span> การสร้างแบบจำลองของกระบวนการเพื่อช่วยในการทำความเข้าใจ วิเคราะห์ ประเมินความเสี่ยง และปรับปรุงการทำงานอย่างต่อเนื่อง</li>
-                    <li><span class="highlight-text">Why Process Matters:</span> เป็นกลไกสำคัญในการควบคุมคุณภาพ (Quality), ต้นทุนการผลิต (Cost), และระยะเวลาส่งมอบ (Schedule) ตามสามเหลี่ยมบริหารโครงการ (Triple Constraint)</li>
-                    <li><span class="highlight-text">The Engineering Paradox:</span> ซอฟต์แวร์คุณภาพดีไม่ได้เกิดจากความขยันเฉพาะบุคคล แต่เกิดจากกระบวนการพัฒนาที่มีประสิทธิภาพและซ้ำเดิมได้ (Repeatable & Scalable)</li>
-                </ul>
+    <!-- Mobile Jump Nav -->
+    <nav class="mobile-jump-nav" aria-label="สารบัญบทเรียนสำหรับหน้าจอเล็ก">
+      <a href="#sec-definitions">1. นิยามวิศวกรรมซอฟต์แวร์</a>
+      <a href="#sec-sdlc">2. แกนหลัก SDLC</a>
+      <a href="#sec-artifacts">3. ผลผลิตและมาตรฐาน</a>
+      <a href="#sec-models">4. การเลือก Process Model</a>
+      <a href="#sec-workshop">5. Hands-on Workshop</a>
+    </nav>
 
-                <div class="visual-box">
-                    <div class="visual-title">💡 Visual / Graphic Idea</div>
-                    <div class="visual-desc">
-                        <strong>แผนภาพ Input-Process-Output (IPO Diagram):</strong> แสดงความเชื่อมโยงโดยฝั่งซ้ายเป็น Business Requirements & Constraints นำเข้าสู่กล่องประมวลผล "Software Process Model" (ที่มีองค์ประกอบ People, Tools, Procedures) และส่งมอบผลลัพธ์ปลายทางเป็น High-Quality Software & Artifacts
-                    </div>
-                </div>
-            </section>
+    <div class="page-grid">
+      <!-- Sidebar TOC -->
+      <aside class="doc-aside" aria-label="สารบัญบทเรียน">
+        <p class="aside-title">Module 01 // Index</p>
+        <ul class="side-nav" id="toc-list">
+          <li><a href="#sec-definitions" class="is-active" data-target="sec-definitions">1. นิยามและขอบเขตวิชาชีพ</a></li>
+          <li><a href="#sec-sdlc" data-target="sec-sdlc">2. วงจรชีวิต SDLC 8 ระยะ</a></li>
+          <li><a href="#sec-artifacts" data-target="sec-artifacts">3. Process Artifacts &amp; มาตรฐาน</a></li>
+          <li><a href="#sec-models" data-target="sec-models">4. การเลือก Process Model</a></li>
+          <li><a href="#sec-workshop" data-target="sec-workshop">5. ปฏิบัติการ Workshop</a></li>
+        </ul>
 
-            <!-- Topic 2 -->
-            <section class="topic-card">
-                <div class="topic-header">
-                    <div class="topic-number">2</div>
-                    <h2>วงจรชีวิตการพัฒนาซอฟต์แวร์ (SDLC Core Phases)</h2>
-                </div>
-                
-                <ul class="bullet-list">
-                    <li><strong>1. Requirements Engineering:</strong> การรวบรวม วิเคราะห์ และจัดทำเอกสารข้อกำหนดความต้องการระบบ</li>
-                    <li><strong>2. System & Software Design:</strong> การออกแบบสถาปัตยกรรมระบบ (Architecture), โครงสร้างฐานข้อมูล (ERD), และ UI/UX (Wireframes/Prototypes)</li>
-                    <li><strong>3. Implementation (Coding):</strong> การพัฒนาโปรแกรมตามข้อกำหนด การเขียน Unit Test และการทำ Code Refactoring</li>
-                    <li><strong>4. Verification & Validation (Testing):</strong> การตรวจสอบความถูกต้อง 
-                        <br>&bull; <em>Verification:</em> "Are we building the product right?" (ตรงตามสเปกหรือไม่)
-                        <br>&bull; <em>Validation:</em> "Are we building the right product?" (ตอบโจทย์ผู้ใช้จริงหรือไม่)
-                    </li>
-                    <li><strong>5. Deployment & Maintenance:</strong> การนำระบบขึ้นใช้งานบน Production Environment การติดตามผล และการบำรุงรักษาระบบ</li>
-                </ul>
+        <div class="layer">
+          <span class="label-th">ความคืบหน้า Workshop</span>
+          <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="aside-progress-bar">
+            <div class="progress-fill" id="aside-progress-fill"></div>
+          </div>
+          <p class="helper-text" id="aside-progress-text">ยังไม่มีรายการที่บันทึก — เริ่มทำ Workshop ในส่วนที่ 5 ได้ทันที</p>
+        </div>
 
-                <div class="visual-box">
-                    <div class="visual-title">💡 Visual / Graphic Idea</div>
-                    <div class="visual-desc">
-                        <strong>แผนภาพวงกลม 5 ขั้นตอน (Circular SDLC Flow Diagram):</strong> แสดงสายงานพัฒนาที่เป็นวงรอบต่อเนื่อง พร้อมลูกศรเชื่อมโยงการย้อนกลับ (Feedback Loop) จากเฟส Testing และ Deployment กลับไปยังเฟส Requirements/Design เพื่อปรับปรุงแก้ไข
-                    </div>
-                </div>
-            </section>
+        <div class="layer" style="margin-top: var(--space-md);">
+          <span class="label-th">วัตถุประสงค์การเรียนรู้</span>
+          <ul class="ruled-list" style="margin: 0; font-size: 0.875rem;">
+            <li>แยกแยะ Programming, Software Development และ Software Engineering ได้</li>
+            <li>อธิบายความสัมพันธ์ของ 4 กิจกรรมหลักกับ 8 ระยะใน SDLC ได้</li>
+            <li>ระบุ Artifacts, Roles และ Pre/Postconditions ของกระบวนการได้</li>
+            <li>เลือก Process Model ที่เหมาะสมกับข้อจำกัดของระบบจริงได้</li>
+          </ul>
+        </div>
+      </aside>
 
-            <!-- Topic 3 -->
-            <section class="topic-card">
-                <div class="topic-header">
-                    <div class="topic-number">3</div>
-                    <h2>ผลลัพธ์ในแต่ละขั้นตอน (Software Process Artifacts)</h2>
-                </div>
-                
-                <ul class="bullet-list">
-                    <li><span class="highlight-text">Requirements Artifacts:</span> เอกสารข้อกำหนดระบบ Software Requirements Specification (SRS), User Stories, Use Case Diagrams</li>
-                    <li><span class="highlight-text">Design Artifacts:</span> แผนผัง Architecture Diagram, Database Schema (ERD), API Specifications (OpenAPI / Swagger)</li>
-                    <li><span class="highlight-text">Implementation Artifacts:</span> Source Code (Clean Code), Unit Test Suite, Developer Documentation</li>
-                    <li><span class="highlight-text">Testing & Deployment Artifacts:</span> Test Cases, Test Summary Reports, Dockerfile, และ CI/CD Pipeline Configuration</li>
-                    <li><span class="highlight-text">ความสำคัญของ Artifacts:</span> ช่วยสร้างสื่อกลางความเข้าใจในทีม ลดความเสี่ยงเมื่อเปลี่ยนสมาชิกในทีม และใช้เป็นหลักฐานยืนยันความสมบูรณ์ในแต่ละเฟส</li>
-                </ul>
+      <!-- Main Content Column -->
+      <main class="doc-main">
 
-                <div class="visual-box">
-                    <div class="visual-title">💡 Visual / Graphic Idea</div>
-                    <div class="visual-desc">
-                        <strong>ตาราง Matrix Artifacts Mapping:</strong> ตารางเปรียบเทียบ 2 คอลัมน์ ฝั่งซ้ายเป็นขั้นตอน SDLC พร้อมไอคอนประจำเฟส ฝั่งขวาเป็นรายการไฟล์/เอกสาร Artifacts เชิงรูปธรรมที่ต้องส่งมอบในเฟสนั้นๆ
-                    </div>
-                </div>
-            </section>
+        <!-- SECTION 1: Software Engineering Definitions -->
+        <section id="sec-definitions" class="lecture-section">
+          <div class="section-head">
+            <span class="section-kicker">Section 01 // Foundations</span>
+            <h2 class="section-title">
+              ซอฟต์แวร์ไม่ได้มีแค่โค้ด: <strong>นิยามและขอบเขตของวิศวกรรมซอฟต์แวร์</strong>
+            </h2>
+          </div>
 
-            <!-- Topic 4 -->
-            <section class="topic-card">
-                <div class="topic-header">
-                    <div class="topic-number">4</div>
-                    <h2>การเลือก Process Model (Context-Driven Model Selection)</h2>
-                </div>
-                
-                <ul class="bullet-list">
-                    <li><span class="highlight-text">หลักการ "No Silver Bullet":</span> ไม่มี Process Model ใดที่สมบูรณ์แบบที่สุดสำหรับทุกโครงการ การเลือกต้องพิจารณาจากบริบทเป็นหลัก</li>
-                    <li><strong>Traditional Models (Waterfall, V-Model):</strong> เหมาะกับโครงการที่ Requirements ชัดเจน ความเสี่ยงสูง และไม่เปลี่ยนบ่อย (เช่น ระบบการบิน, ระบบการแพทย์)</li>
-                    <li><strong>Iterative & Incremental Models:</strong> แบ่งส่งมอบงานเป็นงวดๆ เพื่อลดความเสี่ยงจากการส่งมอบแบบ Big Bang</li>
-                    <li><strong>Agile Process (Scrum, Kanban):</strong> เหมาะกับโครงการที่มีความเปลี่ยนแปลงสูง ต้องการความเร็ว (Time-to-Market) และรับ Feedback จากผู้ใช้ต่อเนื่อง</li>
-                    <li><strong>เกณฑ์การตัดสินใจ:</strong> ขนาดทีม, ความซับซ้อนของเทคโนโลยี, ระดับความชัดเจนของโจทย์, และระดับการมีส่วนร่วมของลูกค้า</li>
-                </ul>
+          <p class="prose">
+            นักศึกษาวิทยาการคอมพิวเตอร์มักคุ้นเคยกับการเขียนโปรแกรมเพื่อแก้โจทย์รายวิชาด้วยตัวคนเดียว
+            แต่ในโลกอุตสาหกรรม <strong>ซอฟต์แวร์ระดับมืออาชีพ (Professional Software)</strong>
+            ถูกสร้างขึ้นเพื่อให้ผู้อื่นใช้งาน พัฒนาร่วมกันเป็นทีม และต้องดูแลปรับปรุงต่อเนื่องตลอดอายุการใช้งาน
+            ดังนั้นคำว่า “ซอฟต์แวร์” ในทางวิศวกรรมจึงไม่ได้หมายถึงเพียงตัวโปรแกรม (Computer Programs)
+            แต่รวมถึงเอกสารระบบ (System Documentation) คู่มือผู้ใช้ (User Documentation) ไลบรารี
+            ข้อมูลการตั้งค่า (Configuration Data) และระบบสนับสนุนที่ทำให้ซอฟต์แวร์นั้นทำงานได้อย่างสมบูรณ์
+          </p>
 
-                <div class="visual-box">
-                    <div class="visual-title">💡 Visual / Graphic Idea</div>
-                    <div class="visual-desc">
-                        <strong>แผนภาพ Radar Chart / Decision Matrix:</strong> เปรียบเทียบ 3 รูปแบบโมเดล (Traditional, Iterative, Agile) ตาม 4 มิติหลัก ได้แก่ Requirement Stability, Project Scale, Risk Tolerance, และ Customer Involvement
-                    </div>
-                </div>
-            </section>
+          <h3 class="sub-title">1.1 เปรียบเทียบระดับขอบเขต: Programming vs. Development vs. Engineering</h3>
+          <p class="prose">
+            ตามกรอบแนวคิดของ Dooley &amp; Kazakova (2024) และ Sommerville (2016) เราสามารถแบ่งขอบเขตงานออกเป็น 3 ระดับที่ซ้อนทับกัน
+            และเทียบเคียงกับศาสตร์ข้างเคียงอย่าง Computer Science และ Systems Engineering ได้ดังตารางต่อไปนี้
+          </p>
 
-            <!-- Topic 5 (Call to Action / Workshop) -->
-            <section class="workshop-card">
-                <div class="topic-header" style="border-bottom-color: #bbf7d0;">
-                    <div class="topic-number" style="background: #166534;">5</div>
-                    <h2>กิจกรรมปิดท้าย (Call to Action): Workshop 1</h2>
-                </div>
-                
-                <h3 style="font-family: 'Kanit', sans-serif; font-size: 1.15rem; color: #15803d; margin-bottom: 0.5rem;">
-                    "SDLC Mapping & Case Study Breakdown"
-                </h3>
-                <p style="font-size: 0.975rem; color: #166534;">
-                    ให้นักศึกษาจับกลุ่ม (3-4 คน) ประยุกต์ใช้ความรู้เรื่อง SDLC เลือกกรณีศึกษา 1 โจทย์ แล้วทำการวิเคราะห์ร่วมกับการตั้งค่า GitHub Projects
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>แนวคิด / ศาสตร์</th>
+                  <th>จุดเน้นหลัก (Core Focus)</th>
+                  <th>ขอบเขตความรับผิดชอบ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Programming</strong></td>
+                  <td>การแปลงอัลกอริทึมเป็นโค้ด</td>
+                  <td>เป็นเพียงส่วน Implementation หรือส่วนหนึ่งของการออกแบบและเขียนโค้ด (Coding &amp; Debugging)</td>
+                </tr>
+                <tr>
+                  <td><strong>Software Development</strong></td>
+                  <td>การสร้างตัวผลิตภัณฑ์ซอฟต์แวร์</td>
+                  <td>รับความต้องการจากผู้ใช้ วิเคราะห์ ออกแบบ เขียนโค้ด ทดสอบ และปล่อยรุ่น (Requirements → Release)</td>
+                </tr>
+                <tr>
+                  <td><strong>Software Engineering</strong></td>
+                  <td>การผลิตอย่างเป็นระบบภายใต้ข้อจำกัด</td>
+                  <td>ครอบคลุม Software Development ทั้งหมด <strong>บวกกับ</strong> การบริหารโครงการ การจัดการการเปลี่ยนแปลง (CM) การประเมินต้นทุน-เวลา และการบริหารทีม</td>
+                </tr>
+                <tr>
+                  <td><strong>Computer Science</strong></td>
+                  <td>ทฤษฎีและพื้นฐานการคำนวณ</td>
+                  <td>เน้นทฤษฎี โครงสร้างข้อมูล อัลกอริทึม และภาษาคอมพิวเตอร์ ซึ่งมักพิสูจน์ได้ดีในโปรแกรมขนาดเล็ก</td>
+                </tr>
+                <tr>
+                  <td><strong>Systems Engineering</strong></td>
+                  <td>ระบบเชิงสังคม-เทคนิคทั้งองค์กร</td>
+                  <td>ออกแบบทั้ง Hardware, Software, นโยบาย (Policy) และกระบวนการทำงานของมนุษย์ (Sociotechnical System)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="sub-title">1.2 ประเภทของผลิตภัณฑ์ซอฟต์แวร์และสัดส่วนต้นทุน</h3>
+          <div class="split-grid">
+            <div>
+              <p class="prose">
+                ในมุมมองของการจัดจ้างและการควบคุมความต้องการ ผลิตภัณฑ์ซอฟต์แวร์แบ่งออกเป็น 2 กลุ่มหลัก:
+              </p>
+              <ul class="ruled-list">
+                <li>
+                  <strong>1. Generic Products (ผลิตภัณฑ์ทั่วไป)</strong> — ระบบแบบ Stand-alone ที่องค์กรพัฒนาเพื่อวางขายในตลาดเปิด
+                  เช่น แอปพลิเคชันมือถือ โปรแกรมฐานข้อมูล โปรแกรมสำนักงาน หรือระบบเฉพาะทางสำหรับตลาดเฉพาะกลุ่ม (เช่น ระบบคลินิกทันตกรรม)
+                  <em>ผู้พัฒนาเป็นผู้ควบคุม Specification</em> หากติดปัญหาสามารถปรับขอบเขตฟีเจอร์ได้
+                </li>
+                <li>
+                  <strong>2. Customized / Bespoke Software (ซอฟต์แวร์สั่งทำเฉพาะ)</strong> — ระบบที่พัฒนาขึ้นตามคำสั่งของลูกค้าเฉพาะราย
+                  เช่น ระบบควบคุมอุปกรณ์อิเล็กทรอนิกส์ หรือระบบควบคุมการจราจรทางอากาศ
+                  <em>ลูกค้าเป็นผู้กำหนดและควบคุม Specification</em> ทีมพัฒนาต้องสร้างให้ตรงตามข้อกำหนดนั้น
+                </li>
+              </ul>
+              <div class="notice">
+                <p class="notice-title">
+                  <i data-lucide="layers" aria-hidden="true" width="18" height="18"></i>
+                  แนวโน้มแบบลูกผสม (Hybrid ERP Systems)
                 </p>
+                <p class="helper-text">
+                  ปัจจุบันเส้นแบ่งทั้งสองเริ่มเลือนลง ระบบองค์กรขนาดใหญ่จำนวนมาก (เช่น SAP หรือ Oracle ERP)
+                  ใช้ Generic Product เป็นฐาน แล้วนำมาปรับแต่ง (Configure) กฎทางธุรกิจและรายงานให้เข้ากับลูกค้าเฉพาะราย
+                </p>
+              </div>
+            </div>
 
-                <div class="case-grid">
-                    <div class="case-box">
-                        <h4>Case A: Food Delivery App</h4>
-                        <p style="font-size: 0.875rem; color: var(--text-muted);">ระบบสั่งอาหารและติดตามไรเดอร์แบบ Real-time (มีความเปลี่ยนแปลงสูง)</p>
-                    </div>
-                    <div class="case-box">
-                        <h4>Case B: Smart Farm IoT</h4>
-                        <p style="font-size: 0.875rem; color: var(--text-muted);">ระบบ IoT ควบคุมฟาร์มอัจฉริยะ (Hardware-Software Hybrid)</p>
-                    </div>
+            <div class="layer">
+              <span class="label-th">โครงสร้างต้นทุนซอฟต์แวร์ (Sommerville Fig 1.1)</span>
+              <p class="helper-text" style="margin-bottom: var(--space-sm);">
+                สัดส่วนค่าใช้จ่ายก่อนส่งมอบระบบ (Pre-delivery Cost) โดยทั่วไปของโครงการซอฟต์แวร์:
+              </p>
+              <div class="ratio-bar" role="img" aria-label="สัดส่วนต้นทุน: Development 60 เปอร์เซ็นต์ และ Testing 40 เปอร์เซ็นต์">
+                <div class="ratio-seg ratio-seg--dev">DEV 60%</div>
+                <div class="ratio-seg ratio-seg--test">TEST 40%</div>
+              </div>
+              <p class="helper-text" style="margin-top: var(--space-sm);">
+                <strong>ข้อสังเกตสำคัญ:</strong> สำหรับระบบ Custom Software ต้นทุนในระยะวิวัฒนาการและบำรุงรักษาหลังส่งมอบ
+                (<strong>Evolution Costs</strong>) มักสูงกว่าต้นทุนการพัฒนาเริ่มต้น (Development Costs)
+                เพราะระบบต้องถูกปรับเปลี่ยนตามสภาพแวดล้อมทางธุรกิจตลอดหลายปี
+              </p>
+            </div>
+          </div>
+
+          <h3 class="sub-title">1.3 คุณลักษณะ 4 ประการของซอฟต์แวร์ที่ดี (Essential Software Attributes)</h3>
+          <p class="prose">
+            คุณภาพของซอฟต์แวร์ไม่ได้วัดแค่ “ทำงานได้ตรงฟังก์ชัน” (Functional) เท่านั้น
+            แต่รวมถึงพฤติกรรมขณะรันและโครงสร้างโค้ดที่ผู้อื่นต้องมาดูแลต่อ (Non-functional Attributes) คลิกที่การ์ดเพื่อดูรายละเอียดเชิงลึก:
+          </p>
+
+          <div class="card-grid" id="attr-grid">
+            <button type="button" class="layer key-tile" style="text-align:left; border-top:0; border-left:0; border-right:0; cursor:pointer;" onclick="selectAttribute(0)" id="attr-btn-0">
+              <span class="mono-code">01 // MAINTAINABILITY</span>
+              <div style="font-weight:600; font-size:1.0625rem; margin: var(--space-xs) 0;">การบำรุงรักษาได้ (Maintainability)</div>
+              <p class="helper-text">โค้ดและเอกสารต้องออกแบบให้แก้ไข ต่อยอด และปรับตัวตามความต้องการใหม่ได้ง่าย</p>
+            </button>
+            <button type="button" class="layer" style="text-align:left; border:0; border-bottom: 2px solid transparent; cursor:pointer;" onclick="selectAttribute(1)" id="attr-btn-1">
+              <span class="mono-code">02 // DEPENDABILITY &amp; SECURITY</span>
+              <div style="font-weight:600; font-size:1.0625rem; margin: var(--space-xs) 0;">ความน่าเชื่อถือและปลอดภัย</div>
+              <p class="helper-text">ครอบคลุม Reliability, Safety และ Security ไม่สร้างความเสียหายต่อชีวิต เศรษฐกิจ หรือข้อมูล</p>
+            </button>
+            <button type="button" class="layer" style="text-align:left; border:0; border-bottom: 2px solid transparent; cursor:pointer;" onclick="selectAttribute(2)" id="attr-btn-2">
+              <span class="mono-code">03 // EFFICIENCY</span>
+              <div style="font-weight:600; font-size:1.0625rem; margin: var(--space-xs) 0;">ประสิทธิภาพ (Efficiency)</div>
+              <p class="helper-text">ไม่สิ้นเปลืองหน่วยความจำและ CPU ตอบสนองต่อคำขอผู้ใช้ได้รวดเร็วทันเวลา</p>
+            </button>
+            <button type="button" class="layer" style="text-align:left; border:0; border-bottom: 2px solid transparent; cursor:pointer;" onclick="selectAttribute(3)" id="attr-btn-3">
+              <span class="mono-code">04 // ACCEPTABILITY</span>
+              <div style="font-weight:600; font-size:1.0625rem; margin: var(--space-xs) 0;">การยอมรับจากผู้ใช้ (Acceptability)</div>
+              <p class="helper-text">เข้าใจง่าย ใช้งานได้สะดวก (Usable) และทำงานร่วมกับระบบอื่นที่ผู้ใช้ใช้อยู่ได้</p>
+            </button>
+          </div>
+          <div class="notice" id="attr-detail-box">
+            <p class="notice-title" id="attr-detail-title">เจาะลึก: Maintainability (การบำรุงรักษาได้)</p>
+            <p class="helper-text" id="attr-detail-body">
+              เป็นคุณลักษณะที่สำคัญที่สุดในระยะยาว เพราะสภาพแวดล้อมทางธุรกิจเปลี่ยนแปลงตลอดเวลา
+              หากระบบมี Modularity ที่ดี มีการห่อหุ้มข้อมูล (Encapsulation) และมีเอกสารประกอบครบถ้วน ทีมวิศวกรรุ่นถัดไปจะลดต้นทุน Evolution ได้อย่างมหาศาล
+            </p>
+          </div>
+
+          <details class="carbon-details">
+            <summary>
+              <span>ขยายความ: 4 ความท้าทายยุคใหม่ &amp; จริยธรรมวิชาชีพวิศวกรซอฟต์แวร์ (ACM/IEEE Code of Ethics)</span>
+              <i data-lucide="chevron-down" aria-hidden="true" width="18" height="18"></i>
+            </summary>
+            <div class="details-body">
+              <div class="split-grid--equal split-grid">
+                <div>
+                  <span class="label-th">4 ความท้าทายหลักของซอฟต์แวร์สมัยใหม่ (Sommerville 1.1.1)</span>
+                  <ul class="ruled-list">
+                    <li><strong>Heterogeneity:</strong> ระบบต้องรันข้ามแพลตฟอร์ม ทั้งมือถือ แท็บเล็ต คลาวด์ และต้องเชื่อมต่อกับระบบเก่า (Legacy Systems) ที่เขียนด้วยคนละภาษา</li>
+                    <li><strong>Business &amp; Social Change:</strong> ธุรกิจและเศรษฐกิจเปลี่ยนแปลงเร็ว กระบวนการพัฒนาจึงต้องลดเวลาส่งมอบคุณค่า (Time-to-value)</li>
+                    <li><strong>Security &amp; Trust:</strong> ซอฟต์แวร์เชื่อมโยงกับทุกมิติของชีวิต การเข้าถึงผ่านเว็บและ API ต้องป้องกันผู้ไม่หวังดีได้</li>
+                    <li><strong>Scale:</strong> ตั้งแต่ระบบฝังตัวขนาดเล็กมาก (Embedded/Wearable) ไปจนถึงระบบคลาวด์ระดับโลก</li>
+                  </ul>
                 </div>
-
-                <h4 style="font-family: 'Kanit', sans-serif; color: #15803d; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1rem;">
-                    🎯 สิ่งที่ต้องส่งมอบในชั่วโมง (Group Deliverables):
-                </h4>
-                <ol class="deliverable-list">
-                    <li>เอกสารสรุปเหตุผลในการเลือก Process Model ที่เหมาะสมกับโจทย์</li>
-                    <li>รายการแผนผัง SDLC Artifacts ที่ต้องสร้างตลอดโครงการ</li>
-                    <li>ลิงก์ GitHub Project Board ที่สร้าง 3 User Stories แรกพร้อมสำหรับเริ่ม Sprint 1</li>
-                </ol>
-
-                <div class="visual-box" style="background: rgba(255, 255, 255, 0.7); border-color: #86efac; margin-top: 1.25rem;">
-                    <div class="visual-title" style="color: #15803d;">💡 Visual / Graphic Idea</div>
-                    <div class="visual-desc">
-                        <strong>Activity Card & Checklist Graphic:</strong> ภาพการ์ดโจทย์กิจกรรมคู่กับไอคอน Rocket และภาพจำลอง Kanban Board บน GitHub Projects พร้อมเครื่องหมาย Checkbox 3 ข้อของผลงานที่ต้องส่ง
-                    </div>
+                <div>
+                  <span class="label-th">ความรับผิดชอบทางจริยธรรม 4 ด้าน &amp; 8 หลักการ ACM/IEEE</span>
+                  <ul class="ruled-list">
+                    <li><strong>4 กรอบความรับผิดชอบที่กฎหมายไม่ได้ระบุทั้งหมด:</strong> Confidentiality (รักษาความลับ), Competence (ไม่รับงานเกินขีดความสามารถ), Intellectual Property Rights (เคารพสิทธิบัตร/ลิขสิทธิ์), Computer Misuse (ไม่ใช้ทักษะในทางมิชอบ)</li>
+                    <li><strong>8 หลักการ (ACM/IEEE Code of Ethics):</strong> 1. Public (ประโยชน์สาธารณะ) · 2. Client &amp; Employer · 3. Product · 4. Judgment · 5. Management · 6. Profession · 7. Colleagues · 8. Self (เรียนรู้ตลอดชีวิต)</li>
+                  </ul>
                 </div>
-            </section>
+              </div>
+            </div>
+          </details>
+        </section>
 
-        </main>
+        <!-- SECTION 2: SDLC Core Phases -->
+        <section id="sec-sdlc" class="lecture-section">
+          <div class="section-head">
+            <span class="section-kicker">Section 02 // Software Process &amp; SDLC</span>
+            <h2 class="section-title">
+              วงจรชีวิตการพัฒนาระบบ: <strong>4 กิจกรรมพื้นฐานสู่ 8 ระยะของ SDLC</strong>
+            </h2>
+          </div>
 
-        <!-- Footer -->
-        <footer>
-            <p>&copy; Software Process Modeling Course — Computer Science & Software Engineering</p>
-        </footer>
+          <p class="prose">
+            <strong>Software Process</strong> คือชุดกิจกรรมที่สัมพันธ์กันเพื่อนำไปสู่การผลิตซอฟต์แวร์หนึ่งระบบ
+            Sommerville (2016) สรุปว่าไม่ว่าจะใช้โมเดลกระบวนการแบบใด ทุกกระบวนการต้องมี <strong>4 กิจกรรมพื้นฐานร่วมกัน</strong>
+            ได้แก่ (1) <em>Software Specification</em> กำหนดความต้องการและข้อจำกัด, (2) <em>Software Development</em> ออกแบบและเขียนโปรแกรม,
+            (3) <em>Software Validation</em> ทวนสอบว่าตรงตามที่ลูกค้าต้องการ และ (4) <em>Software Evolution</em> ปรับเปลี่ยนระบบตามความต้องการใหม่
+          </p>
 
+          <p class="prose">
+            เมื่อนำกิจกรรมเหล่านั้นมาคลี่เป็นลำดับขั้นตอนปฏิบัติใน <strong>Software Development Lifecycle (SDLC)</strong>
+            ตามตำราของ Dooley &amp; Kazakova (2024) จะประกอบด้วย 8 ระยะหลักตั้งแต่แนวคิดเริ่มต้นจนถึงการปลดระวางระบบ
+            ลองสลับโหมดการดำเนินงานด้านล่างและคลิกที่แต่ละระยะเพื่อสำรวจเป้าหมาย เงื่อนไข และสิ่งที่ต้องส่งมอบ
+          </p>
+
+          <div class="tab-bar" role="tablist" aria-label="รูปแบบการเดินขั้นตอน SDLC">
+            <button type="button" class="tab-btn is-active" role="tab" aria-selected="true" id="mode-plan-btn" onclick="setSdlcMode('plan')">
+              โหมด Plan-Driven (ทำทีละขั้นตามลำดับ)
+            </button>
+            <button type="button" class="tab-btn" role="tab" aria-selected="false" id="mode-agile-btn" onclick="setSdlcMode('agile')">
+              โหมด Agile / Iterative (วนซ้ำระยะ 3–5 หลายรอบ)
+            </button>
+          </div>
+
+          <div class="notice" id="sdlc-mode-note">
+            <p class="notice-title" id="sdlc-mode-title">รูปแบบ Plan-Driven (Sequential Cascade)</p>
+            <p class="helper-text" id="sdlc-mode-desc">
+              วางแผนและจัดทำเอกสารครบถ้วนในแต่ละระยะ (Sign-off) ก่อนส่งต่อไปยังระยะถัดไป เหมาะกับระบบที่ข้อกำหนดชัดเจนหรือมีความเสี่ยงด้านความปลอดภัยสูง
+            </p>
+          </div>
+
+          <!-- Interactive 8-Phase SDLC Selector -->
+          <div class="sdlc-diagram-wrap">
+            <span class="label-th" style="margin-bottom: var(--space-sm);">คลิกเลือกระยะของ SDLC (1–8) เพื่อเปิดดูรายละเอียดกิจกรรมและ Artifacts</span>
+            <div class="sdlc-node-grid" id="sdlc-nodes">
+              <button type="button" class="sdlc-node is-active" onclick="selectSdlcPhase(0)" id="sdlc-node-0">
+                <span class="sdlc-node-num">PHASE 01 // SPECIFICATION</span>
+                <span class="sdlc-node-title">1. Conception (ริเริ่มแนวคิด)</span>
+              </button>
+              <button type="button" class="sdlc-node" onclick="selectSdlcPhase(1)" id="sdlc-node-1">
+                <span class="sdlc-node-num">PHASE 02 // SPECIFICATION</span>
+                <span class="sdlc-node-title">2. Requirements &amp; Modeling</span>
+              </button>
+              <button type="button" class="sdlc-node" onclick="selectSdlcPhase(2)" id="sdlc-node-2">
+                <span class="sdlc-node-num">PHASE 03 // DEVELOPMENT</span>
+                <span class="sdlc-node-title">3. Design (ออกแบบระบบ)</span>
+              </button>
+              <button type="button" class="sdlc-node" onclick="selectSdlcPhase(3)" id="sdlc-node-3">
+                <span class="sdlc-node-num">PHASE 04 // DEVELOPMENT</span>
+                <span class="sdlc-node-title">4. Coding &amp; Debugging</span>
+              </button>
+              <button type="button" class="sdlc-node" onclick="selectSdlcPhase(4)" id="sdlc-node-4">
+                <span class="sdlc-node-num">PHASE 05 // VALIDATION</span>
+                <span class="sdlc-node-title">5. Testing (ทดสอบระบบ)</span>
+              </button>
+              <button type="button" class="sdlc-node" onclick="selectSdlcPhase(5)" id="sdlc-node-5">
+                <span class="sdlc-node-num">PHASE 06 // VALIDATION</span>
+                <span class="sdlc-node-title">6. Release (ส่งมอบใช้งาน)</span>
+              </button>
+              <button type="button" class="sdlc-node" onclick="selectSdlcPhase(6)" id="sdlc-node-6">
+                <span class="sdlc-node-num">PHASE 07 // EVOLUTION</span>
+                <span class="sdlc-node-title">7. Maintenance &amp; Evolution</span>
+              </button>
+              <button type="button" class="sdlc-node" onclick="selectSdlcPhase(7)" id="sdlc-node-7">
+                <span class="sdlc-node-num">PHASE 08 // EVOLUTION</span>
+                <span class="sdlc-node-title">8. Retirement (ปลดระวาง)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- SDLC Inspector Panel -->
+          <div class="layer" id="sdlc-inspector">
+            <div class="meta-strip" style="margin-bottom: var(--space-sm);">
+              <span class="mono-code" id="sdlc-insp-tag">PHASE 01 // SOFTWARE SPECIFICATION</span>
+              <span class="tag" id="sdlc-insp-loop">จุดเริ่มต้นโครงการ</span>
+            </div>
+            <h3 class="sub-title" style="margin-top: 0;" id="sdlc-insp-title">1. Conception (การริเริ่มแนวคิดและศึกษาความเป็นไปได้)</h3>
+            <p class="prose" id="sdlc-insp-desc">
+              ระบุปัญหาที่ต้องการแก้ไข ตรวจสอบความเป็นไปได้ทางเทคนิคและธุรกิจ ประเมินกรอบงบประมาณ เวลา และบุคลากรเบื้องต้น เพื่อตัดสินใจว่าควรลงทุนสร้างระบบหรือไม่
+            </p>
+            <div class="split-grid--equal split-grid" style="margin-bottom: 0;">
+              <div class="layer">
+                <span class="label-th">บทบาทผู้เกี่ยวข้อง &amp; เงื่อนไข (Roles &amp; Pre/Postconditions)</span>
+                <p class="helper-text" id="sdlc-insp-roles">
+                  <strong>Roles:</strong> Stakeholders, Product Owner, System Analyst, Project Manager<br>
+                  <strong>Postcondition:</strong> ข้อเสนอโครงการหรือ Concept Formulation ได้รับการอนุมัติ
+                </p>
+              </div>
+              <div class="layer">
+                <span class="label-th">ผลผลิตสำคัญ (Key Artifacts / Deliverables)</span>
+                <p class="helper-text" id="sdlc-insp-artifacts">
+                  Problem Statement, Feasibility Brief, Proposal Plan &amp; Initial Effort Estimate
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 3: Process Artifacts & Standards -->
+        <section id="sec-artifacts" class="lecture-section">
+          <div class="section-head">
+            <span class="section-kicker">Section 03 // Process Artifacts &amp; Governance</span>
+            <h2 class="section-title">
+              ผลผลิตในกระบวนการ: <strong>Artifacts, Roles, เงื่อนไข และมาตรฐานคุณภาพ</strong>
+            </h2>
+          </div>
+
+          <p class="prose">
+            เมื่ออธิบายกระบวนการซอฟต์แวร์ในระดับมืออาชีพ เราไม่พูดถึงแค่ “ใครทำอะไร” แต่ต้องระบุองค์ประกอบกำกับ 3 อย่างเสมอ
+            (Sommerville Ch 2): <strong>1) Products / Deliverables</strong> (ผลลัพธ์ที่เป็นรูปธรรมของกิจกรรม เช่น แบบจำลองสถาปัตยกรรม),
+            <strong>2) Roles</strong> (บทบาทหน้าที่ของผู้รับผิดชอบ เช่น Project Manager, Configuration Manager, Programmer) และ
+            <strong>3) Pre- and Postconditions</strong> (เงื่อนไขที่ต้องเป็นจริงก่อนเริ่มและหลังจบกิจกรรม เช่น ลูกค้าต้องอนุมัติความต้องการก่อนจึงเริ่มออกแบบสถาปัตยกรรมได้)
+          </p>
+
+          <div class="notice">
+            <p class="notice-title">
+              <i data-lucide="alert-circle" aria-hidden="true" width="18" height="18"></i>
+              ข้อควรระวังในการสอบและทำงานจริง: Milestones ≠ Deliverables
+            </p>
+            <p class="helper-text">
+              ตามคำนิยามใน Sommerville (Ch 23): <strong>Milestones</strong> คือรายงานความคืบหน้าระยะสั้นสำหรับผู้บริหารใช้ติดตามโครงการ
+              ส่วน <strong>Deliverables</strong> คือผลผลิตหลักของโครงการที่ส่งมอบให้ลูกค้าตามสัญญา เช่น เอกสารความต้องการ (SRS) หรือระบบซอฟต์แวร์เวอร์ชันแรก
+            </p>
+          </div>
+
+          <h3 class="sub-title">3.1 สำรวจ Process Artifacts ตามกิจกรรมหลัก</h3>
+          <div class="btn-row" role="group" aria-label="กรองรายการ Process Artifacts">
+            <button type="button" class="btn" onclick="filterArtifacts('all')" id="art-filter-all">แสดงทั้งหมด (8)</button>
+            <button type="button" class="btn btn--ghost" onclick="filterArtifacts('spec')" id="art-filter-spec">Specification</button>
+            <button type="button" class="btn btn--ghost" onclick="filterArtifacts('design')" id="art-filter-design">Design &amp; Model</button>
+            <button type="button" class="btn btn--ghost" onclick="filterArtifacts('val')" id="art-filter-val">Build &amp; Validation</button>
+            <button type="button" class="btn btn--ghost" onclick="filterArtifacts('cm')" id="art-filter-cm">Configuration &amp; Release</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ชื่อ Artifact / ผลผลิต</th>
+                  <th>กิจกรรมหลัก</th>
+                  <th>ผู้รับผิดชอบหลัก (Roles)</th>
+                  <th>รายละเอียดและบทบาทในโครงการ</th>
+                </tr>
+              </thead>
+              <tbody id="artifact-table-body">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="sub-title">3.2 Product Standards vs. Process Standards (Sommerville Fig 24.4)</h3>
+          <p class="prose">
+            เพื่อให้ทีมขนาดใหญ่ทำงานได้สม่ำเสมอและตรวจสอบคุณภาพได้ มาตรฐานในวิศวกรรมซอฟต์แวร์แบ่งออกเป็น 2 ฝั่งคู่ขนานกัน:
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product Standards (มาตรฐานของตัวผลผลิต)</th>
+                  <th>Process Standards (มาตรฐานของขั้นตอนการทำงาน)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>โครงสร้างเอกสารความต้องการ (Requirements Document Structure)</td>
+                  <td>กระบวนการทบทวนแบบ (Design Review Conduct)</td>
+                </tr>
+                <tr>
+                  <td>แบบฟอร์มทบทวนการออกแบบ (Design Review Form)</td>
+                  <td>ขั้นตอนการส่งโค้ดใหม่เข้าสู่ระบบ Build (Submission of New Code)</td>
+                </tr>
+                <tr>
+                  <td>รูปแบบ Comment Header ของ Method/Class</td>
+                  <td>กระบวนการปล่อยเวอร์ชัน (Version Release Process)</td>
+                </tr>
+                <tr>
+                  <td>แนวทางการเขียนโค้ด (เช่น Java Programming Style)</td>
+                  <td>กระบวนการอนุมัติแผนโครงการและควบคุมการเปลี่ยนแปลง (Change Control Process)</td>
+                </tr>
+                <tr>
+                  <td>แบบฟอร์มคำขอเปลี่ยนแปลง (Change Request Form)</td>
+                  <td>ขั้นตอนการบันทึกผลการทดสอบ (Test Recording Process)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SECTION 4: Process Model Selection -->
+        <section id="sec-models" class="lecture-section">
+          <div class="section-head">
+            <span class="section-kicker">Section 04 // Process Models &amp; Trade-offs</span>
+            <h2 class="section-title">
+              ไม่มีโมเดลเดียวที่ดีที่สุด: <strong>การเลือก Process Model ให้เหมาะกับระบบ</strong>
+            </h2>
+          </div>
+
+          <p class="prose">
+            ทั้ง Sommerville และ Dooley &amp; Kazakova ย้ำตรงกันว่า <strong>“ไม่มี Process Model ใดที่ดีที่สุดสำหรับทุกโครงการ”</strong>
+            การเลือกโมเดลขึ้นอยู่กับความชัดเจนของความต้องการ ความวิกฤตด้านความปลอดภัย (Safety/Security)
+            ข้อจำกัดของฮาร์ดแวร์ ขนาดและประสบการณ์ของทีม รวมถึงกรอบเวลา
+            ในทางปฏิบัติ โครงการขนาดใหญ่มัก <strong>ผสมผสานหลายโมเดล (Hybridize)</strong> เช่น ส่วนที่เชื่อมฮาร์ดแวร์หรือมีกฎหมายกำกับใช้ Plan-driven
+            ส่วนที่เชื่อมต่อกับผู้ใช้และต้องการการทดลองใช้ Incremental / Agile
+          </p>
+
+          <!-- Chart.js Comparison -->
+          <div class="split-grid">
+            <div class="chart-box">
+              <span class="label-th">เปรียบเทียบคุณลักษณะ 5 Process Models (คะแนนเชิงเปรียบเทียบ 1–5)</span>
+              <canvas id="model-comparison-chart" aria-label="แผนภูมิแท่งเปรียบเทียบ 5 Process Models"></canvas>
+            </div>
+            <div>
+              <span class="label-th">สรุปจุดแข็งและเงื่อนไขการใช้งานแต่ละโมเดล</span>
+              <ul class="ruled-list" style="margin-top: 0;">
+                <li><strong>Waterfall (Plan-driven):</strong> ดีเมื่อความต้องการนิ่ง, เป็น Embedded ที่ผูกกับฮาร์ดแวร์, เป็น Safety-critical system ที่ต้องวิเคราะห์ก่อนเขียนโค้ด, หรือมีหลายบริษัททำคนละ Subsystem</li>
+                <li><strong>Incremental Development:</strong> พัฒนาและส่งมอบทีละส่วน รับ Feedback เร็ว แต่ถ้าเพิ่มฟีเจอร์เรื่อย ๆ โดยไม่ Refactor โครงสร้างระบบอาจเสื่อมสภาพได้</li>
+                <li><strong>Agile / Scrum:</strong> ส่งมอบทุก 2–3 สัปดาห์ ใช้ Product Backlog และ User Stories ลดเอกสารทางการ เหมาะเมื่อทีมสื่อสารใกล้ชิดและ Requirements เปลี่ยนบ่อย</li>
+                <li><strong>Reuse-oriented (Integration &amp; Configuration):</strong> ค้นหา COTS / Open-source / ERP มาปรับแต่ง ลดเวลาและต้นทุน แต่ต้องยอมประนีประนอมบาง Requirement</li>
+                <li><strong>Spiral Model (Boehm):</strong> วนเป็นเกลียวโดยทุกรอบมีการประเมินและลดความเสี่ยง (Risk-driven) เหมาะกับโครงการขนาดใหญ่ที่เสี่ยงสูง</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Interactive Process Model Advisor -->
+          <h3 class="sub-title">4.1 เครื่องมือจำลองการเลือก Process Model (Interactive Model Advisor)</h3>
+          <p class="prose">
+            ทดลองโหลดกรณีศึกษาทั้ง 4 ระบบจากตำรา Sommerville หรือปรับเงื่อนไขโครงงานด้วยตนเอง เพื่อดูคำแนะนำโมเดลกระบวนการที่เหมาะสมและเหตุผลอ้างอิง:
+          </p>
+
+          <div class="layer">
+            <span class="label-th">โหลดกรณีศึกษาตัวอย่างจาก Sommerville (Section 1.3):</span>
+            <div class="btn-row" style="margin-top: var(--space-xs);">
+              <button type="button" class="btn btn--secondary" onclick="loadCasePreset('insulin')">1. Insulin Pump (Embedded)</button>
+              <button type="button" class="btn btn--secondary" onclick="loadCasePreset('mentcare')">2. Mentcare (Medical IS)</button>
+              <button type="button" class="btn btn--secondary" onclick="loadCasePreset('weather')">3. Weather Station (Sensor)</button>
+              <button type="button" class="btn btn--secondary" onclick="loadCasePreset('ilearn')">4. iLearn (Learning Platform)</button>
+            </div>
+
+            <div class="form-grid">
+              <div class="field-group">
+                <label class="field-label" for="sel-req-stability">1. ความนิ่งของ Requirements</label>
+                <select class="field-select" id="sel-req-stability" onchange="evaluateProcessModel()">
+                  <option value="stable">ชัดเจนและนิ่งตั้งแต่ต้น (Well-understood)</option>
+                  <option value="evolving">มีโอกาสเปลี่ยนระหว่างพัฒนา (Evolving)</option>
+                  <option value="volatile">ไม่แน่นอน เปลี่ยนแปลงเร็วมาก (Volatile)</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="sel-criticality">2. ความวิกฤต (Safety / Security)</label>
+                <select class="field-select" id="sel-criticality" onchange="evaluateProcessModel()">
+                  <option value="critical">สูงมาก — กระทบชีวิต/กฎหมาย (Safety/Security-critical)</option>
+                  <option value="moderate">ปานกลาง — เน้นความเป็นส่วนตัวและความถูกต้องข้อมูล</option>
+                  <option value="low">ทั่วไป — ความเสียหายเชิงพาณิชย์จำกัด</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="sel-hardware">3. ความผูกพันกับฮาร์ดแวร์ / หลายทีม</label>
+                <select class="field-select" id="sel-hardware" onchange="evaluateProcessModel()">
+                  <option value="tight">ผูกติดฮาร์ดแวร์เฉพาะทาง / พัฒนาข้ามหลายองค์กร</option>
+                  <option value="standard">รันบนคอมพิวเตอร์ทั่วไป / เว็บ / คลาวด์</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="sel-reuse">4. ความพร้อมของซอฟต์แวร์สำเร็จรูป (COTS/OSS)</label>
+                <select class="field-select" id="sel-reuse" onchange="evaluateProcessModel()">
+                  <option value="low">ไม่มีสำเร็จรูป ต้องออกแบบเฉพาะทางเกือบทั้งหมด</option>
+                  <option value="high">มีบริการ/แอปสำเร็จรูปพร้อมนำมาประกอบสูง</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="notice notice--success" id="advisor-result" style="background: var(--background); margin-bottom: 0;">
+              <div class="meta-strip" style="margin-bottom: var(--space-xs);">
+                <span class="mono-code">RECOMMENDED MODEL</span>
+                <span class="tag" id="advisor-badge">Waterfall / Formal Specification</span>
+              </div>
+              <p class="notice-title" id="advisor-title">แนะนำ: Plan-Driven Waterfall (ร่วมกับการวิเคราะห์ความปลอดภัยเข้มข้น)</p>
+              <p class="helper-text" id="advisor-reason">
+                เนื่องจากเป็นระบบที่มีความวิกฤตด้านความปลอดภัยสูงและผูกติดกับฮาร์ดแวร์ จึงไม่สามารถรอตัดสินใจความต้องการระหว่างเขียนโค้ดได้ จำเป็นต้องมีเอกสาร Specification และ Design ที่สมบูรณ์เพื่อตรวจวิเคราะห์อันตราย (Hazard Analysis) ก่อนลงมือสร้าง
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 5: Hands-on Workshop -->
+        <section id="sec-workshop" class="lecture-section">
+          <div class="section-head">
+            <span class="section-kicker">Section 05 // Hands-on Workshop &amp; Self-Check</span>
+            <h2 class="section-title">
+              ปฏิบัติการ Module 1: <strong>ออกแบบแผนกระบวนการและทบทวนความเข้าใจ</strong>
+            </h2>
+          </div>
+
+          <p class="prose">
+            ส่วนนี้คือใบงานเชิงปฏิบัติสำหรับนักศึกษา ข้อมูลที่กรอกและคำตอบทั้งหมดจะถูกบันทึกไว้ในสถานะของบทเรียนโดยอัตโนมัติ
+            และสามารถส่งออกเป็นไฟล์ <code>.txt</code> เพื่อนำไปแนบส่งใน GitHub Repository หรือ LMS ของรายวิชาได้ทันที
+          </p>
+
+          <!-- Part A: Project Process Design Worksheet -->
+          <h3 class="sub-title">ส่วนที่ 1: ใบงานวิเคราะห์โครงงานและกำหนด Process Artifacts</h3>
+          <div class="layer">
+            <div class="btn-row" style="margin-top: 0;">
+              <span class="label-th" style="margin: 0;">โหลดโจทย์ตัวอย่าง (หากยังไม่ตั้งหัวข้อเอง):</span>
+              <button type="button" class="btn btn--ghost" onclick="fillWorkshopPreset('clinic')">ระบบคิวคลินิกและเวชระเบียน</button>
+              <button type="button" class="btn btn--ghost" onclick="fillWorkshopPreset('drone')">ระบบควบคุมโดรนส่งเวชภัณฑ์</button>
+              <button type="button" class="btn btn--ghost" onclick="fillWorkshopPreset('dorm')">เว็บแอปบริหารหอพักนักศึกษา</button>
+            </div>
+
+            <div class="form-grid">
+              <div class="field-group">
+                <label class="field-label" for="ws-student-id">รหัสนักศึกษา / ชื่อกลุ่ม</label>
+                <input type="text" class="field-input" id="ws-student-id" placeholder="เช่น 67010001 — กลุ่ม Alpha" oninput="saveWorkshopState()">
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="ws-project-name">ชื่อระบบหรือโครงงานที่วิเคราะห์</label>
+                <input type="text" class="field-input" id="ws-project-name" placeholder="ระบุชื่อระบบซอฟต์แวร์" oninput="saveWorkshopState()">
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="field-group">
+                <label class="field-label" for="ws-product-type">ประเภทผลิตภัณฑ์ (Software Product Type)</label>
+                <select class="field-select" id="ws-product-type" onchange="saveWorkshopState()">
+                  <option value="">-- เลือกประเภทผลิตภัณฑ์ --</option>
+                  <option value="Generic Product">Generic Product (พัฒนาขายตลาดทั่วไป)</option>
+                  <option value="Customized / Bespoke">Customized / Bespoke (พัฒนาเฉพาะลูกค้า)</option>
+                  <option value="Hybrid Configurable">Hybrid (นำ Generic Base มาปรับแต่ง)</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="ws-app-type">ประเภทแอปพลิเคชัน (Sommerville 8 Categories)</label>
+                <select class="field-select" id="ws-app-type" onchange="saveWorkshopState()">
+                  <option value="">-- เลือกหมวดหมู่ระบบ --</option>
+                  <option value="Stand-alone Application">Stand-alone Application</option>
+                  <option value="Interactive Transaction-based">Interactive Transaction-based (Web/Cloud)</option>
+                  <option value="Embedded Control System">Embedded Control System</option>
+                  <option value="Batch Processing System">Batch Processing System</option>
+                  <option value="Entertainment System">Entertainment System</option>
+                  <option value="Modeling & Simulation">Modeling &amp; Simulation</option>
+                  <option value="Data Collection & Analysis">Data Collection &amp; Analysis</option>
+                  <option value="System of Systems">System of Systems</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="ws-process-model">Process Model ที่เลือกใช้</label>
+                <select class="field-select" id="ws-process-model" onchange="saveWorkshopState()">
+                  <option value="">-- เลือก Process Model --</option>
+                  <option value="Waterfall Model">Waterfall Model (Plan-driven)</option>
+                  <option value="Incremental Development">Incremental Development</option>
+                  <option value="Agile / Scrum">Agile / Scrum</option>
+                  <option value="Reuse-oriented (Integration & Configuration)">Reuse-oriented (Integration &amp; Configuration)</option>
+                  <option value="Spiral Model (Risk-driven)">Spiral Model (Risk-driven)</option>
+                  <option value="Hybrid Model">Hybrid (ผสมผสาน Plan-driven + Agile)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-group" style="margin-bottom: var(--space-md);">
+              <span class="field-label">Artifacts ที่ทีมกำหนดให้ต้องส่งมอบในโครงการ (เลือกอย่างน้อย 3 รายการ)</span>
+              <div class="check-list" id="ws-artifacts-list">
+                <label class="check-item">
+                  <input type="checkbox" value="SRS / Product Backlog" onchange="saveWorkshopState()">
+                  <span><strong>Specification:</strong> Software Requirements Specification (SRS) หรือ Product Backlog + User Stories</span>
+                </label>
+                <label class="check-item">
+                  <input type="checkbox" value="UML Architecture & Interface Models" onchange="saveWorkshopState()">
+                  <span><strong>Design:</strong> UML System Models (Use Case, Class, Sequence) และเอกสารสถาปัตยกรรม</span>
+                </label>
+                <label class="check-item">
+                  <input type="checkbox" value="Automated Test Suite & Validation Log" onchange="saveWorkshopState()">
+                  <span><strong>Validation:</strong> Unit/Integration Test Cases และรายงานผลการทวนสอบ (Validation Report)</span>
+                </label>
+                <label class="check-item">
+                  <input type="checkbox" value="Git Baseline & Release Notes" onchange="saveWorkshopState()">
+                  <span><strong>Configuration &amp; Release:</strong> Git Repository Baseline, Change Log และ Release Package</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="ws-rationale">เหตุผลประกอบการเลือก Process Model และคุณลักษณะคุณภาพที่ให้ความสำคัญสูงสุด</label>
+              <textarea class="field-textarea" id="ws-rationale" placeholder="อธิบายเหตุผลโดยอ้างอิงความนิ่งของ Requirements, ความเสี่ยงด้านความปลอดภัย และข้อจำกัดของทีม..." oninput="saveWorkshopState()"></textarea>
+            </div>
+          </div>
+
+          <!-- Part B: Git & Configuration Cycle Lab Checklist -->
+          <h3 class="sub-title">ส่วนที่ 2: เช็คลิสต์วงจรการทำงาน Configuration Management &amp; Git พื้นฐาน</h3>
+          <p class="prose">
+            ตามขั้นตอนวงจรการทำงานของ Version Control (Dooley &amp; Kazakova Ch 16 &amp; Sommerville Ch 25)
+            นักศึกษาต้องฝึกทำตามลำดับเพื่อป้องกันการเขียนทับโค้ดในทีมและรักษา Baseline ของซอฟต์แวร์:
+          </p>
+          <div class="check-list" id="git-checklist">
+            <label class="check-item">
+              <input type="checkbox" value="git-1" onchange="saveWorkshopState()">
+              <span><strong>1. Create / Clone Local Repository:</strong> สร้างหรือโคลน Repository หลักมาไว้ใน Workspace ส่วนตัว (แยกจาก Mainline)</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" value="git-2" onchange="saveWorkshopState()">
+              <span><strong>2. Checkout / Branch:</strong> สร้าง Branch ย่อยสำหรับฟีเจอร์หรือบั๊ก เพื่อไม่ให้กระทบโค้ดหลักของสมาชิกคนอื่น</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" value="git-3" onchange="saveWorkshopState()">
+              <span><strong>3. Edit, Build &amp; Test:</strong> แก้ไขโค้ด คอมไพล์ และรัน Unit Tests ในเครื่องตัวเองให้ผ่านก่อนส่งงาน</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" value="git-4" onchange="saveWorkshopState()">
+              <span><strong>4. Commit &amp; Derivation History:</strong> บันทึก Commit พร้อมข้อความอ้างอิง Change Request / Issue ID ที่ชัดเจน</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" value="git-5" onchange="saveWorkshopState()">
+              <span><strong>5. Merge &amp; Resolve Conflicts:</strong> รวม Branch กลับเข้าสู่ Mainline และแก้ Merge Conflict (หากมี) พร้อมสร้าง Baseline Tag</span>
+            </label>
+          </div>
+
+          <!-- Part C: 5-Question Self-Check Quiz -->
+          <h3 class="sub-title">ส่วนที่ 3: แบบทดสอบตรวจสอบความเข้าใจ Module 1 (5 ข้อ)</h3>
+          <div id="quiz-container">
+            <!-- Populated by JS -->
+          </div>
+
+          <div class="notice" id="quiz-summary-box">
+            <p class="notice-title" id="quiz-summary-title">ผลคะแนนแบบทดสอบ: 0 / 5 ข้อ</p>
+            <p class="helper-text" id="quiz-summary-text">เลือกคำตอบในแต่ละข้อเพื่อดูคำอธิบายและบันทึกคะแนนอัตโนมัติ</p>
+          </div>
+
+          <!-- Workshop Actions -->
+          <div class="btn-row">
+            <button type="button" class="btn" onclick="exportWorkshopFile()">
+              <i data-lucide="download" aria-hidden="true" width="18" height="18"></i>
+              ส่งออกใบงาน Workshop (.txt)
+            </button>
+            <button type="button" class="btn btn--danger" id="btn-reset-ws" onclick="handleResetWorkshop(this)">
+              <i data-lucide="rotate-ccw" aria-hidden="true" width="18" height="18"></i>
+              รีเซ็ตข้อมูล Workshop
+            </button>
+          </div>
+          <p class="helper-text" id="ws-status-msg" aria-live="polite"></p>
+        </section>
+
+      </main>
     </div>
 
+    <footer class="doc-footer">
+      <p style="margin: 0 0 var(--space-xs) 0;">
+        <strong>แหล่งข้อมูลอ้างอิง (Sources):</strong>
+        Ian Sommerville, <em>Software Engineering</em> (10th ed., Pearson Education, 2016 — Chapters 1, 2, 3, 4, 8, 9, 19, 23, 24, 25);
+        John F. Dooley &amp; Vera A. Kazakova, <em>Software Development, Design, and Coding</em> (Apress, 2024 — Chapters 1, 2, 12, 16).
+      </p>
+      <p style="margin: 0;">
+        เอกสารประกอบการเรียนการสอน Module 1: Foundations of Software Engineering &amp; SDLC (ภาษาไทย)
+      </p>
+    </footer>
+  </div>
+
+  <api-shim></api-shim>
+  <script>
+    // --- Data Definitions (Backtick literals only) ---
+    const ATTR_DATA = [
+      {
+        title: `เจาะลึก: Maintainability (การบำรุงรักษาได้)`,
+        body: `เป็นคุณลักษณะที่สำคัญที่สุดในระยะยาว เพราะสภาพแวดล้อมทางธุรกิจเปลี่ยนแปลงตลอดเวลา หากระบบมี Modularity ที่ดี มีการห่อหุ้มข้อมูล (Encapsulation) และมีเอกสารประกอบครบถ้วน ทีมวิศวกรรุ่นถัดไปจะลดต้นทุน Evolution ได้อย่างมหาศาล`
+      },
+      {
+        title: `เจาะลึก: Dependability & Security (ความน่าเชื่อถือและความมั่นคงปลอดภัย)`,
+        body: `ซอฟต์แวร์ต้องไม่ก่อให้เกิดความเสียหายต่อร่างกาย ชีวิต หรือเศรษฐกิจเมื่อเกิดข้อผิดพลาด (Reliability & Safety) และต้องป้องกันผู้ไม่หวังดีไม่ให้เข้าถึงหรือทำลายระบบและข้อมูลได้ (Security) ดังเช่นกรณีศึกษา Insulin Pump และ Mentcare`
+      },
+      {
+        title: `เจาะลึก: Efficiency (ประสิทธิภาพการใช้ทรัพยากร)`,
+        body: `ระบบต้องไม่ใช้หน่วยความจำ (Memory) หรือรอบการทำงานของซีพียู (Processor Cycles) อย่างสิ้นเปลือง ครอบคลุมถึงความไวในการตอบสนอง (Responsiveness) เวลาประมวลผล และการใช้พลังงาน โดยเฉพาะในระบบ Embedded เช่น Wilderness Weather Station`
+      },
+      {
+        title: `เจาะลึก: Acceptability (การยอมรับจากผู้ใช้งาน)`,
+        body: `ซอฟต์แวร์ที่ดีทางเทคนิคอาจล้มเหลวได้หากผู้ใช้ไม่ยอมรับ ดังนั้นระบบต้องเข้าใจง่าย ใช้งานได้จริงตามบริบทงาน (Usable) และสามารถทำงานร่วมกับระบบอื่นที่องค์กรใช้อยู่แล้วได้อย่างราบรื่น (Compatible)`
+      }
+    ];
+
+    const SDLC_PHASES = [
+      {
+        tag: `PHASE 01 // SOFTWARE SPECIFICATION`,
+        loop: `จุดเริ่มต้นโครงการ`,
+        title: `1. Conception (การริเริ่มแนวคิดและศึกษาความเป็นไปได้)`,
+        desc: `ระบุปัญหาที่ต้องการแก้ไข ตรวจสอบความเป็นไปได้ทางเทคนิคและธุรกิจ ประเมินกรอบงบประมาณ เวลา และบุคลากรเบื้องต้น เพื่อตัดสินใจว่าควรลงทุนสร้างระบบหรือไม่`,
+        roles: `<strong>Roles:</strong> Stakeholders, Product Owner, System Analyst, Project Manager<br><strong>Postcondition:</strong> ข้อเสนอโครงการหรือ Concept Formulation ได้รับการอนุมัติ`,
+        artifacts: `Problem Statement, Feasibility Brief, Proposal Plan & Initial Effort Estimate`
+      },
+      {
+        tag: `PHASE 02 // SOFTWARE SPECIFICATION`,
+        loop: `ป้อนข้อมูลสู่การออกแบบ`,
+        title: `2. Requirements Gathering, Exploration & Modeling`,
+        desc: `สำรวจความต้องการจากผู้มีส่วนได้ส่วนเสีย แยกแยะ Functional และ Non-functional Requirements ตรวจสอบความขัดแย้งและความถูกต้อง (Requirements Validation) รวมถึงสร้างแบบจำลองเบื้องต้น`,
+        roles: `<strong>Roles:</strong> Requirements Engineer, Domain Experts, End Users<br><strong>Postcondition:</strong> ลูกค้าอนุมัติเอกสารความต้องการ (Requirements Sign-off) หรือจัดลำดับ Product Backlog`,
+        artifacts: `Software Requirements Specification (SRS), Use Cases / User Stories, Context & Domain Models`
+      },
+      {
+        tag: `PHASE 03 // SOFTWARE DEVELOPMENT`,
+        loop: `วนซ้ำในโหมด Agile (Steps 3–5)`,
+        title: `3. Design (การออกแบบสถาปัตยกรรมและรายละเอียด)`,
+        desc: `แบ่งปัญหาใหญ่เป็นโมดูล (Decomposition) กำหนดสถาปัตยกรรมระบบ (Architectural Design) ออกแบบฐานข้อมูล อินเทอร์เฟซของแต่ละคอมโพเนนต์ (Interface Design) และโครงสร้างคลาส/อัลกอริทึม`,
+        roles: `<strong>Roles:</strong> Software Architect, Lead Designer, Database Designer<br><strong>Precondition:</strong> ความต้องการหลักได้รับความเห็นชอบแล้ว`,
+        artifacts: `System Architecture Document, UML Class / Sequence / State Diagrams, Interface Specifications, DB Schema`
+      },
+      {
+        tag: `PHASE 04 // SOFTWARE DEVELOPMENT`,
+        loop: `วนซ้ำในโหมด Agile (Steps 3–5)`,
+        title: `4. Coding & Debugging (การเขียนโค้ดและแก้ไขข้อผิดพลาด)`,
+        desc: `แปลงแบบออกแบบให้เป็นซอร์สโค้ดที่รันได้จริงบน Host-Target Environment ปฏิบัติตามมาตรฐานการเขียนโค้ด (Coding Standards) และใช้ Version Control (เช่น Git) เพื่อควบคุมการเปลี่ยนแปลง`,
+        roles: `<strong>Roles:</strong> Software Developers / Programmers, Code Reviewers<br><strong>Postcondition:</strong> โค้ดคอมไพล์ผ่านและพร้อมเข้าสู่การทดสอบระดับหน่วย`,
+        artifacts: `Source Code, Inline Derivation History, Configuration Files, Build Scripts`
+      },
+      {
+        tag: `PHASE 05 // SOFTWARE VALIDATION`,
+        loop: `วนซ้ำในโหมด Agile (Steps 3–5)`,
+        title: `5. Testing (การทดสอบหน่วย ระบบ และการยอมรับ)`,
+        desc: `ทวนสอบทั้ง Development Testing (Unit, Component, System Testing), Release Testing และ User/Acceptance Testing รวมถึงการทำ Test-Driven Development (TDD) เพื่อยืนยันว่าซอฟต์แวร์ตรงตามสเปกและใช้งานได้จริง`,
+        roles: `<strong>Roles:</strong> QA Engineers, Developers, Beta / Acceptance Testers<br><strong>Postcondition:</strong> ผ่านเกณฑ์ Test Coverage และไม่มี Defect ร้ายแรงค้างอยู่`,
+        artifacts: `Automated Test Suites, Test Execution Logs, Defect / Bug Reports, Validation Sign-off`
+      },
+      {
+        tag: `PHASE 06 // SOFTWARE VALIDATION & DELIVERY`,
+        loop: `ส่งมอบให้ลูกค้าใช้งาน`,
+        title: `6. Release (การเตรียมการปล่อยรุ่นและติดตั้งใช้งานจริง)`,
+        desc: `รวบรวมคอมโพเนนต์ ไลบรารี และเอกสารผู้ใช้เป็นชุดติดตั้ง (Release Package) ย้ายข้อมูลจากระบบเดิม อบรมผู้ใช้งาน และเปิดใช้งานจริง (Go-live) พร้อมบันทึก Baseline เวอร์ชันที่ปล่อยออกไป`,
+        roles: `<strong>Roles:</strong> Release Manager, Configuration Manager, System Administrator<br><strong>Precondition:</strong> ผ่าน System & Acceptance Testing ครบถ้วน`,
+        artifacts: `Executable Release Package, User Manual, Installation Guide, Release Baseline Tag`
+      },
+      {
+        tag: `PHASE 07 // SOFTWARE EVOLUTION`,
+        loop: `ระยะยาวนานที่สุดของ SDLC`,
+        title: `7. Maintenance & Software Evolution (บำรุงรักษาและพัฒนาต่อเนื่อง)`,
+        desc: `จัดการ Change Requests หลังส่งมอบ ครอบคลุมการซ่อมแซมข้อผิดพลาด (Bug fixing) การปรับให้เข้ากับสภาพแวดล้อมใหม่ และการเพิ่มความสามารถใหม่ รวมถึงการทำ Reengineering และ Refactoring`,
+        roles: `<strong>Roles:</strong> Maintenance Team, Support Engineers, Change Control Board<br><strong>หมายเหตุ:</strong> มักมีต้นทุนรวมสูงกว่าการพัฒนาครั้งแรกสำหรับระบบ Custom Software`,
+        artifacts: `Change Request Forms, Impact Analysis Reports, Patch Releases, Refactored Code`
+      },
+      {
+        tag: `PHASE 08 // SOFTWARE EVOLUTION`,
+        loop: `สิ้นสุดวงจรชีวิต`,
+        title: `8. Retirement (การปลดระวางระบบ)`,
+        desc: `เมื่อระบบเสื่อมคุณค่าทางธุรกิจหรือล้าสมัยจนค่าบำรุงรักษาสูงกว่าการสร้างใหม่ (Legacy Assessment) จะทำการย้ายข้อมูลสำคัญออก แจ้งเตือนผู้ใช้ และยุติการให้บริการอย่างปลอดภัย`,
+        roles: `<strong>Roles:</strong> System Owner, Data Migration Lead, Security Officer<br><strong>Postcondition:</strong> ข้อมูลถูกย้ายหรือทำลายตามกฎหมายคุ้มครองข้อมูลอย่างสมบูรณ์`,
+        artifacts: `Decommissioning Plan, Data Migration & Archival Report, Sunset Notice`
+      }
+    ];
+
+    const ARTIFACT_ITEMS = [
+      {
+        name: `Software Requirements Specification (SRS)`,
+        cat: `spec`,
+        catLabel: `Specification`,
+        roles: `Requirements Engineer, Client`,
+        desc: `เอกสารกำหนดบริการและข้อจำกัดของระบบ (Functional & Non-functional) ใช้สื่อสารระหว่างลูกค้ากับทีมพัฒนา`
+      },
+      {
+        name: `Product Backlog & User Stories`,
+        cat: `spec`,
+        catLabel: `Specification`,
+        roles: `Product Owner, Scrum Team`,
+        desc: `รายการฟีเจอร์ ความต้องการ และการปรับปรุงที่จัดลำดับความสำคัญไว้สำหรับกระบวนการแบบ Agile / Scrum`
+      },
+      {
+        name: `UML System Models (Class, Sequence, State)`,
+        cat: `design`,
+        catLabel: `Design & Model`,
+        roles: `Software Architect, Designer`,
+        desc: `แบบจำลองเชิงโครงสร้างและพฤติกรรม เช่น Sequence Chart ของ WeatherStation หรือ Activity Model ของ Insulin Pump`
+      },
+      {
+        name: `Architecture & Interface Specifications`,
+        cat: `design`,
+        catLabel: `Design & Model`,
+        roles: `System Architect, Lead Dev`,
+        desc: `เอกสารระบุโครงสร้างระดับสูง การแบ่งคอมโพเนนต์ โครงสร้างฐานข้อมูล และสัญญาการเชื่อมต่อ API/Interfaces`
+      },
+      {
+        name: `Test Suites & Validation Reports`,
+        cat: `val`,
+        catLabel: `Build & Validation`,
+        roles: `QA Engineer, Developers`,
+        desc: `ชุดทดสอบอัตโนมัติ (Unit/Integration/System) และบันทึกผลการตรวจสอบตาม Process Standard`
+      },
+      {
+        name: `Code Inspection Checklist & Rework Log`,
+        cat: `val`,
+        catLabel: `Build & Validation`,
+        roles: `Moderator, Author, Reviewers`,
+        desc: `เอกสารตรวจโค้ดแบบเป็นทางการตามบทบาท Moderator และ Author เพื่อค้นหาจุดบกพร่องก่อนรันจริง`
+      },
+      {
+        name: `Baseline & Software Configuration Item (SCI)`,
+        cat: `cm`,
+        catLabel: `Configuration & Release`,
+        roles: `Configuration Manager`,
+        desc: `ชุดเวอร์ชันของคอมโพเนนต์ที่ถูกล็อกและมีรหัสเฉพาะ (Unique ID) เพื่อให้สร้างซ้ำ (Re-create) ได้เสมอ`
+      },
+      {
+        name: `Release Package & Derivation History`,
+        cat: `cm`,
+        catLabel: `Configuration & Release`,
+        roles: `Release Manager, DevOps`,
+        desc: `ซอฟต์แวร์พร้อมใช้งาน คู่มือ และประวัติการเปลี่ยนแปลงที่เชื่อมโยงกับ Change Request`
+      }
+    ];
+
+    const QUIZ_DATA = [
+      {
+        q: `1. ข้อใดอธิบายความแตกต่างระหว่าง "Software Engineering" กับ "Programming" ได้ถูกต้องที่สุดตามเนื้อหา Module 1?`,
+        options: [
+          `ทั้งสองคำมีความหมายเหมือนกันทุกประการ ต่างกันเพียงชื่อเรียกในอุตสาหกรรม`,
+          `Programming คือส่วนการเขียนโค้ด (Implementation) ส่วน Software Engineering ครอบคลุมทั้งกระบวนการพัฒนา การบริหารโครงการ การจัดการเวอร์ชัน และงบประมาณ`,
+          `Programming เน้นการจัดการทีมและสัญญา ส่วน Software Engineering เน้นเฉพาะโครงสร้างข้อมูลและอัลกอริทึม`
+        ],
+        correct: 1,
+        explain: `ถูกต้อง — ตาม Dooley & Kazakova (2024) และ Sommerville (2016) Programming เป็นเพียงส่วน Implementation ขณะที่ Software Engineering ครอบคลุมกระบวนการตั้งแต่ต้นจนจบ รวมถึง Project Management และ Configuration Management`
+      },
+      {
+        q: `2. สำหรับซอฟต์แวร์ประเภท "Customized (Bespoke) Software" ใครเป็นผู้ควบคุมและกำหนด Specification?`,
+        options: [
+          `องค์กรผู้พัฒนาซอฟต์แวร์เป็นผู้กำหนดและปรับเปลี่ยนสเปกได้เองทั้งหมด`,
+          `องค์กรลูกค้าผู้ว่าจ้างเป็นผู้พัฒนาและควบคุม Specification`,
+          `ไม่มี Specification เพราะใช้เพียงการทดลองตลาด`
+        ],
+        correct: 1,
+        explain: `ถูกต้อง — ใน Customized Software ลูกค้าผู้สั่งทำเป็นผู้ควบคุม Specification ส่วนใน Generic Products ผู้พัฒนาซอฟต์แวร์จะเป็นผู้ควบคุม Specification (Sommerville 1.1)`
+      },
+      {
+        q: `3. ข้อใดคือความแตกต่างที่ถูกต้องระหว่าง "Milestones" และ "Deliverables" ในการบริหารโครงการซอฟต์แวร์?`,
+        options: [
+          `Milestones คือรายงานความคืบหน้าระยะสั้นสำหรับติดตามงาน ส่วน Deliverables คือผลผลิตหลักที่ส่งมอบให้ลูกค้าตามสัญญา`,
+          `Deliverables คือการประชุมรายวัน ส่วน Milestones คือไฟล์ Executable`,
+          `Milestones ใช้เฉพาะใน Agile ส่วน Deliverables ใช้เฉพาะใน Waterfall`
+        ],
+        correct: 0,
+        explain: `ถูกต้อง — Sommerville (Ch 23) ระบุว่า Milestones เป็นรายงานสั้นเพื่อติดตามความคืบหน้าโครงการ ขณะที่ Deliverables เป็นผลผลิตชิ้นสำคัญที่ส่งมอบตามสัญญา เช่น SRS หรือระบบเวอร์ชันแรก`
+      },
+      {
+        q: `4. ในกรณีศึกษา "Insulin Pump Control System" ซึ่งเป็นระบบฝังตัวที่มีความเสี่ยงต่อชีวิต (Safety-critical) เหตุใดจึงนิยมใช้ Waterfall หรือ Formal Development?`,
+        options: [
+          `เพราะต้องการลดเอกสารทั้งหมดเพื่อปล่อยรุ่นใหม่ทุก 2 สัปดาห์`,
+          `เพราะต้องมี Specification และ Design ที่สมบูรณ์ตั้งแต่ต้นเพื่อวิเคราะห์อันตราย (Hazard Analysis) และผูกติดกับฮาร์ดแวร์ที่ไม่ยืดหยุ่น`,
+          `เพราะระบบนี้ไม่ต้องผ่านขั้นตอนการทดสอบ (Validation)`
+        ],
+        correct: 1,
+        explain: `ถูกต้อง — ระบบ Embedded ที่เป็น Safety-critical ไม่สามารถเลื่อนการตัดสินใจไปทำระหว่างเขียนโค้ดได้ และต้องมีเอกสารครบถ้วนเพื่อตรวจสอบความปลอดภัยก่อนผลิตลงฮาร์ดแวร์`
+      },
+      {
+        q: `5. ในวงจรการพัฒนาแบบ Agile (Dooley & Kazakova Ch 2) ทีมพัฒนามักวนซ้ำ (Iterate) อยู่ในช่วงใดของ SDLC ก่อนจะทำการ Release?`,
+        options: [
+          `ขั้นตอนที่ 1–2 (Conception และ Requirements เท่านั้น)`,
+          `ขั้นตอนที่ 3–5 (Design, Coding/Debugging และ Testing)`,
+          `ขั้นตอนที่ 7–8 (Maintenance และ Retirement)`
+        ],
+        correct: 1,
+        explain: `ถูกต้อง — ทีม Agile จะวนซ้ำขั้นตอนที่ 3 ถึง 5 (ออกแบบ เขียนโค้ด และทดสอบ) เป็นรอบสั้น ๆ หลายครั้งเพื่อสร้าง Product Increment ก่อนส่งมอบ (Release)`
+      }
+    ];
+
+    // --- State Object ---
+    let appState = {
+      studentId: ``,
+      projectName: ``,
+      productType: ``,
+      appType: ``,
+      processModel: ``,
+      artifacts: [],
+      rationale: ``,
+      gitChecks: [],
+      quizAnswers: {}
+    };
+
+    let comparisonChart = null;
+
+    // --- UI Helpers ---
+    function getCssVar(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function selectAttribute(idx) {
+      const data = ATTR_DATA[idx];
+      if (!data) return;
+      for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById(`attr-btn-${i}`);
+        if (btn) {
+          if (i === idx) {
+            btn.classList.add(`key-tile`);
+            btn.style.borderBottom = `var(--indicator)`;
+          } else {
+            btn.classList.remove(`key-tile`);
+            btn.style.borderBottom = `2px solid transparent`;
+          }
+        }
+      }
+      const titleEl = document.getElementById(`attr-detail-title`);
+      const bodyEl = document.getElementById(`attr-detail-body`);
+      if (titleEl) titleEl.textContent = data.title;
+      if (bodyEl) bodyEl.textContent = data.body;
+    }
+
+    function setSdlcMode(mode) {
+      const planBtn = document.getElementById(`mode-plan-btn`);
+      const agileBtn = document.getElementById(`mode-agile-btn`);
+      const titleEl = document.getElementById(`sdlc-mode-title`);
+      const descEl = document.getElementById(`sdlc-mode-desc`);
+      if (!planBtn || !agileBtn || !titleEl || !descEl) return;
+
+      if (mode === `plan`) {
+        planBtn.classList.add(`is-active`);
+        planBtn.setAttribute(`aria-selected`, `true`);
+        agileBtn.classList.remove(`is-active`);
+        agileBtn.setAttribute(`aria-selected`, `false`);
+        titleEl.textContent = `รูปแบบ Plan-Driven (Sequential Cascade)`;
+        descEl.textContent = `วางแผนและจัดทำเอกสารครบถ้วนในแต่ละระยะ (Sign-off) ก่อนส่งต่อไปยังระยะถัดไป เหมาะกับระบบที่ข้อกำหนดชัดเจนหรือมีความเสี่ยงด้านความปลอดภัยสูง`;
+      } else {
+        agileBtn.classList.add(`is-active`);
+        agileBtn.setAttribute(`aria-selected`, `true`);
+        planBtn.classList.remove(`is-active`);
+        planBtn.setAttribute(`aria-selected`, `false`);
+        titleEl.textContent = `รูปแบบ Agile / Iterative (วนซ้ำระยะที่ 3–5)`;
+        descEl.textContent = `ผสานการออกแบบ เขียนโค้ด และทดสอบเป็นรอบสั้น ๆ (เช่น Sprints 2–3 สัปดาห์) เพื่อปล่อยรุ่นย่อยถี่ขึ้น ลดเอกสารทางการ และรับ Feedback จากผู้ใช้ได้เร็ว (Dooley & Kazakova Ch 2; Sommerville Ch 3)`;
+      }
+    }
+
+    function selectSdlcPhase(idx) {
+      const p = SDLC_PHASES[idx];
+      if (!p) return;
+      for (let i = 0; i < SDLC_PHASES.length; i++) {
+        const node = document.getElementById(`sdlc-node-${i}`);
+        if (node) {
+          if (i === idx) node.classList.add(`is-active`);
+          else node.classList.remove(`is-active`);
+        }
+      }
+      const tagEl = document.getElementById(`sdlc-insp-tag`);
+      const loopEl = document.getElementById(`sdlc-insp-loop`);
+      const titleEl = document.getElementById(`sdlc-insp-title`);
+      const descEl = document.getElementById(`sdlc-insp-desc`);
+      const rolesEl = document.getElementById(`sdlc-insp-roles`);
+      const artEl = document.getElementById(`sdlc-insp-artifacts`);
+
+      if (tagEl) tagEl.textContent = p.tag;
+      if (loopEl) loopEl.textContent = p.loop;
+      if (titleEl) titleEl.textContent = p.title;
+      if (descEl) descEl.textContent = p.desc;
+      if (rolesEl) rolesEl.innerHTML = p.roles;
+      if (artEl) artEl.textContent = p.artifacts;
+    }
+
+    function filterArtifacts(cat) {
+      const keys = [`all`, `spec`, `design`, `val`, `cm`];
+      keys.forEach((k) => {
+        const b = document.getElementById(`art-filter-${k}`);
+        if (b) {
+          if (k === cat) {
+            b.classList.remove(`btn--ghost`);
+          } else {
+            b.classList.add(`btn--ghost`);
+          }
+        }
+      });
+
+      const tbody = document.getElementById(`artifact-table-body`);
+      if (!tbody) return;
+      const filtered = cat === `all` ? ARTIFACT_ITEMS : ARTIFACT_ITEMS.filter((item) => item.cat === cat);
+      tbody.innerHTML = filtered.map((item) => `
+        <tr>
+          <td><strong>${item.name}</strong></td>
+          <td><span class="tag tag--neutral">${item.catLabel}</span></td>
+          <td>${item.roles}</td>
+          <td>${item.desc}</td>
+        </tr>
+      `).join(``);
+    }
+
+    function loadCasePreset(key) {
+      const req = document.getElementById(`sel-req-stability`);
+      const crit = document.getElementById(`sel-criticality`);
+      const hw = document.getElementById(`sel-hardware`);
+      const reuse = document.getElementById(`sel-reuse`);
+      if (!req || !crit || !hw || !reuse) return;
+
+      if (key === `insulin`) {
+        req.value = `stable`;
+        crit.value = `critical`;
+        hw.value = `tight`;
+        reuse.value = `low`;
+      } else if (key === `mentcare`) {
+        req.value = `evolving`;
+        crit.value = `moderate`;
+        hw.value = `standard`;
+        reuse.value = `low`;
+      } else if (key === `weather`) {
+        req.value = `stable`;
+        crit.value = `moderate`;
+        hw.value = `tight`;
+        reuse.value = `low`;
+      } else if (key === `ilearn`) {
+        req.value = `volatile`;
+        crit.value = `low`;
+        hw.value = `standard`;
+        reuse.value = `high`;
+      }
+      evaluateProcessModel();
+    }
+
+    function evaluateProcessModel() {
+      const reqEl = document.getElementById(`sel-req-stability`);
+      const critEl = document.getElementById(`sel-criticality`);
+      const hwEl = document.getElementById(`sel-hardware`);
+      const reuseEl = document.getElementById(`sel-reuse`);
+      const badgeEl = document.getElementById(`advisor-badge`);
+      const titleEl = document.getElementById(`advisor-title`);
+      const reasonEl = document.getElementById(`advisor-reason`);
+      if (!reqEl || !critEl || !hwEl || !reuseEl || !badgeEl || !titleEl || !reasonEl) return;
+
+      const req = reqEl.value;
+      const crit = critEl.value;
+      const hw = hwEl.value;
+      const reuse = reuseEl.value;
+
+      if (crit === `critical` && hw === `tight`) {
+        badgeEl.textContent = `Plan-Driven Waterfall / Formal Spec`;
+        titleEl.textContent = `แนะนำ: Plan-Driven Waterfall (ร่วมกับการวิเคราะห์ความปลอดภัยอย่างเข้มข้น)`;
+        reasonEl.textContent = `ระบบที่มีความวิกฤตต่อชีวิตหรือความปลอดภัยและผูกติดกับฮาร์ดแวร์เฉพาะทาง ไม่สามารถรอตัดสินใจความต้องการระหว่างเขียนโค้ดได้ ต้องมี Specification และ Design ที่สมบูรณ์เพื่อตรวจวิเคราะห์อันตราย (Safety & Security Analysis) ก่อนสร้างจริง`;
+      } else if (reuse === `high` && req !== `stable`) {
+        badgeEl.textContent = `Reuse-Oriented + Incremental`;
+        titleEl.textContent = `แนะนำ: Reuse-Oriented (Integration & Configuration) ร่วมกับ Incremental Delivery`;
+        reasonEl.textContent = `เมื่อมีบริการหรือซอฟต์แวร์สำเร็จรูปพร้อมประกอบและผู้ใช้งานต้องการปรับเปลี่ยนฟีเจอร์บ่อย (เช่น ระบบ iLearn) การนำบริการที่มีอยู่มาประกอบและทยอยปล่อยรุ่นย่อยจะลดต้นทุนและเวลาได้มากที่สุด`;
+      } else if (req === `volatile` && crit !== `critical`) {
+        badgeEl.textContent = `Agile / Scrum`;
+        titleEl.textContent = `แนะนำ: Agile Software Development (Scrum / Sprints 2–3 สัปดาห์)`;
+        reasonEl.textContent = `ความต้องการเปลี่ยนแปลงเร็วและไม่ติดข้อจำกัดฮาร์ดแวร์เฉพาะทาง ควรใช้ Product Backlog, User Stories และการส่งมอบบ่อยเพื่อรับ Feedback จากผู้ใช้โดยตรง`;
+      } else if (crit === `critical` && req !== `stable`) {
+        badgeEl.textContent = `Spiral Model / Hybrid`;
+        titleEl.textContent = `แนะนำ: Boehm's Spiral Model หรือ Hybrid (Plan-Driven Core + Incremental UI)`;
+        reasonEl.textContent = `โครงการมีความเสี่ยงสูงทั้งด้านความปลอดภัยและความไม่แน่นอนของความต้องการ จึงควรวางกรอบประเมินความเสี่ยงในทุกรอบ (Spiral) หรือแยกส่วน Core ที่วิกฤตให้เป็น Plan-driven และส่วนเสริมให้เป็น Incremental`;
+      } else {
+        badgeEl.textContent = `Incremental / Hybrid`;
+        titleEl.textContent = `แนะนำ: Incremental Development หรือ Hybrid Model`;
+        reasonEl.textContent = `เหมาะสำหรับระบบสารสนเทศทั่วไปที่ต้องรักษาสมดุลระหว่างความถูกต้องปลอดภัยของข้อมูลกับความยืดหยุ่นในการปรับปรุงตามความต้องการผู้ใช้ เช่น ระบบ Mentcare`;
+      }
+    }
+
+    function initComparisonChart() {
+      const canvas = document.getElementById(`model-comparison-chart`);
+      if (!canvas || typeof Chart === `undefined`) return;
+
+      const c1 = getCssVar(`--data-1`);
+      const c2 = getCssVar(`--data-2`);
+      const c3 = getCssVar(`--data-3`);
+      const c4 = getCssVar(`--data-4`);
+      const gridColor = getCssVar(`--outline-variant`);
+      const tickColor = getCssVar(`--on-surface-variant`);
+
+      if (comparisonChart) {
+        comparisonChart.destroy();
+      }
+
+      comparisonChart = new Chart(canvas, {
+        type: `bar`,
+        data: {
+          labels: [`Waterfall`, `Incremental`, `Agile / Scrum`, `Reuse-Oriented`, `Spiral`],
+          datasets: [
+            {
+              label: `ความเข้มงวดของเอกสาร`,
+              data: [5, 3, 2, 3, 4],
+              backgroundColor: c1
+            },
+            {
+              label: `การรองรับการเปลี่ยนแปลง`,
+              data: [1, 4, 5, 3, 4],
+              backgroundColor: c2
+            },
+            {
+              label: `ความเหมาะสมกับระบบวิกฤต`,
+              data: [5, 3, 2, 2, 5],
+              backgroundColor: c3
+            },
+            {
+              label: `ความเร็วในการรับ Feedback`,
+              data: [1, 4, 5, 4, 3],
+              backgroundColor: c4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: `top`,
+              align: `start`,
+              labels: {
+                boxWidth: 12,
+                boxHeight: 12,
+                color: tickColor,
+                font: { size: 11 }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: tickColor }
+            },
+            y: {
+              beginAtZero: true,
+              max: 5,
+              ticks: { stepSize: 1, color: tickColor },
+              grid: { color: gridColor }
+            }
+          }
+        }
+      });
+    }
+
+    // --- Quiz Rendering & Handling ---
+    function renderQuiz() {
+      const container = document.getElementById(`quiz-container`);
+      if (!container) return;
+
+      container.innerHTML = QUIZ_DATA.map((item, qIdx) => {
+        const chosen = appState.quizAnswers[qIdx];
+        let cardClass = `quiz-card`;
+        let feedbackHtml = ``;
+        if (typeof chosen === `number`) {
+          const isOk = chosen === item.correct;
+          cardClass += isOk ? ` is-correct` : ` is-wrong`;
+          feedbackHtml = `<div class="quiz-feedback"><strong>${isOk ? `ถูกต้อง:` : `ยังไม่ถูกต้อง:`}</strong> ${item.explain}</div>`;
+        }
+        const optsHtml = item.options.map((optText, oIdx) => `
+          <label class="check-item">
+            <input type="radio" name="quiz-q-${qIdx}" value="${oIdx}" ${chosen === oIdx ? `checked` : ``} onchange="answerQuiz(${qIdx}, ${oIdx})">
+            <span>${optText}</span>
+          </label>
+        `).join(``);
+
+        return `
+          <div class="${cardClass}" id="quiz-card-${qIdx}">
+            <p style="font-weight: 600; margin: 0 0 var(--space-sm) 0;">${item.q}</p>
+            <div class="check-list">${optsHtml}</div>
+            ${feedbackHtml}
+          </div>
+        `;
+      }).join(``);
+
+      updateQuizSummary();
+    }
+
+    function answerQuiz(qIdx, oIdx) {
+      appState.quizAnswers[qIdx] = oIdx;
+      renderQuiz();
+      persistState();
+    }
+
+    function updateQuizSummary() {
+      const titleEl = document.getElementById(`quiz-summary-title`);
+      const textEl = document.getElementById(`quiz-summary-text`);
+      const boxEl = document.getElementById(`quiz-summary-box`);
+      if (!titleEl || !textEl || !boxEl) return;
+
+      const answeredCount = Object.keys(appState.quizAnswers).length;
+      let score = 0;
+      QUIZ_DATA.forEach((q, idx) => {
+        if (appState.quizAnswers[idx] === q.correct) score += 1;
+      });
+
+      titleEl.textContent = `ผลคะแนนแบบทดสอบ: ${score} / ${QUIZ_DATA.length} ข้อ (ตอบแล้ว ${answeredCount} ข้อ)`;
+      if (answeredCount === 0) {
+        boxEl.className = `notice`;
+        textEl.textContent = `เลือกคำตอบในแต่ละข้อเพื่อดูคำอธิบายและบันทึกคะแนนอัตโนมัติ`;
+      } else if (answeredCount === QUIZ_DATA.length && score >= 4) {
+        boxEl.className = `notice notice--success`;
+        textEl.textContent = `ยอดเยี่ยม! คุณเข้าใจแกนหลักของ Module 1 ครบถ้วน พร้อมสำหรับเข้าสู่บทถัดไป`;
+      } else {
+        boxEl.className = `notice`;
+        textEl.textContent = `ตรวจสอบคำอธิบายในข้อที่ตอบผิดเพื่อทบทวนแนวคิดจากตำรา Sommerville และ Dooley & Kazakova`;
+      }
+    }
+
+    // --- Workshop State & Persistence ---
+    function fillWorkshopPreset(type) {
+      const nameEl = document.getElementById(`ws-project-name`);
+      const prodEl = document.getElementById(`ws-product-type`);
+      const appEl = document.getElementById(`ws-app-type`);
+      const modEl = document.getElementById(`ws-process-model`);
+      const ratEl = document.getElementById(`ws-rationale`);
+      if (!nameEl || !prodEl || !appEl || !modEl || !ratEl) return;
+
+      if (type === `clinic`) {
+        nameEl.value = `ระบบจองคิวและบริหารจัดการเวชระเบียนคลินิกชุมชน`;
+        prodEl.value = `Customized / Bespoke`;
+        appEl.value = `Interactive Transaction-based`;
+        modEl.value = `Incremental Development`;
+        ratEl.value = `เน้น Dependability (Privacy ข้อมูลผู้ป่วย) และ Acceptability ของพยาบาล/แพทย์ ใช้ Incremental เพื่อทยอยส่งมอบโมดูลนัดหมายก่อนแล้วขยายสู่เวชระเบียน`;
+      } else if (type === `drone`) {
+        nameEl.value = `ระบบซอฟต์แวร์ควบคุมโดรนส่งเวชภัณฑ์ฉุกเฉินอัตโนมัติ`;
+        prodEl.value = `Customized / Bespoke`;
+        appEl.value = `Embedded Control System`;
+        modEl.value = `Waterfall Model`;
+        ratEl.value = `เป็นระบบ Embedded ที่มีความวิกฤตด้านความปลอดภัย (Safety-critical) และต้องทำงานร่วมกับเซ็นเซอร์ฮาร์ดแวร์อย่างแม่นยำ จึงต้องกำหนดสเปกและตรวจวิเคราะห์อันตรายให้ครบก่อนเขียนโค้ด`;
+      } else if (type === `dorm`) {
+        nameEl.value = `เว็บแอปพลิเคชันแจ้งซ่อมและชำระค่าหอพักนักศึกษา`;
+        prodEl.value = `Hybrid Configurable`;
+        appEl.value = `Interactive Transaction-based`;
+        modEl.value = `Agile / Scrum`;
+        ratEl.value = `ความต้องการด้าน UX ของนักศึกษาและเจ้าหน้าที่เปลี่ยนบ่อยและไม่มีความเสี่ยงต่อชีวิต จึงเหมาะกับการใช้ Scrum ปล่อยฟีเจอร์ทุก 2 สัปดาห์`;
+      }
+      saveWorkshopState();
+    }
+
+    function collectWorkshopDomToState() {
+      const sid = document.getElementById(`ws-student-id`);
+      const pname = document.getElementById(`ws-project-name`);
+      const ptype = document.getElementById(`ws-product-type`);
+      const atype = document.getElementById(`ws-app-type`);
+      const pmod = document.getElementById(`ws-process-model`);
+      const rat = document.getElementById(`ws-rationale`);
+
+      if (sid) appState.studentId = sid.value;
+      if (pname) appState.projectName = pname.value;
+      if (ptype) appState.productType = ptype.value;
+      if (atype) appState.appType = atype.value;
+      if (pmod) appState.processModel = pmod.value;
+      if (rat) appState.rationale = rat.value;
+
+      const artBoxes = document.querySelectorAll(`#ws-artifacts-list input[type="checkbox"]`);
+      appState.artifacts = [];
+      artBoxes.forEach((cb) => {
+        if (cb.checked) appState.artifacts.push(cb.value);
+      });
+
+      const gitBoxes = document.querySelectorAll(`#git-checklist input[type="checkbox"]`);
+      appState.gitChecks = [];
+      gitBoxes.forEach((cb) => {
+        if (cb.checked) appState.gitChecks.push(cb.value);
+      });
+    }
+
+    function applyStateToWorkshopDom() {
+      const sid = document.getElementById(`ws-student-id`);
+      const pname = document.getElementById(`ws-project-name`);
+      const ptype = document.getElementById(`ws-product-type`);
+      const atype = document.getElementById(`ws-app-type`);
+      const pmod = document.getElementById(`ws-process-model`);
+      const rat = document.getElementById(`ws-rationale`);
+
+      if (sid) sid.value = appState.studentId || ``;
+      if (pname) pname.value = appState.projectName || ``;
+      if (ptype) ptype.value = appState.productType || ``;
+      if (atype) atype.value = appState.appType || ``;
+      if (pmod) pmod.value = appState.processModel || ``;
+      if (rat) rat.value = appState.rationale || ``;
+
+      const artBoxes = document.querySelectorAll(`#ws-artifacts-list input[type="checkbox"]`);
+      artBoxes.forEach((cb) => {
+        cb.checked = Array.isArray(appState.artifacts) && appState.artifacts.includes(cb.value);
+      });
+
+      const gitBoxes = document.querySelectorAll(`#git-checklist input[type="checkbox"]`);
+      gitBoxes.forEach((cb) => {
+        cb.checked = Array.isArray(appState.gitChecks) && appState.gitChecks.includes(cb.value);
+      });
+    }
+
+    function updateProgressIndicators() {
+      let done = 0;
+      const total = 12;
+      if (appState.projectName && appState.projectName.trim().length > 0) done += 1;
+      if (appState.productType) done += 1;
+      if (appState.processModel) done += 1;
+      if (Array.isArray(appState.artifacts) && appState.artifacts.length >= 3) done += 1;
+      if (appState.rationale && appState.rationale.trim().length >= 10) done += 1;
+      if (Array.isArray(appState.gitChecks)) done += Math.min(2, Math.floor(appState.gitChecks.length / 2));
+      done += Math.min(5, Object.keys(appState.quizAnswers || {}).length);
+
+      const pct = Math.min(100, Math.round((done / total) * 100));
+      const badge = document.getElementById(`header-progress-badge`);
+      const bar = document.getElementById(`aside-progress-bar`);
+      const fill = document.getElementById(`aside-progress-fill`);
+      const text = document.getElementById(`aside-progress-text`);
+
+      if (badge) badge.textContent = `ความคืบหน้า: ${pct}%`;
+      if (bar) bar.setAttribute(`aria-valuenow`, String(pct));
+      if (fill) fill.style.width = `${pct}%`;
+      if (text) {
+        text.textContent = pct === 0
+          ? `ยังไม่มีรายการที่บันทึก — เริ่มทำ Workshop ในส่วนที่ 5 ได้ทันที`
+          : `ทำกิจกรรมแล้ว ${pct}% (บันทึกสถานะอัตโนมัติแล้ว)`;
+      }
+    }
+
+    async function persistState() {
+      updateProgressIndicators();
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === `function`) {
+          await window.notebookAppApi.setAppState(appState);
+        }
+      } catch (err) {
+        const msg = document.getElementById(`ws-status-msg`);
+        if (msg) msg.textContent = `ไม่สามารถบันทึกสถานะไปยังโฮสต์ได้ในขณะนี้`;
+      }
+    }
+
+    function saveWorkshopState() {
+      collectWorkshopDomToState();
+      const msg = document.getElementById(`ws-status-msg`);
+      if (msg) msg.textContent = `บันทึกความคืบหน้าล่าสุดแล้ว`;
+      persistState();
+    }
+
+    function exportWorkshopFile() {
+      collectWorkshopDomToState();
+      const score = QUIZ_DATA.reduce((acc, q, idx) => acc + (appState.quizAnswers[idx] === q.correct ? 1 : 0), 0);
+      const lines = [
+        `MODULE 1 WORKSHEET: FOUNDATIONS OF SOFTWARE ENGINEERING & SDLC`,
+        `================================================================`,
+        `Student / Group: ${appState.studentId || `-`}`,
+        `Project Name: ${appState.projectName || `-`}`,
+        `Software Product Type: ${appState.productType || `-`}`,
+        `Application Category: ${appState.appType || `-`}`,
+        `Selected Process Model: ${appState.processModel || `-`}`,
+        `Planned Artifacts (${appState.artifacts.length}):`,
+        appState.artifacts.length > 0 ? appState.artifacts.map((a) => `  - ${a}`).join(`\n`) : `  - (None selected)`,
+        `Rationale & Quality Focus:`,
+        appState.rationale || `-`,
+        ``,
+        `Git Workflow Checklist Completed: ${appState.gitChecks.length} / 5`,
+        `Self-Check Quiz Score: ${score} / ${QUIZ_DATA.length}`
+      ];
+      const content = lines.join(`\n`);
+
+      if (window.notebookAppApi && typeof window.notebookAppApi.triggerFileDownload === `function`) {
+        window.notebookAppApi.triggerFileDownload({
+          content: content,
+          contentType: `text/plain`,
+          encoding: `UTF-8`,
+          filename: `module1-sdlc-workshop.txt`
+        });
+      }
+      const msg = document.getElementById(`ws-status-msg`);
+      if (msg) msg.textContent = `ส่งออกไฟล์ module1-sdlc-workshop.txt เรียบร้อยแล้ว`;
+    }
+
+    function handleResetWorkshop(btn) {
+      if (!btn) return;
+      if (btn.dataset.armed !== `true`) {
+        btn.dataset.armed = `true`;
+        btn.innerHTML = `<i data-lucide="alert-triangle" aria-hidden="true" width="18" height="18"></i> คลิกอีกครั้งเพื่อยืนยันการล้างข้อมูล`;
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
+      btn.dataset.armed = `false`;
+      btn.innerHTML = `<i data-lucide="rotate-ccw" aria-hidden="true" width="18" height="18"></i> รีเซ็ตข้อมูล Workshop`;
+      if (window.lucide) window.lucide.createIcons();
+
+      appState = {
+        studentId: ``,
+        projectName: ``,
+        productType: ``,
+        appType: ``,
+        processModel: ``,
+        artifacts: [],
+        rationale: ``,
+        gitChecks: [],
+        quizAnswers: {}
+      };
+      applyStateToWorkshopDom();
+      renderQuiz();
+      persistState();
+
+      const msg = document.getElementById(`ws-status-msg`);
+      if (msg) msg.textContent = `ล้างข้อมูลใบงานและแบบทดสอบเรียบร้อยแล้ว`;
+    }
+
+    function initScrollSpy() {
+      const links = document.querySelectorAll(`#toc-list a`);
+      const sections = document.querySelectorAll(`.lecture-section`);
+      if (!links.length || !sections.length || typeof IntersectionObserver === `undefined`) return;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            links.forEach((a) => {
+              if (a.dataset.target === id) a.classList.add(`is-active`);
+              else a.classList.remove(`is-active`);
+            });
+          }
+        });
+      }, { threshold: 0.25 });
+
+      sections.forEach((sec) => observer.observe(sec));
+    }
+
+    // --- Initialization ---
+    async function initApp() {
+      filterArtifacts(`all`);
+      selectSdlcPhase(0);
+      evaluateProcessModel();
+      initComparisonChart();
+      initScrollSpy();
+
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === `function`) {
+          const saved = await window.notebookAppApi.getAppState();
+          if (saved && typeof saved === `object`) {
+            appState = {
+              studentId: saved.studentId || ``,
+              projectName: saved.projectName || ``,
+              productType: saved.productType || ``,
+              appType: saved.appType || ``,
+              processModel: saved.processModel || ``,
+              artifacts: Array.isArray(saved.artifacts) ? saved.artifacts : [],
+              rationale: saved.rationale || ``,
+              gitChecks: Array.isArray(saved.gitChecks) ? saved.gitChecks : [],
+              quizAnswers: saved.quizAnswers && typeof saved.quizAnswers === `object` ? saved.quizAnswers : {}
+            };
+          }
+        }
+      } catch (err) {
+        // Fallback to default empty state cleanly
+      }
+
+      applyStateToWorkshopDom();
+      renderQuiz();
+      updateProgressIndicators();
+
+      if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === `function`) {
+        window.notebookAppApi.notifyAppReady();
+      }
+    }
+
+    document.addEventListener(`DOMContentLoaded`, initApp);
+  </script>
 </body>
 </html>
