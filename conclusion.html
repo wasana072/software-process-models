@@ -1,0 +1,2728 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="narrative">
+  <meta name="design-style" content="haven">
+  <title>Software Process Models — สรุปเนื้อหาบทเรียนฉบับสมบูรณ์ (5 โมดูล)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* 1. Haven base adapted for Clean Light Theme: Off-white, Slate Blue, Violet accents */
+      --background: #f8f9fb;
+      --surface-container-low: #ffffff;
+      --surface-container: #eff2f7;
+      --surface-container-high: #e3e8f0;
+      --surface-violet: #f4f1fe;
+
+      /* Ink */
+      --on-surface: #1e242b;
+      --on-surface-variant: #4f5b69;
+
+      /* Rules */
+      --outline: #c3ccd6;
+      --outline-variant: #dde3ea;
+
+      /* Accents: Slate Blue + Violet */
+      --primary: #334e68;
+      --on-primary: #ffffff;
+      --primary-container: #e4ebf3;
+      --on-primary-container: #1f364d;
+      --secondary: #5b21b6;
+      --tertiary: #6d28d9;
+      --violet-container: #ede9fe;
+      --on-violet-container: #4c1d95;
+      --error: #b91c1c;
+      --error-container: #fee2e2;
+      --on-error: #ffffff;
+
+      /* Semantic */
+      --positive: #15803d;
+      --positive-container: #dcfce7;
+      --warning: #b45309;
+      --warning-container: #fef3c7;
+      --focus: #5b21b6;
+
+      /* Data visualization series */
+      --data-1: #334e68;
+      --data-2: #6d28d9;
+      --data-3: #0f766e;
+      --data-4: #b45309;
+      --data-context: #cbd5e1;
+
+      /* Typography (Non-Latin Thai first) */
+      --font-headline: 'Noto Sans Thai', 'Outfit', sans-serif;
+      --font-body: 'Noto Sans Thai', 'Hanken Grotesk', sans-serif;
+      --font-label: 'Noto Sans Thai', 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', 'Noto Sans Thai', monospace;
+
+      /* Type scale (Narrative) */
+      --display-size: clamp(2rem, 1.35rem + 2.6vw, 3.1rem);
+      --headline-size: clamp(1.5rem, 1.15rem + 1.35vw, 2.05rem);
+      --subhead-size: clamp(1.15rem, 1.05rem + 0.45vw, 1.375rem);
+      --body-size: clamp(1rem, 0.96rem + 0.18vw, 1.09375rem);
+      --label-size: 0.8125rem;
+
+      /* Shape & effects */
+      --rounded: 0.375rem;
+      --rounded-lg: 0.5rem;
+      --rounded-full: 9999px;
+      --hairline: 1px solid var(--outline-variant);
+      --hairline-control: 1px solid var(--outline);
+      --accent-rule: 3px solid var(--secondary);
+      --slate-rule: 3px solid var(--primary);
+      --elevation: none;
+
+      /* Spacing scale (4pt base) */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 5.5rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.72;
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+    button, input, select, textarea { font-family: inherit; }
+
+    /* Focus rings */
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    /* Layout Shell */
+    .page-grid {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: var(--space-xl);
+      padding: var(--space-xl) var(--space-lg) var(--space-3xl);
+      max-width: 1240px;
+      margin: 0 auto;
+      align-items: start;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Reading progress bar */
+    .progress-track {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--outline-variant);
+      z-index: 50;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--tertiary));
+      transition: width var(--dur-micro) linear;
+    }
+
+    /* Sticky Sidebar TOC */
+    aside.toc-sidebar {
+      position: sticky;
+      top: var(--space-lg);
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      max-height: calc(100vh - 3rem);
+      overflow-y: auto;
+    }
+    .toc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: var(--space-sm);
+      margin-bottom: var(--space-md);
+      border-bottom: var(--hairline);
+    }
+    .toc-title {
+      font-family: var(--font-headline);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin: 0;
+    }
+    .toc-badge {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--on-violet-container);
+      background: var(--violet-container);
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--rounded);
+    }
+    .toc-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .toc-module-link {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-sm);
+      text-decoration: none;
+      color: var(--on-surface);
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: var(--rounded);
+      border-left: 2px solid transparent;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+    }
+    .toc-module-link:hover {
+      background: var(--surface-container);
+      color: var(--primary);
+    }
+    .toc-module-link.active {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border-left-color: var(--secondary);
+    }
+    .toc-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--secondary);
+      flex-shrink: 0;
+    }
+    .toc-sublist {
+      list-style: none;
+      margin: 0.15rem 0 0.5rem 1.4rem;
+      padding: 0 0 0 var(--space-sm);
+      border-left: var(--hairline);
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .toc-sublink {
+      display: block;
+      text-decoration: none;
+      color: var(--on-surface-variant);
+      font-size: 0.8rem;
+      line-height: 1.45;
+      padding: 0.2rem 0.4rem;
+      border-radius: var(--rounded);
+      transition: color var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out);
+    }
+    .toc-sublink:hover {
+      color: var(--secondary);
+      background: var(--surface-container);
+    }
+
+    /* Main narrative column */
+    main.content-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2xl);
+    }
+
+    /* Hero Banner */
+    .course-hero {
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-top: 4px solid var(--primary);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-xl);
+    }
+    .hero-kicker-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    .pill-slate {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      font-size: var(--label-size);
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--rounded-full);
+    }
+    .pill-violet {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: var(--violet-container);
+      color: var(--on-violet-container);
+      font-size: var(--label-size);
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--rounded-full);
+    }
+    h1.hero-title {
+      font-family: var(--font-headline);
+      font-size: var(--display-size);
+      font-weight: 400;
+      line-height: 1.2;
+      margin: 0 0 var(--space-md);
+      color: var(--on-surface);
+    }
+    h1.hero-title strong {
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .hero-lede {
+      color: var(--on-surface-variant);
+      font-size: 1.0625rem;
+      max-width: 68ch;
+      margin: 0 0 var(--space-lg);
+    }
+    .key-figures-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
+      gap: var(--space-md);
+      margin-top: var(--space-lg);
+      padding-top: var(--space-lg);
+      border-top: var(--hairline);
+    }
+    .kf-tile {
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+    }
+    .kf-label {
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      font-weight: 500;
+      margin-bottom: var(--space-xs);
+    }
+    .kf-value {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.25;
+    }
+    .kf-caption {
+      font-size: 0.8rem;
+      color: var(--secondary);
+      margin-top: var(--space-xs);
+      font-weight: 500;
+    }
+
+    /* Mobile / Inline TOC (shown on smaller viewports) */
+    .mobile-toc {
+      display: none;
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md) var(--space-lg);
+    }
+    .mobile-toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+      gap: var(--space-sm);
+      margin-top: var(--space-sm);
+    }
+    .mobile-toc-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      text-decoration: none;
+      padding: var(--space-sm) var(--space-md);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      background: var(--background);
+      color: var(--on-surface);
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .mobile-toc-btn:hover {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+
+    /* Module Sections */
+    section.module-section {
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-xl);
+      scroll-margin-top: var(--space-lg);
+    }
+    .module-header {
+      padding-bottom: var(--space-lg);
+      margin-bottom: var(--space-xl);
+      border-bottom: var(--hairline);
+    }
+    .module-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--secondary);
+      background: var(--violet-container);
+      padding: 0.2rem 0.65rem;
+      border-radius: var(--rounded);
+      margin-bottom: var(--space-sm);
+    }
+    h2.module-title {
+      font-family: var(--font-headline);
+      font-size: var(--headline-size);
+      font-weight: 400;
+      line-height: 1.28;
+      margin: 0 0 var(--space-sm);
+      color: var(--on-surface);
+    }
+    h2.module-title strong {
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .module-summary {
+      color: var(--on-surface-variant);
+      margin: 0;
+      max-width: 68ch;
+    }
+
+    /* Subsections */
+    .subsection {
+      margin-top: var(--space-xl);
+      padding-top: var(--space-lg);
+      border-top: var(--hairline);
+      scroll-margin-top: var(--space-lg);
+    }
+    .subsection:first-of-type {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+    h3.subhead {
+      font-family: var(--font-headline);
+      font-size: var(--subhead-size);
+      font-weight: 600;
+      color: var(--primary);
+      margin: 0 0 var(--space-md);
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-sm);
+    }
+    h3.subhead .sub-num {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--secondary);
+      font-weight: 600;
+    }
+    h4.mini-head {
+      font-family: var(--font-headline);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--on-surface);
+      margin: var(--space-lg) 0 var(--space-sm);
+    }
+    p {
+      margin: 0 0 var(--space-md);
+      max-width: 72ch;
+    }
+    ul, ol {
+      margin: 0 0 var(--space-md);
+      padding-left: 1.35rem;
+      max-width: 70ch;
+    }
+    li {
+      margin-bottom: var(--space-xs);
+    }
+    li strong {
+      color: var(--on-surface);
+    }
+
+    /* Callout Cards / Highlight Boxes */
+    .callout {
+      border-left: var(--slate-rule);
+      background: var(--surface-container);
+      border-radius: 0 var(--rounded) var(--rounded) 0;
+      padding: var(--space-md) var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+    .callout--violet {
+      border-left: var(--accent-rule);
+      background: var(--surface-violet);
+    }
+    .callout--warning {
+      border-left: 3px solid var(--warning);
+      background: var(--warning-container);
+    }
+    .callout--positive {
+      border-left: 3px solid var(--positive);
+      background: var(--positive-container);
+    }
+    .callout-title {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--primary);
+      margin-bottom: var(--space-xs);
+    }
+    .callout--violet .callout-title { color: var(--secondary); }
+    .callout--warning .callout-title { color: var(--warning); }
+    .callout--positive .callout-title { color: var(--positive); }
+    .callout p:last-child, .callout ul:last-child { margin-bottom: 0; }
+
+    /* Two-column & Multi-card grids */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(270px, 100%), 1fr));
+      gap: var(--space-md);
+      margin: var(--space-md) 0 var(--space-lg);
+    }
+    .info-card {
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-md) var(--space-lg);
+    }
+    .info-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-xs);
+    }
+    .info-card-title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--primary);
+      margin: 0;
+    }
+    .tag-mono {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--rounded);
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .tag-violet {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--rounded);
+      background: var(--violet-container);
+      color: var(--on-violet-container);
+    }
+
+    /* Tables */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin: var(--space-md) 0 var(--space-lg);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      background: var(--surface-container-low);
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    table.data-table th {
+      background: var(--surface-container);
+      color: var(--primary);
+      font-family: var(--font-headline);
+      font-weight: 600;
+      padding: 0.75rem 0.9rem;
+      border-bottom: 2px solid var(--outline);
+      white-space: nowrap;
+    }
+    table.data-table td {
+      padding: 0.75rem 0.9rem;
+      border-bottom: var(--hairline);
+      vertical-align: top;
+      color: var(--on-surface);
+    }
+    table.data-table tbody tr:last-child td { border-bottom: none; }
+    table.data-table tbody tr:hover { background: var(--background); }
+
+    /* Interactive Explorer Containers */
+    .interactive-box {
+      background: var(--background);
+      border: var(--hairline);
+      border-top: 3px solid var(--secondary);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+    .interactive-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: var(--hairline);
+    }
+    .interactive-title {
+      font-family: var(--font-headline);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--secondary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      min-height: 40px;
+      padding: 0.45rem 0.9rem;
+      border-radius: var(--rounded);
+      border: var(--hairline-control);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+    .btn:hover {
+      background: var(--surface-container-high);
+    }
+    .btn.active, .btn--primary {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+    .btn--violet.active, .btn--violet:hover {
+      background: var(--secondary);
+      color: var(--on-primary);
+      border-color: var(--secondary);
+    }
+
+    /* Sliders & Controls */
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+    .control-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+    .control-val {
+      font-family: var(--font-mono);
+      color: var(--secondary);
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--secondary);
+      cursor: pointer;
+    }
+    .text-input, .select-input {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      border: var(--hairline-control);
+      border-radius: var(--rounded);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      font-size: 0.925rem;
+    }
+
+    /* Output Readout Grid */
+    .output-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+    .output-metric {
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+    }
+    .output-metric-label {
+      font-size: 0.8rem;
+      color: var(--on-surface-variant);
+      margin-bottom: 0.25rem;
+    }
+    .output-metric-val {
+      font-family: var(--font-headline);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .output-metric-val.is-warn { color: var(--warning); }
+    .output-metric-val.is-danger { color: var(--error); }
+    .output-metric-val.is-good { color: var(--positive); }
+
+    /* SVG Diagram Panels */
+    .diagram-panel {
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      margin: var(--space-md) 0 var(--space-lg);
+      overflow-x: auto;
+    }
+    .diagram-caption {
+      font-size: 0.825rem;
+      color: var(--on-surface-variant);
+      margin-top: var(--space-sm);
+      text-align: center;
+    }
+
+    /* Chart Container */
+    .chart-box {
+      position: relative;
+      width: 100%;
+      min-height: 320px;
+      height: 320px;
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+    }
+
+    /* Step-by-step Playbook */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      margin: var(--space-md) 0;
+    }
+    .step-item {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr);
+      gap: var(--space-md);
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      align-items: start;
+    }
+    .step-num-box {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
+      color: var(--on-primary);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1rem;
+      border-radius: var(--rounded);
+    }
+    .step-item.is-violet .step-num-box {
+      background: var(--secondary);
+    }
+
+    /* Code / Command snippets */
+    .code-block {
+      font-family: var(--font-mono);
+      font-size: 0.83rem;
+      line-height: 1.55;
+      background: var(--surface-container);
+      color: var(--on-surface);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      overflow-x: auto;
+      margin: var(--space-sm) 0 var(--space-md);
+      white-space: pre;
+    }
+    code.inline-code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--surface-container);
+      color: var(--secondary);
+      padding: 0.1rem 0.35rem;
+      border-radius: var(--rounded);
+    }
+
+    /* Spiral Interactive Quadrant Buttons */
+    .quadrant-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    .quad-btn {
+      text-align: left;
+      padding: var(--space-md);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      background: var(--surface-container-low);
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+    .quad-btn:hover { background: var(--surface-container); }
+    .quad-btn.active {
+      background: var(--violet-container);
+      border-color: var(--secondary);
+    }
+    .quad-btn-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--secondary);
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+    .quad-btn-title {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--on-surface);
+    }
+
+    /* INVEST Checklist */
+    .invest-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+      gap: var(--space-sm);
+      margin: var(--space-md) 0;
+    }
+    .invest-check {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: 0.65rem 0.75rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .invest-check input {
+      margin-top: 0.25rem;
+      accent-color: var(--secondary);
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* Footer */
+    footer.course-footer {
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-xl);
+      color: var(--on-surface-variant);
+      font-size: 0.9rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 960px) {
+      .page-grid {
+        grid-template-columns: 1fr;
+        padding: var(--space-md);
+      }
+      aside.toc-sidebar { display: none; }
+      .mobile-toc { display: block; }
+    }
+    @media (max-width: 640px) {
+      .page-grid { grid-template-columns: 1fr; padding: var(--space-sm); }
+      aside.toc-sidebar { display: none; }
+      section.module-section, .course-hero { padding: var(--space-md); }
+      .quadrant-grid { grid-template-columns: 1fr; }
+      .step-item { grid-template-columns: 1fr; }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* Print optimization for A4 study */
+    @media print {
+      aside.toc-sidebar, .mobile-toc, .progress-track { display: none !important; }
+      .page-grid { grid-template-columns: 1fr; max-width: 100%; padding: 0; }
+      section.module-section { break-inside: avoid-page; border: none; padding: 1rem 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-track" aria-hidden="true">
+    <div class="progress-fill" id="reading-progress"></div>
+  </div>
+
+  <div class="page-grid">
+    <!-- Sticky Sidebar TOC -->
+    <aside class="toc-sidebar" aria-label="สารบัญเนื้อหาบทเรียน">
+      <div class="toc-header">
+        <h2 class="toc-title">สารบัญบทเรียน</h2>
+        <span class="toc-badge">5 MODULES</span>
+      </div>
+      <ul class="toc-list" id="toc-nav">
+        <li>
+          <a href="#module-1" class="toc-module-link active" data-target="module-1">
+            <span class="toc-num">01</span>
+            <span>Foundations &amp; SDLC</span>
+          </a>
+          <ul class="toc-sublist">
+            <li><a href="#m1-1" class="toc-sublink">1.1 Process &amp; Modeling</a></li>
+            <li><a href="#m1-2" class="toc-sublink">1.2 Triple Constraint &amp; Paradox</a></li>
+            <li><a href="#m1-3" class="toc-sublink">1.3 SDLC &amp; V&amp;V</a></li>
+            <li><a href="#m1-4" class="toc-sublink">1.4 Artifacts Matrix</a></li>
+            <li><a href="#m1-5" class="toc-sublink">1.5 No Silver Bullet</a></li>
+            <li><a href="#m1-6" class="toc-sublink">1.6 Workshop 1: Case Studies</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#module-2" class="toc-module-link" data-target="module-2">
+            <span class="toc-num">02</span>
+            <span>Traditional Models</span>
+          </a>
+          <ul class="toc-sublist">
+            <li><a href="#m2-1" class="toc-sublink">2.1 Waterfall Model</a></li>
+            <li><a href="#m2-2" class="toc-sublink">2.2 V-Model &amp; Testing</a></li>
+            <li><a href="#m2-3" class="toc-sublink">2.3 บริบทที่เหมาะสม</a></li>
+            <li><a href="#m2-4" class="toc-sublink">2.4 จุดคอขวดและข้อจำกัด</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#module-3" class="toc-module-link" data-target="module-3">
+            <span class="toc-num">03</span>
+            <span>Iterative &amp; Incremental</span>
+          </a>
+          <ul class="toc-sublist">
+            <li><a href="#m3-1" class="toc-sublink">3.1 Iterative vs. Incremental</a></li>
+            <li><a href="#m3-2" class="toc-sublink">3.2 Prototyping Models</a></li>
+            <li><a href="#m3-3" class="toc-sublink">3.3 Spiral Model 4 Quadrants</a></li>
+            <li><a href="#m3-4" class="toc-sublink">3.4 Uncertainty &amp; Risks</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#module-4" class="toc-module-link" data-target="module-4">
+            <span class="toc-num">04</span>
+            <span>Agile: Scrum &amp; Kanban</span>
+          </a>
+          <ul class="toc-sublist">
+            <li><a href="#m4-1" class="toc-sublink">4.1 Agile Manifesto &amp; Lean</a></li>
+            <li><a href="#m4-2" class="toc-sublink">4.2 Scrum Framework</a></li>
+            <li><a href="#m4-3" class="toc-sublink">4.3 Kanban &amp; Flow</a></li>
+            <li><a href="#m4-4" class="toc-sublink">4.4 Scrum vs Kanban &amp; Scrumban</a></li>
+            <li><a href="#m4-5" class="toc-sublink">4.5 INVEST &amp; SMART Tasks</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#module-5" class="toc-module-link" data-target="module-5">
+            <span class="toc-num">05</span>
+            <span>Software House &amp; Tooling</span>
+          </a>
+          <ul class="toc-sublist">
+            <li><a href="#m5-1" class="toc-sublink">5.1 ทีมและ Psychological Safety</a></li>
+            <li><a href="#m5-2" class="toc-sublink">5.2 GitHub Projects &amp; Jira</a></li>
+            <li><a href="#m5-3" class="toc-sublink">5.3 Git Branching &amp; PR Culture</a></li>
+            <li><a href="#m5-4" class="toc-sublink">5.4 CI/CD, Testing &amp; Metrics</a></li>
+            <li><a href="#m5-5" class="toc-sublink">5.5 คู่มือปฏิบัติการ Senior Project</a></li>
+          </ul>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Column -->
+    <main class="content-column">
+      <!-- Hero Header -->
+      <header class="course-hero">
+        <div class="hero-kicker-row">
+          <span class="pill-slate">
+            <i data-lucide="book-open" style="width:14px;height:14px;"></i>
+            เอกสารสรุปบทเรียนฉบับสมบูรณ์
+          </span>
+          <span class="pill-violet">
+            <i data-lucide="layers" style="width:14px;height:14px;"></i>
+            Sommerville (2016) &amp; Dooley &amp; Kazakova (2024)
+          </span>
+        </div>
+        <h1 class="hero-title">
+          รายวิชา <strong>Software Process Models</strong> — โมเดลกระบวนการพัฒนาซอฟต์แวร์และการบริหารวิศวกรรมยุคใหม่
+        </h1>
+        <p class="hero-lede">
+          เอกสารทบทวนและอ้างอิงการสอนเชิงลึกครอบคลุมทั้ง 5 โมดูล ตั้งแต่รากฐานวิศวกรรมซอฟต์แวร์ วงจรชีวิต SDLC โมเดลแบบดั้งเดิม (Waterfall, V-Model) โมเดลแบบทำซ้ำและบริหารความเสี่ยง (Iterative, Incremental, Prototyping, Spiral) กรอบการทำงานอไจล์ (Scrum, Kanban, Scrumban) ไปจนถึงการจำลองการทำงานแบบ Software House ด้วย GitHub Projects และ CI/CD
+        </p>
+        <div class="key-figures-grid">
+          <div class="kf-tile">
+            <div class="kf-label">โครงสร้างบทเรียน</div>
+            <div class="kf-value">5 โมดูล</div>
+            <div class="kf-caption">เรียงลำดับจากรากฐานสู่ปฏิบัติการ</div>
+          </div>
+          <div class="kf-tile">
+            <div class="kf-label">กิจกรรมหลักของ Process</div>
+            <div class="kf-value">4 แกน</div>
+            <div class="kf-caption">Specify · Develop · Validate · Evolve</div>
+          </div>
+          <div class="kf-tile">
+            <div class="kf-label">กรณีศึกษามาตรฐาน</div>
+            <div class="kf-value">4 ระบบ</div>
+            <div class="kf-caption">Insulin Pump · Mentcare · Weather · iLearn</div>
+          </div>
+          <div class="kf-tile">
+            <div class="kf-label">กรอบเวลาการอ่านทบทวน</div>
+            <div class="kf-value">~15 หน้า A4</div>
+            <div class="kf-caption">พร้อมตารางเปรียบเทียบและโมเดลจำลอง</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Mobile Quick TOC -->
+      <nav class="mobile-toc" aria-label="สารบัญด่วน">
+        <div style="font-weight:700;color:var(--primary);font-size:0.95rem;">สารบัญด่วน (คลิกเพื่อข้ามไปยังโมดูล)</div>
+        <div class="mobile-toc-grid">
+          <a href="#module-1" class="mobile-toc-btn"><span class="toc-num">01</span> Foundations &amp; SDLC</a>
+          <a href="#module-2" class="mobile-toc-btn"><span class="toc-num">02</span> Traditional Models</a>
+          <a href="#module-3" class="mobile-toc-btn"><span class="toc-num">03</span> Iterative &amp; Incremental</a>
+          <a href="#module-4" class="mobile-toc-btn"><span class="toc-num">04</span> Agile: Scrum &amp; Kanban</a>
+          <a href="#module-5" class="mobile-toc-btn"><span class="toc-num">05</span> Software House &amp; Tooling</a>
+        </div>
+      </nav>
+
+      <!-- ========================================================= -->
+      <!-- MODULE 1 -->
+      <!-- ========================================================= -->
+      <section class="module-section" id="module-1">
+        <div class="module-header">
+          <span class="module-kicker">MODULE 01</span>
+          <h2 class="module-title"><strong>Foundations of Software Engineering &amp; SDLC</strong> — รากฐานวิศวกรรมซอฟต์แวร์และวงจรชีวิตการพัฒนา</h2>
+          <p class="module-summary">
+            ปูพื้นฐานความเข้าใจว่าเหตุใดการพัฒนาซอฟต์แวร์ระดับอาชีพจึงต้องอาศัยกระบวนการที่เป็นระบบ ศึกษาตัวแปรข้อจำกัดของโครงการ คุณลักษณะคุณภาพซอฟต์แวร์ ความแตกต่างระหว่าง Verification กับ Validation และหลักการเลือกใช้โมเดลตามบริบทของระบบ
+          </p>
+        </div>
+
+        <div class="subsection" id="m1-1">
+          <h3 class="subhead"><span class="sub-num">1.1</span> นิยามและความสำคัญของ Software Process และ Software Process Modeling</h3>
+          <p>
+            ในมุมมองของบุคคลทั่วไป ซอฟต์แวร์อาจหมายถึงเพียงโปรแกรมคอมพิวเตอร์หรือซอร์สโค้ด แต่ตามนิยามของ <strong>Ian Sommerville (2016)</strong> ซอฟต์แวร์ระดับอาชีพ (Professional Software) ไม่ได้มีเพียงโปรแกรมที่รันได้เท่านั้น หากแต่ครอบคลุมถึง <strong>ไลบรารี ไฟล์ตั้งค่าระบบ (Configuration Data) เอกสารระบบ (System Documentation) คู่มือผู้ใช้ (User Documentation) รวมถึงเว็บไซต์สนับสนุน</strong> เพื่อให้บุคคลอื่นสามารถใช้งาน บำรุงรักษา และพัฒนาต่อยอดได้ตลอดอายุขัยของระบบ
+          </p>
+          <p>
+            ผลิตภัณฑ์ซอฟต์แวร์แบ่งออกเป็น 2 ประเภทหลักที่มีผลโดยตรงต่อการบริหารความต้องการและกระบวนการพัฒนา ได้แก่
+          </p>
+          <div class="card-grid">
+            <div class="info-card">
+              <div class="info-card-top">
+                <h4 class="info-card-title">Generic Products (ซอฟต์แวร์สำเร็จรูป)</h4>
+                <span class="tag-mono">Market-Driven</span>
+              </div>
+              <p>ระบบที่องค์กรพัฒนาขึ้นเพื่อจำหน่ายในตลาดเสรีแก่ลูกค้าทั่วไป เช่น แอปพลิเคชันมือถือ ฐานข้อมูล โปรแกรมสำนักงาน หรือระบบเฉพาะทาง (Vertical Applications) จุดสำคัญคือ <strong>ผู้พัฒนาเป็นผู้ควบคุม Specification เอง</strong> จึงปรับขอบเขตได้เมื่อเกิดอุปสรรค</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-top">
+                <h4 class="info-card-title">Customized / Bespoke Software (ซอฟต์แวร์สั่งทำ)</h4>
+                <span class="tag-violet">Contract-Driven</span>
+              </div>
+              <p>ระบบที่พัฒนาตามการว่าจ้างของลูกค้ารายใดรายหนึ่งโดยเฉพาะ เช่น ระบบควบคุมอุปกรณ์การแพทย์ ระบบควบคุมจราจรทางอากาศ หรือระบบกระบวนการธุรกิจเฉพาะองค์กร จุดสำคัญคือ <strong>ผู้ซื้อหรือลูกค้าเป็นผู้ควบคุม Specification</strong> ทีมพัฒนาต้องส่งมอบให้ตรงตามข้อตกลง</p>
+            </div>
+          </div>
+          <p>
+            อย่างไรก็ตาม ปัจจุบันเส้นแบ่งระหว่างสองประเภทเริ่มเลือนรางลง ระบบธุรกิจจำนวนมากใช้แนวทางนำ Generic Product เช่น ERP (SAP, Oracle) มาเป็นฐานแล้วปรับแต่ง (Customize) กฎทางธุรกิจและรายงานเพิ่มเติมให้เข้ากับองค์กร
+          </p>
+          <p>
+            <strong>Software Process (กระบวนการซอฟต์แวร์)</strong> คือ ลำดับของกิจกรรมที่เชื่อมโยงกันเพื่อนำไปสู่การผลิตและวิวัฒนาการของผลิตภัณฑ์ซอฟต์แวร์ แม้แต่ละองค์กรจะมีกระบวนการที่แตกต่างกัน แต่ทุกกระบวนการต้องประกอบด้วย <strong>4 กิจกรรมพื้นฐาน (Fundamental Process Activities)</strong> ได้แก่
+          </p>
+          <ol>
+            <li><strong>Software Specification (การกำหนดคุณลักษณะ):</strong> ลูกค้าและวิศวกรร่วมกันนิยามฟังก์ชันที่ระบบต้องทำและข้อจำกัดในการทำงาน</li>
+            <li><strong>Software Development (การพัฒนาซอฟต์แวร์):</strong> การออกแบบสถาปัตยกรรม ออกแบบรายละเอียด และการเขียนโปรแกรมให้เป็นไปตามข้อกำหนด</li>
+            <li><strong>Software Validation (การตรวจสอบความถูกต้อง):</strong> การตรวจเช็คและทดสอบว่าระบบทำงานตรงตามข้อกำหนดและตอบโจทย์ความต้องการจริงของผู้ใช้</li>
+            <li><strong>Software Evolution (การวิวัฒนาการซอฟต์แวร์):</strong> การปรับปรุงและเปลี่ยนแปลงซอฟต์แวร์หลังส่งมอบเพื่อให้สอดรับกับความต้องการทางธุรกิจและเทคโนโลยีที่เปลี่ยนไป</li>
+          </ol>
+          <p>
+            <strong>Software Process Modeling</strong> คือ การสร้างแบบจำลองเชิงนามธรรม (Simplified Representation) ของกระบวนการพัฒนาซอฟต์แวร์ เพื่อใช้สื่อสาร กำหนดมาตรฐาน ฝึกอบรม และปรับปรุงวิธีการทำงานในทีม แบบจำลองหนึ่งๆ มักแสดงมุมมองเฉพาะด้าน เช่น <em>มุมมองลำดับกิจกรรม (Workflow)</em>, <em>มุมมองการไหลของข้อมูลและเอกสาร (Data-flow / Artifacts)</em>, และ <em>มุมมองบทบาทหน้าที่ของผู้เกี่ยวข้อง (Role / Action)</em>
+          </p>
+        </div>
+
+        <div class="subsection" id="m1-2">
+          <h3 class="subhead"><span class="sub-num">1.2</span> Triple Constraint (3+3 Variables) และ Engineering Paradox</h3>
+          <p>
+            ตามกรอบความรู้ของ Project Management Institute (PMI) และตำราของ <strong>Dooley &amp; Kazakova (2024)</strong> การพัฒนาซอฟต์แวร์อยู่ภายใต้แรงกดดันของตัวแปรหลัก 3 ประการที่เรียกว่า <strong>Iron Triangle (Triple Constraint)</strong> ได้แก่ <strong>Cost (งบประมาณ/ทรัพยากร)</strong>, <strong>Time (กำหนดเวลา)</strong> และ <strong>Scope (ขอบเขตฟังก์ชันงาน)</strong> โดยมี <strong>Quality (คุณภาพ)</strong> อยู่ตรงจุดศูนย์กลาง การกำหนดค่าของสองตัวแปรย่อมบังคับให้ตัวแปรที่สามต้องปรับตัวตาม เช่น หากลูกค้าล็อกงบประมาณและกำหนดวันส่งมอบตายตัว ทีมวิศวกรจำเป็นต้องบริหารจัดการ Scope อย่างเคร่งครัดเพื่อไม่ให้คุณภาพพังทลาย
+          </p>
+          <p>
+            ในโครงการยุคใหม่ โมเดล 3 ตัวแปรได้ถูกขยายเป็น <strong>6 Variables of Software Development</strong> (Siegelaub, 2007) โดยเพิ่ม <strong>Quality</strong>, <strong>Risk (ความเสี่ยง)</strong> และ <strong>Benefits (คุณค่าทางธุรกิจที่ได้รับ)</strong> เข้ามาพิจารณาร่วมกัน การลดระยะเวลาส่งมอบโดยไม่ลด Scope และไม่เพิ่มคน มักนำไปสู่การแอบลด Quality หรือการสะสม Technical Debt ซึ่งต้องจ่ายคืนด้วยต้นทุนการแก้ไขที่สูงกว่าเดิมหลายเท่าในรุ่นถัดไป
+          </p>
+
+          <!-- Interactive Triple Constraint & 6-Variable Explorer -->
+          <div class="interactive-box" id="iron-triangle-explorer">
+            <div class="interactive-header">
+              <h4 class="interactive-title">
+                <i data-lucide="sliders" style="width:18px;height:18px;"></i>
+                แบบจำลอง Interactive: สมดุลตัวแปรโครงการ (Triple Constraint &amp; 6-Variable Trade-off)
+              </h4>
+              <span class="tag-violet">Experiment</span>
+            </div>
+            <div class="btn-row">
+              <button type="button" class="btn active" id="preset-balanced" onclick="applyTrianglePreset('balanced', this)">สมดุลมาตรฐาน</button>
+              <button type="button" class="btn" id="preset-crunch" onclick="applyTrianglePreset('crunch', this)">เร่งส่งมอบ (Deadline Crunch)</button>
+              <button type="button" class="btn" id="preset-creep" onclick="applyTrianglePreset('creep', this)">ขอบเขตบานปลาย (Scope Creep)</button>
+              <button type="button" class="btn" id="preset-critical" onclick="applyTrianglePreset('critical', this)">ระบบวิกฤตความปลอดภัย (Safety-Critical)</button>
+            </div>
+            <div class="control-grid">
+              <div class="control-field">
+                <label class="control-label" for="slider-cost">
+                  <span>Cost / ทรัพยากรทีม</span>
+                  <span class="control-val" id="val-cost">60%</span>
+                </label>
+                <input type="range" id="slider-cost" min="20" max="100" value="60" oninput="updateTriangleModel()">
+              </div>
+              <div class="control-field">
+                <label class="control-label" for="slider-time">
+                  <span>Schedule / ระยะเวลาที่มี</span>
+                  <span class="control-val" id="val-time">65%</span>
+                </label>
+                <input type="range" id="slider-time" min="20" max="100" value="65" oninput="updateTriangleModel()">
+              </div>
+              <div class="control-field">
+                <label class="control-label" for="slider-scope">
+                  <span>Scope / ปริมาณฟีเจอร์</span>
+                  <span class="control-val" id="val-scope">60%</span>
+                </label>
+                <input type="range" id="slider-scope" min="20" max="100" value="60" oninput="updateTriangleModel()">
+              </div>
+            </div>
+            <div class="output-grid">
+              <div class="output-metric">
+                <div class="output-metric-label">ระดับคุณภาพซอฟต์แวร์ (Quality)</div>
+                <div class="output-metric-val" id="out-quality">สมดุล (88/100)</div>
+              </div>
+              <div class="output-metric">
+                <div class="output-metric-label">ความเสี่ยงและหนี้ทางเทคนิค (Risk &amp; Tech Debt)</div>
+                <div class="output-metric-val" id="out-risk">ต่ำ (22%)</div>
+              </div>
+              <div class="output-metric">
+                <div class="output-metric-label">รูปแบบกระบวนการที่แนะนำ</div>
+                <div class="output-metric-val" id="out-process">Iterative / Scrum</div>
+              </div>
+            </div>
+            <p id="out-triangle-advice" style="margin-top:var(--space-md);margin-bottom:0;font-size:0.9rem;color:var(--on-surface-variant);">
+              ทรัพยากรและเวลาสอดคล้องกับขอบเขตงาน สามารถรักษามาตรฐานการทดสอบและ Code Review ได้อย่างต่อเนื่อง
+            </p>
+          </div>
+
+          <h4 class="mini-head">Engineering Paradox และคุณลักษณะสำคัญของซอฟต์แวร์ที่ดี</h4>
+          <p>
+            <strong>Engineering Paradox (ความย้อนแย้งทางวิศวกรรมซอฟต์แวร์)</strong> เกิดจากธรรมชาติของซอฟต์แวร์ที่จับต้องไม่ได้ (Intangible) และไร้ข้อจำกัดทางกายภาพหรือกฎหมายการผลิต ทำให้ใครๆ ก็เขียนโปรแกรมที่ "ดูเหมือนทำงานได้" โดยไม่ใช้กระบวนการวิศวกรรมได้ง่าย แต่เมื่อระบบขยายขนาดขึ้น ความซับซ้อนจะทวีคูณจนควบคุมไม่ได้ นอกจากนี้ ยิ่งเทคโนโลยีวิศวกรรมซอฟต์แวร์ก้าวหน้าและช่วยให้สร้างระบบใหญ่ขึ้นได้เร็วเท่าไร ความคาดหวังของตลาดและผู้ใช้งานก็ยิ่งเรียกร้องระบบที่ซับซ้อนยิ่งขึ้นและเร็วขึ้นกว่าเดิมเสมอ (Sommerville, 2016)
+          </p>
+          <p>
+            ในเชิงเศรษฐศาสตร์ซอฟต์แวร์ โดยเฉลี่ย <strong>60% ของต้นทุนการพัฒนาอยู่ที่การออกแบบและเขียนโปรแกรม และอีก 40% อยู่ที่การทดสอบ</strong> แต่สำหรับ Custom Software ตลอดอายุการใช้งาน <strong>ค่าใช้จ่ายในการวิวัฒนาการและบำรุงรักษา (Evolution/Maintenance Costs) มักสูงกว่าค่าพัฒนาเริ่มต้น</strong> ดังนั้น ซอฟต์แวร์ระดับอาชีพจึงต้องมีคุณลักษณะคุณภาพหลัก 4 ประการ (Sommerville Fig. 1.2)
+          </p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>คุณลักษณะ (Attribute)</th>
+                  <th>คำอธิบายเชิงวิศวกรรม</th>
+                  <th>ตัวอย่างรูปธรรมตามประเภทระบบ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>1. Acceptability</strong><br><span style="color:var(--on-surface-variant);font-size:0.82rem;">การยอมรับของผู้ใช้</span></td>
+                  <td>ระบบต้องเข้าใจง่าย ใช้งานได้สะดวก (Usable) และทำงานร่วมกับระบบเดิมที่ผู้ใช้มีอยู่ได้อย่างราบรื่น</td>
+                  <td>ระบบ Mentcare ต้องใช้งานง่ายสำหรับแพทย์และพยาบาลในคลินิกชุมชนที่มีภาระงานสูง</td>
+                </tr>
+                <tr>
+                  <td><strong>2. Dependability &amp; Security</strong><br><span style="color:var(--on-surface-variant);font-size:0.82rem;">ความเชื่อถือได้และความปลอดภัย</span></td>
+                  <td>ครอบคลุม Reliability, Safety และ Security ระบบต้องไม่ก่อความเสียหายต่อชีวิตหรือทรัพย์สิน และป้องกันการเข้าถึงโดยมิชอบ</td>
+                  <td>ระบบ Insulin Pump ต้องจ่ายอินซูลินแม่นยำ 100% และไม่หยุดทำงานในภาวะวิกฤต</td>
+                </tr>
+                <tr>
+                  <td><strong>3. Efficiency</strong><br><span style="color:var(--on-surface-variant);font-size:0.82rem;">ประสิทธิภาพการใช้ทรัพยากร</span></td>
+                  <td>ไม่ใช้หน่วยความจำ รอบซีพียู หรือพลังงานแบตเตอรี่อย่างสิ้นเปลือง รวมถึงเวลาตอบสนอง (Responsiveness) ที่เหมาะสม</td>
+                  <td>Wilderness Weather Station ต้องบริหารพลังงานแบตเตอรี่จากโซลาร์เซลล์และส่งข้อมูลผ่านดาวเทียมแบนด์วิดท์ต่ำ</td>
+                </tr>
+                <tr>
+                  <td><strong>4. Maintainability</strong><br><span style="color:var(--on-surface-variant);font-size:0.82rem;">ความสามารถในการบำรุงรักษา</span></td>
+                  <td>โครงสร้างโค้ดและเอกสารต้องออกแบบให้วิศวกรคนอื่นเข้ามาแก้ไข เพิ่มฟีเจอร์ และปรับเปลี่ยนตามสภาพแวดล้อมได้ง่าย</td>
+                  <td>ระบบ iLearn ที่โรงเรียนต้องปรับเปลี่ยนเครื่องมือการเรียนรู้และเชื่อมต่อบริการภายนอกใหม่ๆ ได้เสมอ</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="subsection" id="m1-3">
+          <h3 class="subhead"><span class="sub-num">1.3</span> วงจรชีวิตการพัฒนาซอฟต์แวร์ (SDLC Core Phases) และการเปรียบเทียบ Verification vs. Validation</h3>
+          <p>
+            <strong>Software Development Lifecycle (SDLC)</strong> คือ ลำดับช่วงชีวิตของซอฟต์แวร์ตั้งแต่ถือกำเนิดจนปลดระวาง Dooley &amp; Kazakova (2024) สรุปขั้นตอนแกนหลักของ SDLC ไว้ครบถ้วน 8 ขั้นตอน (โดยขั้นตอนหลักที่ดำเนินการซ้ำในทุกโครงการมี 5–6 ขั้นตอนแรก):
+          </p>
+          <div class="card-grid">
+            <div class="info-card">
+              <div class="info-card-top"><h4 class="info-card-title">1. Conception &amp; Feasibility</h4><span class="tag-mono">Phase 01</span></div>
+              <p>การระบุปัญหาทางธุรกิจ การศึกษาความเป็นไปได้ทางเทคนิค เศรษฐศาสตร์ และกฎหมาย รวมถึงการกำหนดวิสัยทัศน์เบื้องต้น</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-top"><h4 class="info-card-title">2. Requirements &amp; Modeling</h4><span class="tag-mono">Phase 02</span></div>
+              <p>การรวบรวม วิเคราะห์ จัดทำข้อกำหนดความต้องการ (Functional &amp; Non-functional) และสร้างแบบจำลองระบบ</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-top"><h4 class="info-card-title">3. System &amp; Software Design</h4><span class="tag-mono">Phase 03</span></div>
+              <p>การวางสถาปัตยกรรมระบบ (Architecture) โครงสร้างฐานข้อมูล อินเทอร์เฟซ และการออกแบบรายละเอียดระดับโมดูล/คลาส</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-top"><h4 class="info-card-title">4. Coding &amp; Debugging</h4><span class="tag-mono">Phase 04</span></div>
+              <p>การแปลงแบบจำลองการออกแบบให้เป็นซอร์สโค้ดที่ทำงานได้ การทดสอบระดับหน่วย (Unit Test) และการแก้ไขจุดบกพร่องเบื้องต้น</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-top"><h4 class="info-card-title">5. Integration &amp; Testing</h4><span class="tag-mono">Phase 05</span></div>
+              <p>การรวมส่วนประกอบย่อยเข้าด้วยกัน (Integration Testing) การทดสอบทั้งระบบ (System Testing) และการทดสอบยอมรับโดยผู้ใช้ (UAT)</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-top"><h4 class="info-card-title">6. Release, Evolution &amp; Retirement</h4><span class="tag-mono">Phase 06–08</span></div>
+              <p>การติดตั้งใช้งานจริง (Deployment) การบำรุงรักษาและพัฒนาต่อเนื่อง (Maintenance/Evolution — ยาวนานที่สุด) จนถึงการปลดระวางระบบ</p>
+            </div>
+          </div>
+
+          <div class="callout callout--violet">
+            <div class="callout-title">
+              <i data-lucide="shield-check" style="width:18px;height:18px;"></i>
+              Verification vs. Validation (V&amp;V) — ความแตกต่างที่นักวิศวกรซอฟต์แวร์ต้องไม่สับสน
+            </div>
+            <p>
+              <strong>Barry Boehm (1979)</strong> นิยามความแตกต่างของ V&amp;V ไว้อย่างคมชัด และถูกเน้นย้ำใน Sommerville บทที่ 8 ดังนี้:
+            </p>
+            <ul>
+              <li><strong>Verification ("Are we building the product right?"):</strong> การตรวจสอบว่าซอฟต์แวร์ถูกสร้างขึ้นสอดคล้องกับ <em>Specification ที่ระบุไว้</em> ทั้งในเชิงฟังก์ชันและ Non-functional หรือไม่ (เช่น โค้ดคำนวณภาษีตรงตามสูตรในเอกสาร Spec หรือไม่)</li>
+              <li><strong>Validation ("Are we building the right product?"):</strong> การตรวจสอบว่าซอฟต์แวร์ที่สร้างขึ้นตอบสนอง <em>ความต้องการและบริบทการใช้งานจริงของลูกค้า</em> หรือไม่ (แม้ระบบจะทำตาม Spec 100% แต่หาก Spec ต้นทางเข้าใจผู้ใช้ผิด Validation ก็จะไม่ผ่าน)</li>
+            </ul>
+            <p>
+              <strong>Edsger Dijkstra (1972)</strong> เตือนไว้ว่า <em>"Testing can only show the presence of errors, not their absence"</em> ดังนั้นกระบวนการ V&amp;V ที่สมบูรณ์จึงต้องผสานทั้ง <strong>Static V&amp;V</strong> (การตรวจโดยไม่รันโค้ด เช่น Requirements Review, Code Inspection, Static Analysis, Model Checking) และ <strong>Dynamic V&amp;V</strong> (การรันโปรแกรมทดสอบทั้ง <em>Defect Testing</em> เพื่อหาบั๊ก และ <em>Validation Testing</em> เพื่อยืนยันการทำงานตามปกติ)
+            </p>
+          </div>
+        </div>
+
+        <div class="subsection" id="m1-4">
+          <h3 class="subhead"><span class="sub-num">1.4</span> ผลลัพธ์เชิงรูปธรรมในแต่ละเฟส (Software Process Artifacts Matrix)</h3>
+          <p>
+            ทุกเฟสของ SDLC ต้องผลิตชิ้นงานหรือผลลัพธ์เชิงรูปธรรม (Artifacts) เพื่อส่งต่อองค์ความรู้ ลดการตีความผิดพลาด และใช้เป็นเกณฑ์ผ่านด่าน (Gate Criteria) ในการประเมินความก้าวหน้า ตารางต่อไปนี้สรุป Artifacts สำคัญตั้งแต่ต้นจนจบวงจรชีวิต
+          </p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>เฟส SDLC</th>
+                  <th>กิจกรรมหลัก</th>
+                  <th>ผลลัพธ์เชิงรูปธรรม (Artifacts)</th>
+                  <th>ผู้รับผิดชอบหลัก</th>
+                  <th>เกณฑ์ยืนยันคุณภาพ (Exit Criteria)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>1. Conception</strong></td>
+                  <td>ประเมินปัญหาและความคุ้มค่า</td>
+                  <td>Project Charter, Feasibility Report, Business Case, High-level Risk Log</td>
+                  <td>Stakeholders, PM, Product Owner</td>
+                  <td>อนุมัติงบประมาณ ขอบเขตเบื้องต้น และความเป็นไปได้</td>
+                </tr>
+                <tr>
+                  <td><strong>2. Requirements</strong></td>
+                  <td>Elicitation, Analysis &amp; Spec</td>
+                  <td>SRS (Software Requirements Spec), Use Case / User Stories, Domain Model, Wireframes</td>
+                  <td>BA, Product Owner, System Analyst</td>
+                  <td>ผ่าน Requirements Validation (Validity, Consistency, Completeness, Realism, Verifiability)</td>
+                </tr>
+                <tr>
+                  <td><strong>3. Design</strong></td>
+                  <td>Architectural &amp; Detailed Design</td>
+                  <td>Architecture Document (SDD), UML Diagrams (Class, Sequence, State), ERD, API Contract (OpenAPI)</td>
+                  <td>Software Architect, Tech Lead, UI/UX</td>
+                  <td>Design Review ผ่าน, สนับสนุน Non-functional Requirements ได้จริง</td>
+                </tr>
+                <tr>
+                  <td><strong>4. Implementation</strong></td>
+                  <td>Coding, Refactoring &amp; Unit Test</td>
+                  <td>Source Code (ใน VCS), Unit Test Suites, Build Scripts, Config Files</td>
+                  <td>Developers, Engineers</td>
+                  <td>Code Review / PR Approved, Unit Tests Pass, Static Analysis Clean</td>
+                </tr>
+                <tr>
+                  <td><strong>5. Testing (V&amp;V)</strong></td>
+                  <td>Integration, System &amp; User Testing</td>
+                  <td>Test Plan, Test Cases, Defect/Bug Reports, Automated Regression Suite, UAT Sign-off</td>
+                  <td>QA Engineers, Independent Testers, End-Users</td>
+                  <td>Critical Defects = 0, Acceptance Criteria ผ่านครบถ้วน</td>
+                </tr>
+                <tr>
+                  <td><strong>6. Release &amp; Evolution</strong></td>
+                  <td>Deployment, Ops &amp; Maintenance</td>
+                  <td>Release Notes, Deployment Package/Docker, User Manual, Monitoring Logs, Change Requests</td>
+                  <td>DevOps / SRE, Support, Maintenance Team</td>
+                  <td>ระบบเสถียรใน Production, SLA เป็นไปตามเป้าหมาย</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="subsection" id="m1-5">
+          <h3 class="subhead"><span class="sub-num">1.5</span> หลักการเลือก Process Model ตามบริบท (Context-Driven Selection) และแนวคิด "No Silver Bullet"</h3>
+          <p>
+            ในบทความคลาสสิก <strong>"No Silver Bullet — Essence and Accidents of Software Engineering" (1987)</strong> ที่อ้างอิงในตำรา Dooley &amp; Kazakova (2024) <strong>Frederick Brooks</strong> ชี้ให้เห็นว่าความยากของการพัฒนาซอฟต์แวร์แบ่งเป็น 2 ส่วน คือ <strong>Accidental Complexity</strong> (ความยุ่งยากจากเครื่องมือ ภาษาโปรแกรม หรือฮาร์ดแวร์ ซึ่งพัฒนาดีขึ้นได้มาก) และ <strong>Essential Complexity</strong> (ความซับซ้อนโดยเนื้อแท้ของปัญหา เช่น ความซับซ้อนของกฎธุรกิจ การเปลี่ยนแปลงของความต้องการ และการสื่อสารระหว่างมนุษย์) ซึ่งไม่มีเทคโนโลยีหรือ Process Model วิเศษใดเพียงหนึ่งเดียวที่สามารถลดความซับซ้อนหลักให้หายไปได้ในชั่วข้ามคืน
+          </p>
+          <p>
+            สอดคล้องกับหลักการของ <strong>Sommerville (2016)</strong> ที่ย้ำว่า <em>"ไม่มีกระบวนการซอฟต์แวร์แบบสากลที่เหมาะสมกับทุกระบบ"</em> การเลือกโมเดลต้องอ้างอิงบริบทจริงของโครงการ (Context-Driven Selection — Sommerville Fig. 3.12) โดยพิจารณาจาก: <strong>ประเภทของระบบ</strong>, <strong>ระดับความวิกฤต (Criticality)</strong>, <strong>ความผันผวนของความต้องการ</strong>, <strong>ขนาดและการกระจายตัวของทีม</strong>, <strong>ข้อกำหนดทางกฎหมายและสัญญา</strong> และ <strong>วัฒนธรรมองค์กร</strong>
+          </p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ประเภทระบบ (Sommerville 1.1.2)</th>
+                  <th>ลักษณะเด่นและความเสี่ยง</th>
+                  <th>Process Model ที่เหมาะสม</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Embedded Control Systems</strong></td>
+                  <td>ควบคุมฮาร์ดแวร์โดยตรง แก้ไขหลังผลิตยาก (ROM) ต้องมั่นใจเรื่อง Safety</td>
+                  <td>Plan-Driven / Waterfall / V-Model + Formal Verification</td>
+                </tr>
+                <tr>
+                  <td><strong>Interactive Web / Mobile Apps</strong></td>
+                  <td>ความต้องการเปลี่ยนไว ต้องการ UX ดีและปล่อยฟีเจอร์แข่งกับตลาดเร็ว</td>
+                  <td>Agile (Scrum / XP) + Incremental Delivery + Prototyping</td>
+                </tr>
+                <tr>
+                  <td><strong>Organizational Information Systems</strong></td>
+                  <td>เชื่อมฐานข้อมูลขนาดใหญ่ ต้องปรับใช้ร่วมกับระบบเดิมหรือ ERP</td>
+                  <td>Hybrid (Architecture Plan-Driven + Agile Feature Sprints / Integration &amp; Config)</td>
+                </tr>
+                <tr>
+                  <td><strong>Data Collection &amp; Simulation</strong></td>
+                  <td>ทำงานในสภาพแวดล้อมปิด/รุนแรง ประมวลผลสูง หรือวิเคราะห์ Big Data</td>
+                  <td>Spiral / Incremental Model เน้น Prototyping อัลกอริทึมและฮาร์ดแวร์</td>
+                </tr>
+                <tr>
+                  <td><strong>Systems of Systems (SoS)</strong></td>
+                  <td>ประกอบด้วยหลายระบบย่อยอิสระจากหลายองค์กร/ทีม (Brownfield)</td>
+                  <td>Plan-Driven Interface Contracts + Agile ภายในแต่ละทีมย่อย (Scaled Agile)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="subsection" id="m1-6">
+          <h3 class="subhead"><span class="sub-num">1.6</span> แนวทาง Workshop 1: SDLC Mapping &amp; Case Study Breakdown</h3>
+          <p>
+            ในบทที่ 1 ของ Sommerville (2016) ได้กำหนดกรณีศึกษา 4 ระบบที่มีธรรมชาติแตกต่างกันโดยสิ้นเชิง เพื่อใช้ฝึกวิเคราะห์และจับคู่กระบวนการพัฒนาที่เหมาะสมใน Workshop 1:
+          </p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>กรณีศึกษา (Sommerville Ch. 1)</th>
+                  <th>ประเภทระบบ</th>
+                  <th>ความต้องการเชิงคุณภาพวิกฤต</th>
+                  <th>แนวทาง Process &amp; Mapping เหตุผล</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>1. Insulin Pump Control System</strong><br>เครื่องปั๊มอินซูลินอัตโนมัติ</td>
+                  <td>Embedded Safety-Critical System</td>
+                  <td>Safety, Availability, Reliability (ผิดพลาด = อันตรายถึงชีวิต)</td>
+                  <td><strong>V-Model / Plan-Driven + Formal Spec:</strong> ต้องวิเคราะห์ Hazard และทำ Verification ครบทุกเงื่อนไขก่อนเขียนโค้ด</td>
+                </tr>
+                <tr>
+                  <td><strong>2. Mentcare System</strong><br>ระบบข้อมูลผู้ป่วยจิตเวช</td>
+                  <td>Medical Information System</td>
+                  <td>Privacy (กฎหมายข้อมูล), Safety (เตือนผู้ป่วยเสี่ยงฆ่าตัวตาย), Offline Availability</td>
+                  <td><strong>Hybrid (Incremental + Plan-Driven):</strong> ส่วนฐานข้อมูล/กฎหมายต้องวางแผนชัด ส่วน UI คลินิกปรับตามแพทย์แบบ Iterative</td>
+                </tr>
+                <tr>
+                  <td><strong>3. Wilderness Weather Station</strong><br>สถานีตรวจอากาศในถิ่นทุรกันดาร</td>
+                  <td>Sensor-Based Data Collection System</td>
+                  <td>Fault Tolerance, Power Management, Remote Reconfiguration</td>
+                  <td><strong>Spiral / Incremental + Hardware Co-design:</strong> เน้นจัดการความเสี่ยงด้านแบตเตอรี่และแบนด์วิดท์ดาวเทียมตั้งแต่รอบแรกๆ</td>
+                </tr>
+                <tr>
+                  <td><strong>4. iLearn Digital Learning</strong><br>สภาพแวดล้อมการเรียนรู้ดิจิทัล</td>
+                  <td>Web-Based Support Environment</td>
+                  <td>Extensibility, Usability, Interoperability กับเครื่องมือภายนอก</td>
+                  <td><strong>Agile (Scrum) + Reuse/Configuration:</strong> ครูและนักเรียนต้องการเครื่องมือหลากหลาย ต้องส่งมอบไวและรับ Feedback ต่อเนื่อง</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- MODULE 2 -->
+      <!-- ========================================================= -->
+      <section class="module-section" id="module-2">
+        <div class="module-header">
+          <span class="module-kicker">MODULE 02</span>
+          <h2 class="module-title"><strong>Traditional Software Process Models &amp; Their Limitations</strong> — โมเดลกระบวนการแบบดั้งเดิมและข้อจำกัด</h2>
+          <p class="module-summary">
+            เจาะลึกโมเดลแบบวางแผนล่วงหน้า (Plan-Driven) ได้แก่ Waterfall Model และ V-Model วิเคราะห์จุดแข็งในระบบที่ต้องการความแม่นยำและตรวจสอบได้ทางกฎหมาย พร้อมถอดรหัสข้อจำกัดเชิงโครงสร้างที่นำไปสู่ต้นทุนความผิดพลาดมหาศาลในเฟสท้ายของโครงการ
+          </p>
+        </div>
+
+        <div class="subsection" id="m2-1">
+          <h3 class="subhead"><span class="sub-num">2.1</span> โครงสร้างและหลักการของ Waterfall Model (Phase Gates &amp; Document-Driven)</h3>
+          <p>
+            <strong>Waterfall Model</strong> เป็นโมเดลกระบวนการซอฟต์แวร์แบบ Plan-Driven ตัวแรกที่ได้รับการตีพิมพ์อย่างเป็นทางการโดย <strong>Winston Royce (1970)</strong> โดยดัดแปลงมาจากสายการผลิตทางวิศวกรรมฮาร์ดแวร์และระบบการทหารขนาดใหญ่ (ในบทความต้นฉบับ Royce เองได้เตือนถึงความจำเป็นของการวนย้อนกลับ แต่ในทางปฏิบัติอุตสาหกรรมมักนำรูปแบบเชิงเส้นตรงมาใช้)
+          </p>
+          <p>
+            โครงสร้างหลักแบ่งเป็นเฟสต่อเนื่องแบบน้ำตก 5–7 ขั้นตอน (Requirements Analysis &amp; Definition → System &amp; Software Design → Implementation &amp; Unit Testing → Integration &amp; System Testing → Operation &amp; Maintenance) โดยมีเสาหลักสำคัญ 2 ประการ:
+          </p>
+          <ul>
+            <li><strong>Phase Gates (Stage-Gate Control):</strong> ตามหลักการเชิงทฤษฎี เฟสที่ $N+1$ จะไม่สามารถเริ่มต้นได้จนกว่าเฟสที่ $N$ จะเสร็จสมบูรณ์และผ่านการอนุมัติอย่างเป็นทางการ</li>
+            <li><strong>Document-Driven (ขับเคลื่อนด้วยเอกสาร):</strong> ผลผลิตหลักของทุกเฟสก่อนการเขียนโค้ดคือเอกสารที่ต้องลงนามรับรอง (Sign-off) เช่น เอกสาร SRS, เอกสารสถาปัตยกรรม SDD เพื่อใช้เป็นหลักฐานตรวจสอบความก้าวหน้าและอ้างอิงตามสัญญา</li>
+          </ul>
+        </div>
+
+        <div class="subsection" id="m2-2">
+          <h3 class="subhead"><span class="sub-num">2.2</span> V-Model: การจัดแนวระหว่างการพัฒนาและการทดสอบ (Development &amp; Testing Alignment)</h3>
+          <p>
+            <strong>V-Model</strong> (Sommerville Fig. 2.7) เป็นการต่อยอด Waterfall Model เพื่อแก้จุดอ่อนที่มักมองข้ามการวางแผนทดสอบจนถึงท้ายโครงการ โดยจัดเรียงขั้นตอนเป็นรูปตัว V: <strong>ฝั่งซ้าย</strong> คือกระบวนการย่อยรายละเอียดจากภาพรวมสู่ระดับโมดูล (Decomposition &amp; Design) และ <strong>ฝั่งขวา</strong> คือกระบวนการประกอบและทดสอบย้อนกลับขึ้นไป (Integration &amp; Verification) หัวใจสำคัญคือ <strong>Test Plans ของแต่ละระดับจะถูกเขียนขึ้นคู่ขนานทันทีในฝั่งซ้าย</strong> เพื่อสร้างความเชื่อมโยงตรงกัน 1 ต่อ 1
+          </p>
+
+          <!-- Clean Inline SVG Schematic of V-Model -->
+          <div class="diagram-panel">
+            <svg viewBox="0 0 820 340" width="100%" height="auto" role="img" aria-label="แผนภาพ V-Model แสดงความเชื่อมโยงระหว่างฝั่งการพัฒนากับฝั่งการทดสอบ">
+              <defs>
+                <marker id="arrow-slate" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#334e68" />
+                </marker>
+                <marker id="arrow-violet" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#6d28d9" />
+                </marker>
+              </defs>
+              <!-- Horizontal Verification/Validation Alignment Dashed Lines -->
+              <line x1="215" y1="52" x2="595" y2="52" stroke="#6d28d9" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow-violet)" />
+              <line x1="265" y1="118" x2="545" y2="118" stroke="#6d28d9" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow-violet)" />
+              <line x1="315" y1="184" x2="495" y2="184" stroke="#6d28d9" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow-violet)" />
+
+              <!-- Labels on Dashed Lines -->
+              <text x="405" y="44" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5b21b6" font-family="Noto Sans Thai, sans-serif">Customer Acceptance Test Plan (Validation)</text>
+              <text x="405" y="110" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5b21b6" font-family="Noto Sans Thai, sans-serif">System Integration Test Plan</text>
+              <text x="405" y="176" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5b21b6" font-family="Noto Sans Thai, sans-serif">Sub-system / Unit Test Plan</text>
+
+              <!-- Left Leg (Definition) -->
+              <rect x="30" y="28" width="185" height="48" rx="6" fill="#e4ebf3" stroke="#334e68" stroke-width="1.5" />
+              <text x="122" y="49" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1f364d" font-family="Noto Sans Thai, sans-serif">Requirements Spec</text>
+              <text x="122" y="66" text-anchor="middle" font-size="10.5" fill="#4f5b69" font-family="Noto Sans Thai, sans-serif">ความต้องการผู้ใช้และระบบ</text>
+
+              <rect x="80" y="94" width="185" height="48" rx="6" fill="#e4ebf3" stroke="#334e68" stroke-width="1.5" />
+              <text x="172" y="115" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1f364d" font-family="Noto Sans Thai, sans-serif">System Design</text>
+              <text x="172" y="132" text-anchor="middle" font-size="10.5" fill="#4f5b69" font-family="Noto Sans Thai, sans-serif">สถาปัตยกรรมภาพรวม</text>
+
+              <rect x="130" y="160" width="185" height="48" rx="6" fill="#e4ebf3" stroke="#334e68" stroke-width="1.5" />
+              <text x="222" y="181" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1f364d" font-family="Noto Sans Thai, sans-serif">Component Design</text>
+              <text x="222" y="198" text-anchor="middle" font-size="10.5" fill="#4f5b69" font-family="Noto Sans Thai, sans-serif">ออกแบบโมดูล/คลาส/API</text>
+
+              <!-- Bottom Apex (Coding) -->
+              <rect x="315" y="248" width="190" height="54" rx="6" fill="#334e68" />
+              <text x="410" y="271" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff" font-family="Noto Sans Thai, sans-serif">Implementation &amp; Coding</text>
+              <text x="410" y="289" text-anchor="middle" font-size="11" fill="#e4ebf3" font-family="Noto Sans Thai, sans-serif">เขียนโปรแกรมและ Unit Test</text>
+
+              <!-- Right Leg (Testing) -->
+              <rect x="505" y="160" width="185" height="48" rx="6" fill="#ede9fe" stroke="#5b21b6" stroke-width="1.5" />
+              <text x="597" y="181" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4c1d95" font-family="Noto Sans Thai, sans-serif">Unit &amp; Sub-system Test</text>
+              <text x="597" y="198" text-anchor="middle" font-size="10.5" fill="#4f5b69" font-family="Noto Sans Thai, sans-serif">ตรวจระดับหน่วยและโมดูลย่อย</text>
+
+              <rect x="555" y="94" width="185" height="48" rx="6" fill="#ede9fe" stroke="#5b21b6" stroke-width="1.5" />
+              <text x="647" y="115" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4c1d95" font-family="Noto Sans Thai, sans-serif">System Integration Test</text>
+              <text x="647" y="132" text-anchor="middle" font-size="10.5" fill="#4f5b69" font-family="Noto Sans Thai, sans-serif">ทดสอบการเชื่อมโยงทั้งระบบ</text>
+
+              <rect x="605" y="28" width="185" height="48" rx="6" fill="#ede9fe" stroke="#5b21b6" stroke-width="1.5" />
+              <text x="697" y="49" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4c1d95" font-family="Noto Sans Thai, sans-serif">Acceptance / Service Test</text>
+              <text x="697" y="66" text-anchor="middle" font-size="10.5" fill="#4f5b69" font-family="Noto Sans Thai, sans-serif">ตรวจรับโดยลูกค้า (UAT)</text>
+
+              <!-- Flow arrows down left leg & up right leg -->
+              <line x1="122" y1="76" x2="145" y2="92" stroke="#334e68" stroke-width="1.8" marker-end="url(#arrow-slate)" />
+              <line x1="172" y1="142" x2="195" y2="158" stroke="#334e68" stroke-width="1.8" marker-end="url(#arrow-slate)" />
+              <line x1="255" y1="208" x2="335" y2="246" stroke="#334e68" stroke-width="1.8" marker-end="url(#arrow-slate)" />
+              <line x1="485" y1="246" x2="565" y2="208" stroke="#6d28d9" stroke-width="1.8" marker-end="url(#arrow-violet)" />
+              <line x1="625" y1="158" x2="645" y2="144" stroke="#6d28d9" stroke-width="1.8" marker-end="url(#arrow-violet)" />
+              <line x1="675" y1="92" x2="695" y2="78" stroke="#6d28d9" stroke-width="1.8" marker-end="url(#arrow-violet)" />
+            </svg>
+            <div class="diagram-caption">แผนภาพที่ 2.1: โครงสร้าง V-Model แสดงการจัดแนว Test Plans ในฝั่งซ้ายให้สอดคล้องกับการทดสอบในฝั่งขวา (ดัดแปลงจาก Sommerville Fig. 2.7)</div>
+          </div>
+        </div>
+
+        <div class="subsection" id="m2-3">
+          <h3 class="subhead"><span class="sub-num">2.3</span> บริบทที่เหมาะสมสำหรับ Traditional / Plan-Driven Models</h3>
+          <p>
+            แม้โมเดลแบบดั้งเดิมจะถูกวิพากษ์วิจารณ์ว่าขาดความยืดหยุ่น แต่ Sommerville (2016) ย้ำว่าโมเดล Plan-Driven ยังคงเป็นทางเลือกที่ดีที่สุดใน 4 สถานการณ์สำคัญ:
+          </p>
+          <div class="card-grid">
+            <div class="info-card">
+              <div class="info-card-top"><h4 class="info-card-title">1. Safety-Critical Systems</h4><span class="tag-violet">Zero-Tolerance</span></div>
+              <p>ระบบที่ความผิดพลาดหมายถึงชีวิตหรือหายนะ เช่น ระบบควบคุมการบิน (Avionics) ระบบควบคุมรถไฟ หรือเครื่องปั๊มอินซูลิน ซึ่งต้องวิเคราะห์ความปลอดภัย (Hazard Analysis) และสร้าง Safety Case อย่างสมบูรณ์ก่อนลงมือเขียนโค้ด</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-top"><h4 class="info-card-title">2. Hardware-Software Co-Design</h4><span class="tag-mono">Embedded</span></div>
+              <p>ระบบฝังตัวที่ต้องรอผลิตฮาร์ดแวร์ควบคู่กันหรือฝังลงใน ROM (เช่น กล่อง ECU รถยนต์) การเปลี่ยนแปลงฟังก์ชันซอฟต์แวร์ภายหลังมีราคาแพงมาก จึงต้องล็อก Interface ทางฮาร์ดแวร์ล่วงหน้า</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-top"><h4 class="info-card-title">3. Multi-Partner Large Engineering</h4><span class="tag-mono">Contractual</span></div>
+              <p>โครงการขนาดมหึมาที่มีหลายบริษัทรับเหมาพัฒนา Subsystem แยกกัน (ต่างสถานที่/ต่างองค์กร) เอกสาร Complete Specification เป็นตัวกลางสำคัญเพื่อให้แต่ละทีมทำงานขนานกันได้</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-top"><h4 class="info-card-title">4. Regulatory Compliance</h4><span class="tag-violet">Auditability</span></div>
+              <p>อุตสาหกรรมที่มีกฎหมายหรือหน่วยงานกำกับดูแลเข้มงวด เช่น FDA (เครื่องมือแพทย์), DO-178C (การบิน), Sarbanes-Oxley (บัญชี) ซึ่งบังคับต้องมีเอกสาร Traceability ย้อนหลังครบทุกขั้นตอน</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="subsection" id="m2-4">
+          <h3 class="subhead"><span class="sub-num">2.4</span> ข้อจำกัดเชิงลึกและจุดคอขวดของโมเดลแบบดั้งเดิม</h3>
+          <p>
+            เมื่อนำ Waterfall ไปใช้กับซอฟต์แวร์ธุรกิจทั่วไปที่มีความไม่แน่นอนสูง จะเกิดจุดคอขวดเชิงโครงสร้าง 5 ประการ:
+          </p>
+          <ol>
+            <li><strong>Big Design Up Front (BDUF) และ Premature Freezing:</strong> การบังคับให้ระบุความต้องการและออกแบบสถาปัตยกรรมทั้งหมด 100% ตั้งแต่วันแรกทั้งที่ผู้ใช้ยังไม่เห็นภาพจริง เมื่อลูกค้าหรือผู้พัฒนาเร่งรีบปิดจบเฟส Requirements ("แช่แข็ง Spec ก่อนเวลาอันควร") ปัญหาจะถูกซุกไว้ใต้พรมและบีบให้โปรแกรมเมอร์ต้องเขียนโค้ดแฮ็ก (Workarounds) ในเฟสหลังจนสถาปัตยกรรมพัง</li>
+            <li><strong>The Waterfall Dilemma (Dooley &amp; Kazakova, 2024):</strong> สรุปเป็น 2 ปัญหาใหญ่ที่แก้ไม่ตก คือ <em>Problem 1: ต้องจบเฟส N ก่อนจึงจะเริ่มเฟส N+1 ได้</em> และ <em>Problem 2: ไม่มีกลไกย้อนกลับไปปรับปรุงเฟสก่อนหน้าอย่างคุ้มค่า</em> เพราะในความเป็นจริง ซอฟต์แวร์เป็น <strong>"Wicked Problem"</strong> (ปัญหาที่ผู้มีส่วนได้ส่วนเสียจะเข้าใจความต้องการที่แท้จริงได้ก็ต่อเมื่อได้เห็นหรือลองใช้ตัวระบบแล้วเท่านั้น)</li>
+            <li><strong>Late Integration Risk:</strong> ช่วงเวลาส่วนใหญ่ในเฟสต้นหมดไปกับเอกสารและการเขียนโมดูลแยกส่วน การประกอบระบบจริง (Integration) ถูกเลื่อนไปท้ายโครงการ ทำให้บั๊กเชิงสถาปัตยกรรม คอขวดด้านประสิทธิภาพ และความไม่เข้ากันของ API เพิ่งโผล่ออกมาในช่วงที่เวลาและงบประมาณใกล้หมด</li>
+            <li><strong>Handoff Friction (แรงเสียดทานจากการส่งต่อข้ามไซโล):</strong> เมื่อทีมถูกแบ่งตามหน้าที่ (Analyst → Architect → Programmer → QA) การส่งต่อผ่านเอกสารหนาหนักมักเกิดการสูญหายของบริบท (Knowledge Loss) และการโยนความรับผิดชอบเมื่อเกิดปัญหา</li>
+            <li><strong>Defect Amplification &amp; Cost of Change Curve:</strong> ความผิดพลาดที่เกิดในเฟส Requirements หากตรวจพบทันทีจะแก้ได้ด้วยต้นทุนต่ำมาก แต่หากปล่อยให้ไหลผ่าน Design และ Coding ไปพบในเฟส Testing หรือหลังส่งมอบ (Production) ค่าใช้จ่ายในการรื้อสถาปัตยกรรม แก้โค้ด ทดสอบใหม่ และชดเชยความเสียหายทางธุรกิจจะพุ่งสูงขึ้นแบบทวีคูณ (Exponential Escalation)</li>
+          </ol>
+
+          <!-- Chart.js Defect Cost Escalation Curve -->
+          <div class="interactive-box">
+            <div class="interactive-header">
+              <h4 class="interactive-title">
+                <i data-lucide="trending-up" style="width:18px;height:18px;"></i>
+                กราฟเปรียบเทียบต้นทุนการแก้ไขข้อผิดพลาด (Cost of Change Escalation Curve)
+              </h4>
+              <span class="tag-mono">Relative Cost Multiplier</span>
+            </div>
+            <div class="btn-row">
+              <button type="button" class="btn active" id="cost-btn-both" onclick="setCostChartMode('both', this)">เปรียบเทียบ Waterfall vs. Agile/Iterative</button>
+              <button type="button" class="btn" id="cost-btn-wf" onclick="setCostChartMode('wf', this)">เน้น Waterfall BDUF</button>
+            </div>
+            <div class="chart-box">
+              <canvas id="defectCostChart" aria-label="กราฟแสดงต้นทุนสัมพัทธ์ในการแก้ไขข้อผิดพลาดตามเฟสที่ตรวจพบ"></canvas>
+            </div>
+            <p style="margin-top:var(--space-sm);margin-bottom:0;font-size:0.86rem;color:var(--on-surface-variant);">
+              หมายเหตุเชิงวิเคราะห์ (อ้างอิงแนวคิด Barry Boehm &amp; Kent Beck): ใน Waterfall ต้นทุนแก้บั๊กพุ่งขึ้นแบบทวีคูณ (1x → 100x+) เมื่อพบในเฟสหลัง ขณะที่กระบวนการ Iterative/Agile ที่มี Automated Regression Test และ Short Feedback Loop ช่วยให้เส้นต้นทุนแบนราบลงอย่างมีนัยสำคัญ
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- MODULE 3 -->
+      <!-- ========================================================= -->
+      <section class="module-section" id="module-3">
+        <div class="module-header">
+          <span class="module-kicker">MODULE 03</span>
+          <h2 class="module-title"><strong>Iterative &amp; Incremental Process Models</strong> — โมเดลแบบทำซ้ำ เพิ่มพูน และบริหารความเสี่ยง</h2>
+          <p class="module-summary">
+            ทำความเข้าใจทางออกจากข้อจำกัดของ Waterfall ด้วยการแบ่งส่งมอบและการทำซ้ำ แยกแยะความต่างระหว่าง Iterative, Incremental, Throwaway/Evolutionary Prototyping และเจาะลึก Spiral Model แบบ 4 Quadrants ของ Barry Boehm
+          </p>
+        </div>
+
+        <div class="subsection" id="m3-1">
+          <h3 class="subhead"><span class="sub-num">3.1</span> นิยามและการเปรียบเทียบเชิงลึกระหว่าง Iterative vs. Incremental Development</h3>
+          <p>
+            คำว่า <em>Iterative</em> และ <em>Incremental</em> มักถูกใช้คู่กันจนสับสน แต่ในทางวิศวกรรมซอฟต์แวร์ทั้งสองแนวคิดมีเป้าหมายเชิงกลยุทธ์ที่ต่างกันชัดเจน:
+          </p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>มิติการเปรียบเทียบ</th>
+                  <th>Iterative Development (ทำซ้ำ/ขัดเกลา)</th>
+                  <th>Incremental Development (เพิ่มพูนทีละส่วน)</th>
+                  <th>Combined Iterative &amp; Incremental</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>หลักการแกนกลาง</strong></td>
+                  <td>สร้างโครงร่างระบบทั้งหมดหรือส่วนใหญ่แบบคร่าวๆ ก่อน แล้ววนรอบปรับปรุงคุณภาพ ความแม่นยำ และ UX ให้ดีขึ้นเรื่อยๆ</td>
+                  <td>แบ่งระบบออกเป็นส่วนย่อย (Increments) ตามลำดับความสำคัญ แล้วพัฒนาส่งมอบทีละส่วนจนครบสมบูรณ์</td>
+                  <td>พัฒนาทีละส่วนที่ใช้งานได้จริง พร้อมเปิดรับ Feedback เพื่อกลับไปขัดเกลาส่วนเดิมและวางแผนส่วนถัดไป</td>
+                </tr>
+                <tr>
+                  <td><strong>อุปมาเชิงศิลปะ</strong></td>
+                  <td>การวาดภาพสเก็ตช์ทั้งผืนผ้าใบแล้วค่อยๆ ลงสีและเก็บรายละเอียดให้คมชัดทั้งภาพ</td>
+                  <td>การต่อจิ๊กซอว์ทีละชิ้นที่สมบูรณ์แล้ว จนครบเป็นภาพใหญ่</td>
+                  <td>วาดทีละโซนให้สมบูรณ์พอใช้งานได้ แล้วปรับแสงเงาทั้งภาพทุกรอบ</td>
+                </tr>
+                <tr>
+                  <td><strong>จุดแข็งหลัก</strong></td>
+                  <td>ลดความเสี่ยงด้านความเข้าใจผิดใน Requirements และสถาปัตยกรรม</td>
+                  <td>ส่งมอบคุณค่าทางธุรกิจ (Early Value) ได้เร็ว ลดต้นทุนการแก้ความต้องการ (Sommerville 2.1.2)</td>
+                  <td>ได้ทั้งความเร็วในการส่งมอบและความยืดหยุ่นในการปรับคุณภาพ (เป็นรากฐานของ Agile)</td>
+                </tr>
+                <tr>
+                  <td><strong>ข้อควรระวัง</strong></td>
+                  <td>อาจใช้เวลานานก่อนผู้ใช้จะได้ระบบที่นำไปใช้งานจริงได้</td>
+                  <td>ต้องวางสถาปัตยกรรมแกนกลาง (Common Facilities) ให้รองรับการต่อขยาย</td>
+                  <td>หากขาดวินัยในการ Refactoring โครงสร้างโค้ดจะเสื่อมโทรม (Structural Degradation)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4 class="mini-head">Incremental Development vs. Incremental Delivery และปัญหาการบริหารจัดการ</h4>
+          <p>
+            <strong>Sommerville (บทที่ 2.1.2 &amp; 2.3.2)</strong> แยกแยะว่า <em>Incremental Development</em> คือการพัฒนาเป็นรอบๆ เพื่อนำไปสาธิตให้ผู้มีส่วนได้ส่วนเสียดู แต่ไม่จำเป็นต้องติดตั้งใช้งานจริงทุกรอบ ส่วน <strong>Incremental Delivery</strong> คือการนำ Increment ที่มีลำดับความสำคัญสูงสุดไปติดตั้งในสภาพแวดล้อมการทำงานจริงของลูกค้า (Production) เพื่อรับ Feedback จากการใช้งานจริง ซึ่งช่วยหลีกเลี่ยงการปักใจล็อก Spec ทั้งระบบตั้งแต่ต้น
+          </p>
+          <div class="callout callout--warning">
+            <div class="callout-title">
+              <i data-lucide="alert-triangle" style="width:18px;height:18px;"></i>
+              2 ปัญหาหลักด้านการบริหารจัดการของ Incremental Development (Sommerville 2.1.2)
+            </div>
+            <ul>
+              <li><strong>1. Process Visibility (การมองเห็นความก้าวหน้า):</strong> ผู้บริหารต้องการเอกสาร Deliverable ประจำระยะเพื่อวัดผล แต่การพัฒนาแบบรวดเร็วไม่คุ้มค่าที่จะเขียนเอกสารประกอบครบทุกเวอร์ชันย่อย</li>
+              <li><strong>2. System Structure Degradation (ความเสื่อมโทรมของโครงสร้างระบบ):</strong> การเพิ่มฟีเจอร์ใหม่อย่างต่อเนื่องมักทำให้โค้ดยุ่งเหยิงและเปราะบาง ทางแก้จำเป็นต้องมีวินัยในการทำ <strong>Refactoring</strong> (ปรับโครงสร้างโค้ดโดยไม่เปลี่ยนพฤติกรรม) อย่างสม่ำเสมอ นอกจากนี้ระบบขนาดใหญ่มากหรือระบบที่ต้องทดแทนระบบเดิมทั้งหมด (Legacy Replacement) มักใช้ Incremental Delivery ล้วนได้ยาก เพราะผู้ใช้ไม่ยอมใช้ระบบใหม่ที่ฟีเจอร์ยังไม่ครบเท่าระบบเก่า</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="subsection" id="m3-2">
+          <h3 class="subhead"><span class="sub-num">3.2</span> Prototyping Models: Throwaway vs. Evolutionary Prototyping</h3>
+          <p>
+            <strong>System Prototyping</strong> คือการสร้างตัวแบบจำลองของระบบอย่างรวดเร็วเพื่อใช้ทดลองร่วมกับผู้ใช้และทดสอบความเป็นไปได้ของการออกแบบ (Change Anticipation — ลดการขอแก้ไข Spec หลังส่งมอบ) โมเดลนี้แบ่งออกเป็น 2 สายหลักที่ห้ามนำมาปะปนกัน:
+          </p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>หัวข้อเปรียบเทียบ</th>
+                  <th>Throwaway (Exploratory) Prototyping</th>
+                  <th>Evolutionary Prototyping</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>เป้าหมายหลัก</strong></td>
+                  <td>ค้นหาความต้องการที่แท้จริง (Requirements Validation) หรือพิสูจน์ Feasibility ทางเทคนิคในส่วนที่เสี่ยงสูง</td>
+                  <td>ส่งมอบระบบที่ใช้งานได้จริงตั้งแต่ต้น แล้วค่อยๆ ขยายและวิวัฒนาการตัวแบบนั้นไปเป็นระบบ Production</td>
+                </tr>
+                <tr>
+                  <td><strong>คุณภาพโค้ดเริ่มต้น</strong></td>
+                  <td>เน้นความเร็วเป็นหลัก อาจละเลย Error Handling, Security, หรือ Clean Architecture เพราะตั้งใจ <strong>"ทิ้ง"</strong> เมื่อได้คำตอบ</td>
+                  <td>ต้องวางโครงสร้างสถาปัตยกรรม คุณภาพโค้ด และความปลอดภัยให้แข็งแรงตั้งแต่ก้าวแรก</td>
+                </tr>
+                <tr>
+                  <td><strong>ความเสี่ยงร้ายแรง</strong></td>
+                  <td>ผู้บริหารหรือลูกค้าเห็น Prototype ทำงานได้แล้วสั่งให้นำไปขึ้น Production ทันที (กลายเป็น <em>Code-and-Fix Anti-pattern</em> ที่บำรุงรักษาไม่ได้)</td>
+                  <td>หากความต้องการหลักเปลี่ยนแบบถอนรากถอนโคนกลางทาง การปรับสถาปัตยกรรมอาจทำได้ยาก</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="subsection" id="m3-3">
+          <h3 class="subhead"><span class="sub-num">3.3</span> Spiral Model: กรอบการทำงานแบบขับเคลื่อนด้วยความเสี่ยง (Risk-Driven 4 Quadrants)</h3>
+          <p>
+            <strong>Spiral Model</strong> เสนอโดย <strong>Barry Boehm (1988)</strong> เป็นการปฏิวัติแนวคิดจากการขับเคลื่อนด้วยเอกสารหรือโค้ด มาเป็นการขับเคลื่อนด้วย <strong>ความเสี่ยง (Risk-Driven Process Model)</strong> โมเดลนี้ผสมผสานทั้ง <em>Change Avoidance</em> (วิเคราะห์ความเสี่ยงและทำ Prototype ก่อนตัดสินใจ) และ <em>Change Tolerance</em> (ยอมรับการวนรอบซ้ำหลายรอบ) แต่ละรอบของเกลียว (Loop) แทนเฟสหนึ่งของโครงการ และทุกรอบจะหมุนผ่าน <strong>4 Quadrants (4 จตุภาค)</strong> เสมอ
+          </p>
+
+          <!-- Interactive 4-Quadrant Spiral Model Explorer -->
+          <div class="interactive-box" id="spiral-explorer">
+            <div class="interactive-header">
+              <h4 class="interactive-title">
+                <i data-lucide="compass" style="width:18px;height:18px;"></i>
+                แบบจำลอง Interactive: Spiral Model — เลือกรอบเกลียวและสำรวจ 4 Quadrants
+              </h4>
+              <span class="tag-violet">Boehm (1988)</span>
+            </div>
+            <div style="margin-bottom:var(--space-sm);font-size:0.85rem;font-weight:600;color:var(--on-surface-variant);">
+              ขั้นที่ 1 — เลือกรอบของเกลียว (Spiral Loop):
+            </div>
+            <div class="btn-row">
+              <button type="button" class="btn active" id="loop-btn-1" onclick="selectSpiralLoop(1, this)">Loop 1: Feasibility Study</button>
+              <button type="button" class="btn" id="loop-btn-2" onclick="selectSpiralLoop(2, this)">Loop 2: Requirements &amp; UX</button>
+              <button type="button" class="btn" id="loop-btn-3" onclick="selectSpiralLoop(3, this)">Loop 3: Architecture &amp; Core</button>
+              <button type="button" class="btn" id="loop-btn-4" onclick="selectSpiralLoop(4, this)">Loop 4: Production &amp; Release</button>
+            </div>
+            <div style="margin-bottom:var(--space-sm);font-size:0.85rem;font-weight:600;color:var(--on-surface-variant);">
+              ขั้นที่ 2 — คลิกเลือก Quadrant เพื่อดูรายละเอียดกิจกรรม:
+            </div>
+            <div class="quadrant-grid">
+              <button type="button" class="quad-btn active" id="quad-btn-1" onclick="selectSpiralQuad(1, this)">
+                <span class="quad-btn-num">QUADRANT 01</span>
+                <span class="quad-btn-title">Determine Objectives, Alternatives &amp; Constraints</span>
+              </button>
+              <button type="button" class="quad-btn" id="quad-btn-2" onclick="selectSpiralQuad(2, this)">
+                <span class="quad-btn-num">QUADRANT 02</span>
+                <span class="quad-btn-title">Evaluate Alternatives, Identify &amp; Resolve Risks</span>
+              </button>
+              <button type="button" class="quad-btn" id="quad-btn-3" onclick="selectSpiralQuad(3, this)">
+                <span class="quad-btn-num">QUADRANT 03</span>
+                <span class="quad-btn-title">Develop &amp; Verify Next-Level Product</span>
+              </button>
+              <button type="button" class="quad-btn" id="quad-btn-4" onclick="selectSpiralQuad(4, this)">
+                <span class="quad-btn-num">QUADRANT 04</span>
+                <span class="quad-btn-title">Review &amp; Plan Next Phases</span>
+              </button>
+            </div>
+            <div class="callout callout--violet" style="margin:0;">
+              <div class="callout-title" id="spiral-detail-title">Loop 1 · Quadrant 1: กำหนดวัตถุประสงค์และขอบเขตความเป็นไปได้</div>
+              <p id="spiral-detail-body" style="margin-bottom:var(--space-xs);">ระบุเป้าหมายทางธุรกิจ ทางเลือกในการสร้างระบบ (ซื้อสำเร็จรูป, จ้างพัฒนา, พัฒนาเอง) และข้อจำกัดด้านงบประมาณ เวลา และกฎหมาย</p>
+              <div style="font-size:0.85rem;color:var(--primary);font-weight:600;" id="spiral-detail-artifact">Artifact สำคัญ: Concept of Operation &amp; Initial Constraints List</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="subsection" id="m3-4">
+          <h3 class="subhead"><span class="sub-num">3.4</span> การบริหารจัดการความต้องการที่ไม่แน่นอนและความเสี่ยง (Handling Uncertain &amp; Evolving Requirements)</h3>
+          <p>
+            ในการพัฒนาซอฟต์แวร์จริง ความต้องการเปลี่ยนแปลงตลอดเวลาเนื่องจากสภาพตลาด กฎหมาย และความเข้าใจที่เพิ่มขึ้นของผู้ใช้ <strong>Sommerville (บทที่ 2.3)</strong> และ <strong>Dooley &amp; Kazakova (บทที่ 2)</strong> เสนอกลยุทธ์การรับมือความไม่แน่นอน 3 ประการ:
+          </p>
+          <ul>
+            <li><strong>Change Anticipation (คาดการณ์การเปลี่ยนแปลงล่วงหน้า):</strong> ใช้ Throwaway Prototyping หรือ UX Mockups เพื่อให้ผู้ใช้ทดลองก่อนเขียนโค้ดจริง ลดการขอแก้หลังส่งมอบ</li>
+            <li><strong>Change Tolerance (ออกแบบกระบวนการให้ทนทานต่อการเปลี่ยนแปลง):</strong> ใช้การพัฒนาแบบ Incremental Delivery และการวางสถาปัตยกรรมแบบ Modular / Loose Coupling เพื่อให้ปรับแก้เฉพาะจุดได้ในต้นทุนต่ำ</li>
+            <li><strong>MVP-Based Closed-End Mini-Projects (Dooley &amp; Kazakova):</strong> แบ่งโครงการใหญ่เป็นรอบย่อยที่มีเป้าหมายชัดเจนเป็น <em>Minimum Viable Product (MVP)</em> ซึ่งแต่ละรอบต้องมีเกณฑ์ความสำเร็จแบบ Binary (Done / Not Done) สามารถ Demo เพื่อเก็บ Feedback มาปรับแผนรอบถัดไปได้ทันที</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- MODULE 4 -->
+      <!-- ========================================================= -->
+      <section class="module-section" id="module-4">
+        <div class="module-header">
+          <span class="module-kicker">MODULE 04</span>
+          <h2 class="module-title"><strong>Agile Process Frameworks: Scrum &amp; Kanban</strong> — กรอบการทำงานอไจล์และการบริหารงานแบบลีน</h2>
+          <p class="module-summary">
+            เจาะลึกปรัชญา Agile Manifesto และ Lean Software Development ศึกษากลไกของ Scrum (3 Roles, 3 Artifacts, 5 Events) ระบบดึงงานและจำกัดงานค้างใน Kanban รวมถึงการประเมินคุณภาพ User Stories ด้วยหลัก INVEST และ SMART
+          </p>
+        </div>
+
+        <div class="subsection" id="m4-1">
+          <h3 class="subhead"><span class="sub-num">4.1</span> ปรัชญา Agile Manifesto (4 Core Values, 12 Principles) และ Lean Software Development</h3>
+          <p>
+            ในช่วงปลายทศวรรษ 1990s วิศวกรซอฟต์แวร์กลุ่มหนึ่งเกิดความไม่พอใจกับกระบวนการแบบ Plan-Driven ที่หนักเอกสาร (Heavyweight) จนทีมใช้เวลาเขียนเอกสารและประชุมอนุมัติมากกว่าเขียนโค้ด จึงร่วมกันประกาศ <strong>Agile Manifesto (2001)</strong> เพื่อวางค่านิยมหลัก 4 ประการ (โดยตระหนักว่าฝั่งขวามีคุณค่า แต่ให้คุณค่าฝั่งซ้ายมากกว่า):
+          </p>
+          <div class="card-grid">
+            <div class="info-card">
+              <div class="info-card-top"><h4 class="info-card-title">Value 01</h4><span class="tag-violet">People</span></div>
+              <p><strong>Individuals and interactions</strong> over processes and tools — ให้ความสำคัญกับคนและการสื่อสารโดยตรงมากกว่าขั้นตอนตายตัวและเครื่องมือ</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-top"><h4 class="info-card-title">Value 02</h4><span class="tag-violet">Software</span></div>
+              <p><strong>Working software</strong> over comprehensive documentation — ซอฟต์แวร์ที่ทำงานได้จริงเป็นตัววัดความก้าวหน้าหลัก เหนือกว่าเอกสารที่หนาเทอะทะ</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-top"><h4 class="info-card-title">Value 03</h4><span class="tag-violet">Collaboration</span></div>
+              <p><strong>Customer collaboration</strong> over contract negotiation — ร่วมมือกับลูกค้าอย่างใกล้ชิดระหว่างพัฒนา แทนการถกเถียงตีความตามตัวอักษรในสัญญา</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-top"><h4 class="info-card-title">Value 04</h4><span class="tag-violet">Adaptability</span></div>
+              <p><strong>Responding to change</strong> over following a plan — พร้อมปรับตัวรับความเปลี่ยนแปลง ดีกว่ายึดติดกับแผนเดิมที่ล้าสมัยไปแล้ว</p>
+            </div>
+          </div>
+
+          <h4 class="mini-head">สรุป 12 Principles ของ Agile (จัดกลุ่มเป็น 4 เสาหลัก)</h4>
+          <ul>
+            <li><strong>Customer Value &amp; Adaptability:</strong> ส่งมอบซอฟต์แวร์ที่มีคุณค่าอย่างรวดเร็วและต่อเนื่อง (ข้อ 1) และยินดีต้อนรับการเปลี่ยนแปลงของความต้องการแม้ในช่วงท้ายของการพัฒนา (ข้อ 2)</li>
+            <li><strong>Frequent Iterative Delivery:</strong> ส่งมอบซอฟต์แวร์ที่ทำงานได้ทุกๆ 2–3 สัปดาห์หรือ 1–2 เดือน (ข้อ 3) โดยใช้ Working Software เป็นตัวชี้วัดหลัก (ข้อ 7)</li>
+            <li><strong>Empowered Cross-Functional Teams:</strong> ฝ่ายธุรกิจและนักพัฒนาทำงานร่วมกันทุกวัน (ข้อ 4), สร้างสภาพแวดล้อมที่ไว้ใจทีม (ข้อ 5), สื่อสารแบบ Face-to-face (ข้อ 6), รักษาจังหวะการทำงานที่ยั่งยืน (ข้อ 8), และทีมจัดการตนเอง (ข้อ 11)</li>
+            <li><strong>Technical Excellence &amp; Simplicity:</strong> ใส่ใจความเป็นเลิศทางเทคนิคและการออกแบบที่ดีอย่างต่อเนื่อง (ข้อ 9), ความเรียบง่ายคือการตัดงานที่ไม่จำเป็นทิ้ง (ข้อ 10), และทบทวนปรับปรุงทีมสม่ำเสมอ (ข้อ 12)</li>
+          </ul>
+
+          <h4 class="mini-head">Lean Software Development: การกำจัดความสูญเปล่า 7 ประการ (7 Wastes)</h4>
+          <p>
+            Mary &amp; Tom Poppendieck (2003) และ Dooley &amp; Kazakova (2024) นำแนวคิด Lean Manufacturing มาประยุกต์กับซอฟต์แวร์ โดยระบุ <strong>ความสูญเปล่า (Waste / Muda)</strong> ที่ต้องกำจัดให้หมดไป ได้แก่: (1) <strong>Partially Done Work</strong> (โค้ดที่เขียนไว้แต่ยังไม่ Test/ยังไม่ Deploy), (2) <strong>Extra Processing</strong> (เอกสารส่วนเกิน การประชุมที่ไม่จำเป็น), (3) <strong>Extra Features</strong> (ฟีเจอร์ที่ไม่มีใครใช้ — Gold Plating), (4) <strong>Task / Context Switching</strong> (การให้คนหนึ่งคนสลับทำหลายโปรเจกต์พร้อมกัน), (5) <strong>Waiting</strong> (รอการอนุมัติ รอโค้ดจากทีมอื่น), (6) <strong>Motion</strong> (การส่งต่อข้อมูลข้ามหลายคนโดยไม่มีระบบจัดเก็บที่ชัดเจน), และ (7) <strong>Defects</strong> (บั๊กที่หลุดรอดไปจนแก้ยากและแพง)
+          </p>
+        </div>
+
+        <div class="subsection" id="m4-2">
+          <h3 class="subhead"><span class="sub-num">4.2</span> Scrum Framework: Roles, Artifacts &amp; Events</h3>
+          <p>
+            <strong>Scrum</strong> (Sommerville Ch. 3.3) เป็นกรอบการทำงานแบบ Agile ที่ได้รับความนิยมสูงสุด จัดระเบียบงานผ่านรอบเวลาคงที่เรียกว่า <strong>Sprint</strong> (ปกติ 1–4 สัปดาห์) ประกอบด้วย <strong>3 บทบาท (Accountabilities)</strong>, <strong>3 ชิ้นงาน (Artifacts)</strong> และ <strong>5 กิจกรรม (Events)</strong>
+          </p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>องค์ประกอบ Scrum</th>
+                  <th>รายละเอียดและหน้าที่รับผิดชอบ</th>
+                  <th>ข้อผูกมัด / จุดเน้นสำคัญ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Role 1: Product Owner (PO)</strong></td>
+                  <td>ผู้บริหารจัดการ Product Backlog กำหนดทิศทางและจัดลำดับความสำคัญของงานตามคุณค่าทางธุรกิจ เป็นตัวแทนเสียงของลูกค้า</td>
+                  <td>ความรับผิดชอบสูงสุดต่อผลตอบแทนคุณค่าของผลิตภัณฑ์ (Value Maximization)</td>
+                </tr>
+                <tr>
+                  <td><strong>Role 2: Scrum Master (SM)</strong></td>
+                  <td>Servant Leader ผู้ช่วยให้ทีมเข้าใจและปฏิบัติตามหลัก Scrum ขจัดอุปสรรค (Impediments) และปกป้องทีมจากการแทรกแซงระหว่าง Sprint</td>
+                  <td>ไม่ใช่หัวหน้างานแบบสั่งการ (Not a traditional PM) แต่เป็น Process Coach</td>
+                </tr>
+                <tr>
+                  <td><strong>Role 3: Developers</strong></td>
+                  <td>ทีมข้ามสายงาน (Cross-functional) ที่ร่วมกันออกแบบ เขียนโค้ด ทดสอบ และส่งมอบ Increment ในทุก Sprint</td>
+                  <td>มีอำนาจในการจัดสรรงานและประเมินขนาดงานด้วยตนเอง (Self-managing)</td>
+                </tr>
+                <tr>
+                  <td><strong>Artifact 1: Product Backlog</strong></td>
+                  <td>รายการความต้องการทั้งหมดของระบบที่เรียงลำดับความสำคัญจากบนลงล่าง และปรับปรุงตลอดเวลา</td>
+                  <td><em>Commitment:</em> <strong>Product Goal</strong> (เป้าหมายระยะยาวของผลิตภัณฑ์)</td>
+                </tr>
+                <tr>
+                  <td><strong>Artifact 2: Sprint Backlog</strong></td>
+                  <td>ชุด Product Backlog Items ที่ทีมเลือกมาทำใน Sprint ปัจจุบัน พร้อมแผนการปฏิบัติงาน (Tasks)</td>
+                  <td><em>Commitment:</em> <strong>Sprint Goal</strong> (เป้าหมายรวมของ Sprint นี้)</td>
+                </tr>
+                <tr>
+                  <td><strong>Artifact 3: Increment</strong></td>
+                  <td>ผลรวมของชิ้นงานที่เสร็จสมบูรณ์ ใช้งานได้จริง และผสานเข้ากับชิ้นงานก่อนหน้าอย่างสมบูรณ์</td>
+                  <td><em>Commitment:</em> <strong>Definition of Done (DoD)</strong> (เกณฑ์มาตรฐานคุณภาพ เช่น ผ่าน Test &amp; Review แล้ว)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4 class="mini-head">5 กิจกรรม Time-Boxed ของ Scrum</h4>
+          <ul>
+            <li><strong>1. The Sprint:</strong> ภาชนะบรรจุเวลา 1–4 สัปดาห์ที่ห้ามเปลี่ยนแปลงเป้าหมายหลักกลางคันเพื่อให้เกิดสมาธิในการส่งมอบ Increment</li>
+            <li><strong>2. Sprint Planning:</strong> วางแผน 3 เรื่อง คือ <em>Why</em> (กำหนด Sprint Goal), <em>What</em> (PO และทีมเลือก Backlog Items), และ <em>How</em> (Developers แตกงานเป็น Tasks)</li>
+            <li><strong>3. Daily Scrum:</strong> ประชุมยืน 15 นาทีทุกวันโดย Developers เพื่อตรวจสอบความคืบหน้าสู่ Sprint Goal และระบุปัญหาติดขัด (ไม่ใช่การรายงานหัวหน้างาน)</li>
+            <li><strong>4. Sprint Review:</strong> ท้าย Sprint ทีมสาธิต Working Increment ให้ Stakeholders ทดลองใช้งานจริงและเก็บ Feedback เพื่อปรับ Product Backlog</li>
+            <li><strong>5. Sprint Retrospective:</strong> ทีมทบทวนกระบวนการทำงานภายใน (People, Process, Tools, DoD) เพื่อหา Action Item ปรับปรุงให้ Sprint หน้าดียิ่งขึ้น</li>
+          </ul>
+        </div>
+
+        <div class="subsection" id="m4-3">
+          <h3 class="subhead"><span class="sub-num">4.3</span> Kanban Method: 6 Core Practices, WIP Limits &amp; Flow Management</h3>
+          <p>
+            <strong>Kanban</strong> มุ่งเน้นการส่งมอบงานอย่างต่อเนื่อง (Continuous Flow) โดยไม่ต้องรอครบรอบ Sprint มีหลักปฏิบัติหลัก <strong>6 Core Practices</strong> ได้แก่: (1) <strong>Visualize the Workflow</strong> (แสดงสถานะงานทั้งหมดบนบอร์ดให้เห็นคอขวด), (2) <strong>Limit Work in Progress (WIP)</strong> (จำกัดจำนวนงานที่ทำค้างไว้ในแต่ละคอลัมน์), (3) <strong>Manage Flow</strong> (วัดและปรับปรุงความลื่นไหลของงาน), (4) <strong>Make Process Policies Explicit</strong> (เขียนกฎการย้ายคอลัมน์ให้ทุกคนรู้ตรงกัน), (5) <strong>Implement Feedback Loops</strong> (ทบทวน Flow และบริการ), และ (6) <strong>Improve Collaboratively</strong> (พัฒนาด้วยข้อมูลเชิงประจักษ์)
+          </p>
+          <div class="callout">
+            <div class="callout-title">
+              <i data-lucide="gauge" style="width:18px;height:18px;"></i>
+              Little's Law และความต่างระหว่าง Lead Time กับ Cycle Time
+            </div>
+            <p>
+              หัวใจทางคณิตศาสตร์ของ Kanban คือ <strong>Little's Law:</strong> <code class="inline-code">Average Lead Time = WIP / Throughput</code> ดังนั้นวิธีลดระยะเวลารอคอยที่ทรงพลังที่สุดไม่ใช่การเร่งให้คนทำงานหนักขึ้น แต่คือ <strong>การลด WIP Limit</strong> เพื่อให้ทีมโฟกัสปิดงานทีละชิ้น ลด Context Switching (Stop starting, start finishing!)
+            </p>
+            <ul>
+              <li><strong>Lead Time:</strong> เวลาทั้งหมดตั้งแต่การ์ดงานถูกสร้าง/รับเข้ามาในระบบ (Requested) จนถึงเวลาที่ส่งมอบเสร็จสมบูรณ์ (Delivered/Done) — <em>มุมมองของลูกค้า</em></li>
+              <li><strong>Cycle Time:</strong> เวลาตั้งแต่ทีมวิศวกรเริ่มลงมือทำจริง (In Progress) จนถึงเสร็จสิ้น (Done) — <em>มุมมองประสิทธิภาพของทีมพัฒนา</em></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="subsection" id="m4-4">
+          <h3 class="subhead"><span class="sub-num">4.4</span> การเปรียบเทียบ Scrum vs. Kanban vs. Scrumban และ Scaling Agile</h3>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>มิติเปรียบเทียบ</th>
+                  <th>Scrum</th>
+                  <th>Kanban</th>
+                  <th>Scrumban (Hybrid)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>จังหวะการทำงาน (Cadence)</strong></td>
+                  <td>Time-boxed Sprints (1–4 สัปดาห์)</td>
+                  <td>Continuous Flow (ไหลต่อเนื่อง ไม่มี Sprint)</td>
+                  <td>วางแผนแบบ Pull-based ต่อเนื่อง + มีรอบ Review/Retro</td>
+                </tr>
+                <tr>
+                  <td><strong>การบริหารการเปลี่ยนแปลง</strong></td>
+                  <td>ล็อก Sprint Backlog ระหว่าง Sprint (ห้ามแทรกงานโดยพลการ)</td>
+                  <td>แทรกงานด่วนเข้าคอลัมน์ To Do ได้ตลอดเวลาเมื่อมีช่องว่าง</td>
+                  <td>ยืดหยุ่นรับงานแทรกได้ภายใต้เกณฑ์ WIP Limit</td>
+                </tr>
+                <tr>
+                  <td><strong>บทบาทกำหนดเฉพาะ</strong></td>
+                  <td>ชัดเจน: PO, Scrum Master, Developers</td>
+                  <td>ไม่มีบทบาทบังคับ ปรับใช้กับโครงสร้างทีมเดิมได้ทันที</td>
+                  <td>มีเฉพาะบทบาทที่จำเป็นต่อการประสานงาน</td>
+                </tr>
+                <tr>
+                  <td><strong>กลไกควบคุมปริมาณงาน</strong></td>
+                  <td>Sprint Capacity &amp; Velocity</td>
+                  <td>WIP Limits ในแต่ละสถานะ (Column)</td>
+                  <td>WIP Limits + Iteration / On-demand Planning</td>
+                </tr>
+                <tr>
+                  <td><strong>ตัวชี้วัดหลัก (Metrics)</strong></td>
+                  <td>Velocity, Sprint Burn-down Chart</td>
+                  <td>Lead Time, Cycle Time, Throughput, CFD</td>
+                  <td>Cycle Time, CFD, Throughput</td>
+                </tr>
+                <tr>
+                  <td><strong>บริบทที่เหมาะสม</strong></td>
+                  <td>พัฒนาผลิตภัณฑ์ใหม่ ฟีเจอร์เป็นชุดที่วางเป้าหมายราย 2 สัปดาห์ได้</td>
+                  <td>งาน Support, Operations, Bug Fixing ที่งานเข้าตลอดไม่แน่นอน</td>
+                  <td>ทีม Maintenance หรืองานพัฒนาที่มีทั้งฟีเจอร์ใหม่และงานแก้ด่วน</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <strong>Scaling Agile &amp; Brownfield Systems (Sommerville 3.4, Fig. 3.13):</strong> สำหรับองค์กรขนาดใหญ่หรือระบบแบบ <em>Brownfield</em> ที่ต้องเชื่อมต่อกับระบบเก่าและมีทีมพัฒนาหลายทีมกระจายอยู่หลายเขตเวลา การใช้ Pure Agile เพียงอย่างเดียวไม่เพียงพอ จำเป็นต้องผสมผสานแนวทาง Plan-Driven เช่น การกำหนดสถาปัตยกรรมและข้อกำหนดเบื้องต้น (Up-front Architecture), มีตัวแทนลูกค้าหลายคน, เอกสารมาตรฐานกลางสำหรับ Compliance และการประสานรอบ Release ระหว่างทีม (Multi-team Release Alignment)
+          </p>
+        </div>
+
+        <div class="subsection" id="m4-5">
+          <h3 class="subhead"><span class="sub-num">4.5</span> การเขียน User Stories (หลัก INVEST) และ SMART Tasks</h3>
+          <p>
+            ใน Agile ความต้องการจะถูกเขียนในรูปของ <strong>User Story</strong> เพื่อกระตุ้นให้เกิดบทสนทนา (Card - Conversation - Confirmation) โดยมีโครงสร้างมาตรฐาน: <code class="inline-code">As a [Role], I want [Feature/Action], so that [Business Value]</code> คู่กับ <strong>Acceptance Criteria</strong> (มักเขียนแบบ <em>Given - When - Then</em>) และเมื่อเข้าสู่ Sprint Planning นักพัฒนาจะแตก Story ออกเป็น <strong>SMART Tasks</strong> (Specific, Measurable, Achievable, Relevant, Time-boxed เช่น ไม่เกิน 1 วันต่อ Task)
+          </p>
+
+          <!-- Interactive INVEST Quality Checker -->
+          <div class="interactive-box" id="invest-checker">
+            <div class="interactive-header">
+              <h4 class="interactive-title">
+                <i data-lucide="check-square" style="width:18px;height:18px;"></i>
+                เครื่องมือประเมินคุณภาพ User Story ตามหลัก INVEST
+              </h4>
+              <span class="tag-violet">Interactive Tool</span>
+            </div>
+            <div class="btn-row">
+              <button type="button" class="btn active" id="story-ex-1" onclick="loadStoryExample(1, this)">ตัวอย่างดี: Mentcare Alert</button>
+              <button type="button" class="btn" id="story-ex-2" onclick="loadStoryExample(2, this)">ตัวอย่างต้องปรับปรุง: ระบบรายงานใหญ่เกินไป</button>
+            </div>
+            <div class="control-field" style="margin-bottom:var(--space-md);">
+              <label for="story-input" style="font-size:0.875rem;font-weight:600;">ข้อความ User Story (ทดลองแก้ไขได้):</label>
+              <input type="text" id="story-input" class="text-input" value="As a clinic nurse, I want the Mentcare system to flag patients who missed 2 consecutive appointments, so that I can follow up before their condition worsens." oninput="evaluateStoryScore()">
+            </div>
+            <div class="invest-grid">
+              <label class="invest-check"><input type="checkbox" id="chk-i" checked onchange="evaluateStoryScore()"><span><strong>I — Independent:</strong> แยกพัฒนาและปล่อยอิสระจาก Story อื่นได้</span></label>
+              <label class="invest-check"><input type="checkbox" id="chk-n" checked onchange="evaluateStoryScore()"><span><strong>N — Negotiable:</strong> เปิดกว้างให้ทีมและ PO คุยรายละเอียดได้ ไม่ใช่ Spec ตายตัว</span></label>
+              <label class="invest-check"><input type="checkbox" id="chk-v" checked onchange="evaluateStoryScore()"><span><strong>V — Valuable:</strong> ส่งมอบคุณค่าที่ชัดเจนต่อผู้ใช้หรือธุรกิจ</span></label>
+              <label class="invest-check"><input type="checkbox" id="chk-e" checked onchange="evaluateStoryScore()"><span><strong>E — Estimable:</strong> ทีมสามารถประเมินขนาดงาน (Story Points) ได้</span></label>
+              <label class="invest-check"><input type="checkbox" id="chk-s" checked onchange="evaluateStoryScore()"><span><strong>S — Small:</strong> ขนาดเล็กพอที่จะจบได้ภายใน 1 Sprint</span></label>
+              <label class="invest-check"><input type="checkbox" id="chk-t" checked onchange="evaluateStoryScore()"><span><strong>T — Testable:</strong> เขียน Acceptance Criteria ทดสอบผ่าน/ไม่ผ่านได้ชัด</span></label>
+            </div>
+            <div class="output-grid">
+              <div class="output-metric">
+                <div class="output-metric-label">คะแนนความพร้อม (INVEST Readiness)</div>
+                <div class="output-metric-val is-good" id="invest-score">6 / 6 (Ready for Sprint)</div>
+              </div>
+              <div class="output-metric">
+                <div class="output-metric-label">คำแนะนำเชิงปฏิบัติ</div>
+                <div id="invest-feedback" style="font-size:0.88rem;color:var(--on-surface);">Story มีองค์ประกอบ Role, Action, Value ครบถ้วน และผ่านเกณฑ์ Ready พร้อมนำเข้า Sprint Planning</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- MODULE 5 -->
+      <!-- ========================================================= -->
+      <section class="module-section" id="module-5">
+        <div class="module-header">
+          <span class="module-kicker">MODULE 05</span>
+          <h2 class="module-title"><strong>Software House Simulation &amp; Modern Engineering Tooling</strong> — การจำลองสภาพแวดล้อม Software House และเครื่องมือวิศวกรรมสมัยใหม่</h2>
+          <p class="module-summary">
+            เชื่อมโยงทฤษฎีกระบวนการซอฟต์แวร์เข้ากับการทำงานจริงในอุตสาหกรรม ครอบคลุมวัฒนธรรมทีมและ Psychological Safety การบริหารงานบน GitHub Projects/Jira กลยุทธ์ Git Branching การทำ CI/CD การวัดผลด้วย Process Metrics และคู่มือปฏิบัติการสำหรับ Senior Project
+          </p>
+        </div>
+
+        <div class="subsection" id="m5-1">
+          <h3 class="subhead"><span class="sub-num">5.1</span> การจัดโครงสร้างทีมและวัฒนธรรมใน Software House</h3>
+          <p>
+            ใน Software House สมัยใหม่ ประสิทธิภาพของการส่งมอบไม่ได้ขึ้นอยู่กับความเก่งรายบุคคลเท่านั้น แต่ขึ้นอยู่กับการออกแบบโครงสร้างทีมและสภาพแวดล้อมทางสังคมของวิศวกร:
+          </p>
+          <ul>
+            <li><strong>Cross-Functional Team (ทีมข้ามสายงาน):</strong> แทนที่จะแยกแผนก Frontend, Backend, QA และ Ops ออกจากกัน (ซึ่งสร้าง Handoff Friction และเวลารอคอย) ทีมผลิตซอฟต์แวร์ยุคใหม่รวมทุกทักษะที่จำเป็นไว้ในทีมเดียว (5–9 คน) เพื่อให้จบงานได้ตั้งแต่ต้นจนขึ้น Production (End-to-End Ownership)</li>
+            <li><strong>Psychological Safety (ความปลอดภัยทางจิตใจ):</strong> งานวิจัย Project Aristotle ของ Google และ Amy Edmondson พบว่าปัจจัยอันดับหนึ่งของทีมประสิทธิภาพสูงคือความเชื่อมั่นว่าสมาชิกสามารถตั้งคำถาม ขอความช่วยเหลือ เสนอไอเดียแย้ง หรือยอมรับความผิดพลาดได้โดยไม่ถูกลงโทษหรืออับอาย นำไปสู่วัฒนธรรม <em>Blameless Post-mortem</em> (เมื่อระบบล่ม ให้วิเคราะห์จุดอ่อนของกระบวนการและเครื่องมือ ไม่ใช่หาแพะรับบาป)</li>
+            <li><strong>Soft-Aware Development &amp; Sociotechnical Mindset:</strong> อ้างอิงแนวคิด Sociotechnical Systems ของ Sommerville (บทที่ 10 &amp; 19) วิศวกรต้องตระหนักว่าซอฟต์แวร์เป็นส่วนหนึ่งของระบบสังคมและองค์กร ต้องคำนึงถึงจรรยาบรรณ (ACM/IEEE Code of Ethics) กฎหมายข้อมูลส่วนบุคคล ความหลากหลายของผู้ใช้ และความยืดหยุ่นทางสังคมควบคู่ไปกับโค้ด</li>
+          </ul>
+        </div>
+
+        <div class="subsection" id="m5-2">
+          <h3 class="subhead"><span class="sub-num">5.2</span> ระบบ Issue Tracking และการประยุกต์ใช้ GitHub Projects / Jira</h3>
+          <p>
+            ระบบ Issue Tracking อย่าง <strong>GitHub Projects</strong> หรือ <strong>Jira</strong> ทำหน้าที่เป็น <em>Single Source of Truth</em> ของทีม เพื่อให้มองเห็นงานทั้งหมด (Work Visualization) และเชื่อมโยงความต้องการเข้ากับโค้ดจริง:
+          </p>
+          <ul>
+            <li><strong>ลำดับชั้นของงาน (Work Hierarchy):</strong> <em>Milestone / Initiative</em> (เป้าหมายรุ่นส่งมอบ) → <em>Epic</em> (ฟีเจอร์กลุ่มใหญ่) → <em>User Story / Issue</em> (งานที่ส่งมอบคุณค่าได้ใน 1 Sprint) → <em>Sub-task / Checklist</em> (งานย่อยทางเทคนิค)</li>
+            <li><strong>องค์ประกอบสำคัญบน Board:</strong> การตั้งสถานะที่สะท้อน Workflow จริง (เช่น <code class="inline-code">Backlog</code> → <code class="inline-code">Ready</code> → <code class="inline-code">In Progress [WIP: 3]</code> → <code class="inline-code">In Review</code> → <code class="inline-code">Done</code>), การติด Labels (<code class="inline-code">feat</code>, <code class="inline-code">bug</code>, <code class="inline-code">tech-debt</code>, <code class="inline-code">blocked</code>) และ Custom Fields สำหรับบันทึก Story Points และ Iteration/Sprint</li>
+            <li><strong>Traceability อัตโนมัติ:</strong> ใน GitHub Projects เมื่อนักพัฒนาผูก Issue ID เข้ากับ Pull Request (เช่น <code class="inline-code">Closes #42</code>) สถานะการ์ดบน Board จะขยับจาก <em>In Progress</em> ไปยัง <em>In Review</em> และ <em>Done</em> โดยอัตโนมัติ ลดภาระงานเอกสารซ้ำซ้อน</li>
+          </ul>
+        </div>
+
+        <div class="subsection" id="m5-3">
+          <h3 class="subhead"><span class="sub-num">5.3</span> Version Control Workflows &amp; Git Branching Strategies</h3>
+          <p>
+            <strong>Configuration Management &amp; Distributed Version Control (Sommerville Ch. 25)</strong> เป็นเสาหลักของการทำงานร่วมกัน ระบบ Git ช่วยให้วิศวกรทุกคนมี Repository ฉบับเต็มและทำงานขนานกันได้โดยไม่ทับซ้อนกันผ่านกลยุทธ์ Branching ที่เหมาะสม:
+          </p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>กลยุทธ์ Branching</th>
+                  <th>โครงสร้าง Branch หลัก</th>
+                  <th>จุดแข็ง &amp; บริบทที่เหมาะสม</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>GitHub Flow (Feature Branching)</strong></td>
+                  <td><code class="inline-code">main</code> (พร้อม Deploy ตลอดเวลา) + <code class="inline-code">feature/*</code> หรือ <code class="inline-code">fix/*</code> แตกจาก main แล้ว Merge กลับผ่าน PR</td>
+                  <td>เรียบง่าย รวดเร็ว เหมาะกับเว็บแอปพลิเคชัน SaaS ที่ใช้ CI/CD ปล่อยงานบ่อย และ Senior Project</td>
+                </tr>
+                <tr>
+                  <td><strong>GitFlow</strong></td>
+                  <td><code class="inline-code">main</code>, <code class="inline-code">develop</code>, <code class="inline-code">feature/*</code>, <code class="inline-code">release/*</code>, <code class="inline-code">hotfix/*</code></td>
+                  <td>รองรับการดูแลซอฟต์แวร์หลายเวอร์ชันพร้อมกัน (เช่น Mobile Apps หรือซอฟต์แวร์องค์กรที่มีรอบ Release ชัดเจน)</td>
+                </tr>
+                <tr>
+                  <td><strong>Trunk-Based Development</strong></td>
+                  <td>ทุก Commit เข้า <code class="inline-code">main</code> (Trunk) บ่อยครั้ง (หรือ Short-lived branch ไม่เกิน 1–2 วัน) ใช้ Feature Flags</td>
+                  <td>ลด Merge Conflict สูงสุด เหมาะกับทีมระดับสูงที่มี Automated Test Coverage เข้มแข็ง</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <strong>Pull Requests (PRs), Code Review Culture &amp; Branch Protection:</strong> Pull Request ไม่ใช่แค่คำสั่งรวมโค้ด แต่เป็นจุดทำ <em>Static Verification</em> ที่ทรงพลังที่สุด การสร้างวัฒนธรรม Code Review ที่ดีควรตรวจทั้ง Logic, Security, Readability และ Test Coverage โดยให้คำแนะนำอย่างสร้างสรรค์ ("วิจารณ์โค้ด ไม่วิจารณ์คน") พร้อมตั้งกฎ <strong>Branch Protection Rules</strong> บน Branch <code class="inline-code">main</code> ได้แก่ (1) ห้าม Push ตรงเข้า <code class="inline-code">main</code>, (2) ต้องผ่าน PR และได้รับการอนุมัติอย่างน้อย 1–2 คน, และ (3) Status Checks จาก CI Pipeline ต้องผ่านทั้งหมดก่อน Merge
+          </p>
+        </div>
+
+        <div class="subsection" id="m5-4">
+          <h3 class="subhead"><span class="sub-num">5.4</span> Modern Engineering: CI/CD Pipelines, Automated Testing &amp; Process Metrics</h3>
+          <p>
+            <strong>CI/CD Pipelines (Continuous Integration / Delivery / Deployment):</strong> ทุกครั้งที่มีการ Push หรือเปิด PR ระบบ CI (เช่น GitHub Actions) จะทำงานอัตโนมัติ: <em>Checkout Code → Install Dependencies → Linter/Static Analysis → Run Automated Tests → Build Artifact</em> หากผ่านทั้งหมดและ Merge แล้ว ระบบ <em>Continuous Delivery</em> จะนำขึ้น Staging เพื่อตรวจรับ หรือ <em>Continuous Deployment</em> จะส่งขึ้น Production อัตโนมัติทันที
+          </p>
+          <p>
+            <strong>Automated Testing Pyramid &amp; TDD:</strong> การทดสอบอัตโนมัติควรมีฐานล่างเป็น <strong>Unit Tests</strong> จำนวนมาก (รันเร็ว ทดสอบฟังก์ชัน/คลาสแยกเดี่ยว) ชั้นกลางเป็น <strong>Integration / API Tests</strong> และยอดบนเป็น <strong>End-to-End (E2E) Tests</strong> ในจำนวนที่พอเหมาะ นอกจากนี้เทคนิค <strong>Test-Driven Development (TDD — Sommerville 8.2)</strong> ที่เขียนเทสต์ให้ Fail ก่อน (Red) → เขียนโค้ดให้ผ่านเทสต์ (Green) → ปรับโครงสร้างให้สะอาด (Refactor) ช่วยให้เกิด Regression Safety Net ตลอดชีวิตซอฟต์แวร์
+          </p>
+          <p>
+            <strong>Process Metrics สำหรับติดตามและปรับปรุงทีม:</strong>
+          </p>
+          <ul>
+            <li><strong>Velocity:</strong> จำนวน Story Points ที่ทีมทำเสร็จ (ตรงตาม DoD) ในแต่ละ Sprint ใช้สำหรับพยากรณ์กำลังการผลิตใน Sprint ถัดไป <em>(ข้อห้ามสำคัญ: ห้ามใช้ Velocity เปรียบเทียบระหว่างทีมหรือประเมินผลงานรายบุคคล เพราะจะเกิดการปั่นตัวเลข Story Points!)</em></li>
+            <li><strong>Sprint Burn-down &amp; Release Burn-up Charts:</strong> Burn-down แสดงงานคงเหลือเทียบกับเวลาที่เหลือใน Sprint ส่วน Burn-up แสดงงานที่เสร็จสะสมเทียบกับเส้น Total Scope ซึ่งช่วยแยกแยะได้ชัดว่าความล่าช้าเกิดจากทีมทำช้าหรือเกิดจาก Scope Creep</li>
+            <li><strong>Cumulative Flow Diagram (CFD):</strong> กราฟพื้นที่สะสมที่แสดงจำนวนงานในแต่ละสถานะตามแกนเวลา สามารถอ่านค่าสำคัญได้ทันที: <em>ความสูงแนวตั้งระหว่างเส้น</em> = ปริมาณ WIP, <em>ระยะห่างแนวนอน</em> = Average Lead/Cycle Time, และ <em>ความชันของแถบ Done</em> = Throughput หากแถบใดพองตัวขึ้นแสดงว่ากำลังเกิดคอขวด (Bottleneck) ที่สถานะนั้น</li>
+          </ul>
+
+          <!-- Interactive Agile Metrics Visualizer (Chart.js) -->
+          <div class="interactive-box" id="metrics-visualizer">
+            <div class="interactive-header">
+              <h4 class="interactive-title">
+                <i data-lucide="bar-chart-3" style="width:18px;height:18px;"></i>
+                Interactive Process Metrics: Sprint Burn-down &amp; Cumulative Flow Diagram (CFD)
+              </h4>
+              <span class="tag-violet">Chart Explorer</span>
+            </div>
+            <div class="btn-row">
+              <button type="button" class="btn active" id="metric-btn-healthy" onclick="setMetricsChart('burndown-healthy', this)">Sprint Burn-down (ปกติ)</button>
+              <button type="button" class="btn" id="metric-btn-creep" onclick="setMetricsChart('burndown-creep', this)">Sprint Burn-down (เกิด Scope Creep)</button>
+              <button type="button" class="btn" id="metric-btn-cfd" onclick="setMetricsChart('cfd', this)">Cumulative Flow Diagram (CFD)</button>
+            </div>
+            <div class="chart-box">
+              <canvas id="agileMetricsChart" aria-label="กราฟ Process Metrics แสดง Sprint Burn-down และ Cumulative Flow Diagram"></canvas>
+            </div>
+            <p id="metrics-explanation" style="margin-top:var(--space-sm);margin-bottom:0;font-size:0.88rem;color:var(--on-surface-variant);">
+              <strong>Sprint Burn-down (สถานะปกติ):</strong> เส้นงานคงเหลือจริง (Actual) ลดลงเกาะใกล้เส้น Ideal Guideline อย่างสม่ำเสมอ สะท้อนว่าทีมแตก Tasks ได้พอดีและไม่มีงานค้างสะสมจนวันสุดท้าย
+            </p>
+          </div>
+        </div>
+
+        <div class="subsection" id="m5-5">
+          <h3 class="subhead"><span class="sub-num">5.5</span> คู่มือปฏิบัติการจำลองการทำงานบน GitHub Projects ร่วมกับ Senior Project</h3>
+          <p>
+            ขั้นตอนปฏิบัติ 6 ขั้นต่อไปนี้ถูกออกแบบให้นักศึกษาใช้จำลองระบบนิเวศ Software House เพื่อบริหารจัดการโครงการ Senior Project อย่างมืออาชีพ:
+          </p>
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-num-box">01</div>
+              <div>
+                <h4 style="margin:0 0 0.25rem;font-size:1rem;color:var(--primary);">สร้าง Repository มาตรฐานและโครงสร้าง CI พื้นฐาน</h4>
+                <p style="margin:0;font-size:0.92rem;">จัดทำ <code class="inline-code">README.md</code> (สถาปัตยกรรมและวิธีรันเครื่อง Local), <code class="inline-code">.github/ISSUE_TEMPLATE/</code> (User Story &amp; Bug Report), <code class="inline-code">PULL_REQUEST_TEMPLATE.md</code> และตั้งค่า GitHub Actions (<code class="inline-code">ci.yml</code>) เพื่อรัน Linter และ Unit Tests อัตโนมัติทุก PR</p>
+              </div>
+            </div>
+            <div class="step-item is-violet">
+              <div class="step-num-box">02</div>
+              <div>
+                <h4 style="margin:0 0 0.25rem;font-size:1rem;color:var(--secondary);">ออกแบบ GitHub Projects Board และกำหนด Explicit Policies</h4>
+                <p style="margin:0;font-size:0.92rem;">สร้าง Project View แบบ Board (5 คอลัมน์: <code class="inline-code">Backlog</code>, <code class="inline-code">Sprint Ready</code>, <code class="inline-code">In Progress</code>, <code class="inline-code">In Review</code>, <code class="inline-code">Done</code>) กำหนด WIP Limit (เช่น ไม่เกิน 1–2 งานต่อคนในคอลัมน์ In Progress) และเพิ่ม Custom Fields: <em>Iteration (Sprint 1–4)</em>, <em>Story Points (1, 2, 3, 5, 8)</em>, และ <em>Priority</em></p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num-box">03</div>
+              <div>
+                <h4 style="margin:0 0 0.25rem;font-size:1rem;color:var(--primary);">แตกขอบเขต Senior Project เป็น Epics และ User Stories (INVEST)</h4>
+                <p style="margin:0;font-size:0.92rem;">แปลงฟังก์ชันในบทที่ 1–3 ของ Senior Project เป็น GitHub Issues โดยระบุรูปแบบ User Story และ Acceptance Criteria ให้ชัดเจน ใช้การโหวต Planning Poker ประเมิน Story Points และจัดลำดับความสำคัญร่วมกับอาจารย์ที่ปรึกษา (สวมบทบาท PO/Stakeholder)</p>
+              </div>
+            </div>
+            <div class="step-item is-violet">
+              <div class="step-num-box">04</div>
+              <div>
+                <h4 style="margin:0 0 0.25rem;font-size:1rem;color:var(--secondary);">เปิดใช้งาน Branch Protection และ GitHub Flow</h4>
+                <p style="margin:0;font-size:0.92rem;">ล็อก Branch <code class="inline-code">main</code> (ห้าม Direct Push, บังคับ PR + 1 Reviewer Approval + CI Pass) สมาชิกทุกคนแตกสาขาใหม่ตามเลข Issue เช่น <code class="inline-code">feat/14-auth-login</code> หรือ <code class="inline-code">fix/23-pdf-export</code> และเขียน Commit Message แบบ Conventional Commits</p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num-box">05</div>
+              <div>
+                <h4 style="margin:0 0 0.25rem;font-size:1rem;color:var(--primary);">ดำเนิน Sprint รอบละ 1–2 สัปดาห์ และทำ Code Review จริงจัง</h4>
+                <p style="margin:0;font-size:0.92rem;">จัด Daily/Async Check-in บนแชทหรือบอร์ด 15 นาที แจ้งงานที่ทำและอุปสรรค (Blocker) เมื่อโค้ดเสร็จให้เปิด PR พร้อมแนบ Screenshots/Test Result และอ้างอิง <code class="inline-code">Closes #issue-id</code> เพื่อให้เพื่อนร่วมทีมตรวจ Code Review ตาม Definition of Done</p>
+              </div>
+            </div>
+            <div class="step-item is-violet">
+              <div class="step-num-box">06</div>
+              <div>
+                <h4 style="margin:0 0 0.25rem;font-size:1rem;color:var(--secondary);">Sprint Review, Burn-down Check &amp; Retrospective</h4>
+                <p style="margin:0;font-size:0.92rem;">ท้ายรอบ Sprint สาธิตซอฟต์แวร์จริงบน Staging/Demo (ห้ามโชว์แค่สไลด์) ตรวจสอบ Velocity และ Burn-down Chart ใน GitHub Insights แล้วทำ Retrospective (Start / Stop / Continue) เพื่อปรับปรุงกระบวนการทำงานใน Sprint ถัดไป</p>
+              </div>
+            </div>
+          </div>
+          <div class="code-block"># ตัวอย่างขั้นตอนการทำงานของนักพัฒนาใน 1 Issue บน GitHub Flow
+git checkout main && git pull origin main
+git checkout -b feat/14-mentcare-patient-alert
+# ... เขียนโค้ด + เขียน Unit Tests + รันเทสต์ผ่านในเครื่อง ...
+git add .
+git commit -m "feat(alert): add missed appointment threshold check (#14)"
+git push -u origin feat/14-mentcare-patient-alert
+# เปิด Pull Request บน GitHub โดยใส่ "Closes #14" -> รอ CI Pass + Peer Review Approval -> Squash &amp; Merge</div>
+        </div>
+      </section>
+
+      <!-- Footer & Sources -->
+      <footer class="course-footer">
+        <h3 style="margin:0 0 var(--space-sm);font-size:1rem;color:var(--primary);">แหล่งอ้างอิงทางวิชาการหลัก (Primary Academic References)</h3>
+        <ul style="margin:0;padding-left:1.25rem;">
+          <li><strong>Sommerville, Ian. (2016).</strong> <em>Software Engineering</em> (10th Edition, Global Edition). Pearson Education Limited. (ครอบคลุม Part 1 Ch. 1–3, Ch. 4, Ch. 8–9, Ch. 10, Ch. 19–20, Ch. 23, Ch. 25)</li>
+          <li><strong>Dooley, John F., &amp; Kazakova, Vera A. (2024).</strong> <em>Software Development, Design, and Coding: With Patterns, Debugging, Unit Testing, and Refactoring</em> (3rd Edition). Apress / Springer Nature. (ครอบคลุม Part I Ch. 1–2: SDLC, 3(+3) Variables, Lean Wastes, Waterfall, Code-and-Fix, Agile Implementations)</li>
+          <li><strong>เอกสารแนวคิดรากฐานที่อ้างถึงในตำรา:</strong> Royce (1970) Waterfall Model; Brooks (1987) "No Silver Bullet"; Boehm (1988) Spiral Model; Beck et al. (2001) Agile Manifesto; Poppendieck &amp; Poppendieck (2003) Lean Software Development; Siegelaub (2007) Six Constraints.</li>
+        </ul>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Initialize Lucide icons safely
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+      lucide.createIcons();
+    }
+
+    // Helper: read CSS custom property for Chart.js colors
+    function cssVar(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    // =====================================================
+    // 1. Reading Progress & Scroll-Spy for Sidebar TOC
+    // =====================================================
+    function updateScrollState() {
+      const progressEl = document.getElementById('reading-progress');
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (progressEl && docHeight > 0) {
+        const pct = Math.min(100, Math.max(0, (window.scrollY / docHeight) * 100));
+        progressEl.style.width = pct.toFixed(1) + '%';
+      }
+
+      const sections = ['module-1', 'module-2', 'module-3', 'module-4', 'module-5'];
+      let currentId = sections[0];
+      const offset = 160;
+      for (let i = 0; i < sections.length; i++) {
+        const sec = document.getElementById(sections[i]);
+        if (sec && sec.getBoundingClientRect().top <= offset) {
+          currentId = sections[i];
+        }
+      }
+
+      const links = document.querySelectorAll('.toc-module-link');
+      links.forEach(function(link) {
+        if (link.getAttribute('data-target') === currentId) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+    window.addEventListener('scroll', updateScrollState, { passive: true });
+
+    // =====================================================
+    // 2. Module 1: Triple Constraint & 6-Variable Explorer
+    // =====================================================
+    function applyTrianglePreset(preset, btn) {
+      const costEl = document.getElementById('slider-cost');
+      const timeEl = document.getElementById('slider-time');
+      const scopeEl = document.getElementById('slider-scope');
+      if (!costEl || !timeEl || !scopeEl) return;
+
+      const btns = document.querySelectorAll('#iron-triangle-explorer .btn-row .btn');
+      btns.forEach(function(b) { b.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+
+      if (preset === 'balanced') {
+        costEl.value = 60; timeEl.value = 65; scopeEl.value = 60;
+      } else if (preset === 'crunch') {
+        costEl.value = 50; timeEl.value = 25; scopeEl.value = 80;
+      } else if (preset === 'creep') {
+        costEl.value = 55; timeEl.value = 50; scopeEl.value = 95;
+      } else if (preset === 'critical') {
+        costEl.value = 90; timeEl.value = 90; scopeEl.value = 55;
+      }
+      updateTriangleModel();
+    }
+
+    function updateTriangleModel() {
+      const costEl = document.getElementById('slider-cost');
+      const timeEl = document.getElementById('slider-time');
+      const scopeEl = document.getElementById('slider-scope');
+      const valCost = document.getElementById('val-cost');
+      const valTime = document.getElementById('val-time');
+      const valScope = document.getElementById('val-scope');
+      const outQuality = document.getElementById('out-quality');
+      const outRisk = document.getElementById('out-risk');
+      const outProcess = document.getElementById('out-process');
+      const outAdvice = document.getElementById('out-triangle-advice');
+      if (!costEl || !timeEl || !scopeEl || !outQuality || !outRisk || !outProcess || !outAdvice) return;
+
+      const cost = Number(costEl.value);
+      const time = Number(timeEl.value);
+      const scope = Number(scopeEl.value);
+
+      if (valCost) valCost.textContent = cost + '%';
+      if (valTime) valTime.textContent = time + '%';
+      if (valScope) valScope.textContent = scope + '%';
+
+      const capacity = (cost * 0.45) + (time * 0.55);
+      const gap = scope - capacity;
+      const qualityScore = Math.max(25, Math.min(99, Math.round(88 - gap * 1.1)));
+      const riskPct = Math.max(8, Math.min(95, Math.round(25 + gap * 1.25)));
+
+      outQuality.classList.remove('is-good', 'is-warn', 'is-danger');
+      outRisk.classList.remove('is-good', 'is-warn', 'is-danger');
+
+      if (qualityScore >= 80) {
+        outQuality.textContent = `สูง / มั่นคง (${qualityScore}/100)`;
+        outQuality.classList.add('is-good');
+      } else if (qualityScore >= 58) {
+        outQuality.textContent = `ปานกลาง (${qualityScore}/100)`;
+        outQuality.classList.add('is-warn');
+      } else {
+        outQuality.textContent = `วิกฤต — หนี้เทคนิคสูง (${qualityScore}/100)`;
+        outQuality.classList.add('is-danger');
+      }
+
+      if (riskPct <= 35) {
+        outRisk.textContent = `ต่ำ (${riskPct}%)`;
+        outRisk.classList.add('is-good');
+      } else if (riskPct <= 60) {
+        outRisk.textContent = `ปานกลาง (${riskPct}%)`;
+        outRisk.classList.add('is-warn');
+      } else {
+        outRisk.textContent = `สูงมาก (${riskPct}%)`;
+        outRisk.classList.add('is-danger');
+      }
+
+      if (cost >= 80 && time >= 80 && scope <= 65) {
+        outProcess.textContent = `V-Model / Plan-Driven`;
+        outAdvice.textContent = `ทรัพยากรและเวลาเพียงพอสำหรับงานวิเคราะห์ Verification & Validation เข้มข้น เหมาะกับระบบ Safety-Critical หรือมาตรฐานกฎหมายเข้มงวด`;
+      } else if (gap > 18) {
+        outProcess.textContent = `Incremental MVP + Cut Scope`;
+        outAdvice.textContent = `คำเตือน: Scope เกินขีดความสามารถของเวลาและงบประมาณ! หากไม่ตัดฟีเจอร์รองออก (MoSCoW Prioritization) คุณภาพจะถูกบีบจนเกิดบั๊กร้ายแรงใน Production`;
+      } else {
+        outProcess.textContent = `Iterative / Scrum`;
+        outAdvice.textContent = `ทรัพยากรและเวลาสมดุลกับขอบเขตงาน เหมาะกับการส่งมอบเป็นรอบ Sprint เพื่อตรวจรับและปรับแก้ตาม Feedback`;
+      }
+    }
+
+    // =====================================================
+    // 3. Module 2: Defect Cost Escalation Chart (Chart.js)
+    // =====================================================
+    let defectCostChartInstance = null;
+
+    function initDefectCostChart() {
+      const canvas = document.getElementById('defectCostChart');
+      if (!canvas || typeof Chart === 'undefined') return;
+      const ctx = canvas.getContext('2d');
+
+      const labels = ['Requirements', 'Design', 'Coding', 'Integration Test', 'System Test', 'Production'];
+      const wfData = [1, 3, 7, 18, 42, 100];
+      const agileData = [1, 2, 3, 5, 8, 15];
+
+      defectCostChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Waterfall / BDUF (Late Feedback)',
+              data: wfData,
+              borderColor: cssVar('--data-2'),
+              backgroundColor: cssVar('--violet-container'),
+              borderWidth: 3,
+              pointRadius: 5,
+              tension: 0.32,
+              fill: true
+            },
+            {
+              label: 'Iterative / Agile (TDD & Short Loop)',
+              data: agileData,
+              borderColor: cssVar('--data-1'),
+              backgroundColor: 'transparent',
+              borderWidth: 3,
+              pointRadius: 5,
+              borderDash: [6, 4],
+              tension: 0.3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+              callbacks: {
+                label: function(ctxItem) {
+                  return ctxItem.dataset.label + ': ' + ctxItem.parsed.y + 'x ต้นทุนสัมพัทธ์';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: 'Relative Cost to Fix Defect (Multiplier)' },
+              grid: { color: cssVar('--outline-variant') }
+            },
+            x: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    function setCostChartMode(mode, btn) {
+      if (!defectCostChartInstance) return;
+      const btns = document.querySelectorAll('#cost-btn-both, #cost-btn-wf');
+      btns.forEach(function(b) { b.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+
+      defectCostChartInstance.data.datasets[1].hidden = (mode === 'wf');
+      defectCostChartInstance.update();
+    }
+
+    // =====================================================
+    // 4. Module 3: Interactive Spiral Model 4 Quadrants
+    // =====================================================
+    let currentSpiralLoop = 1;
+    let currentSpiralQuad = 1;
+
+    const spiralData = {
+      1: {
+        1: {
+          title: `Loop 1 · Quadrant 1: กำหนดวัตถุประสงค์และขอบเขตความเป็นไปได้`,
+          body: `ระบุเป้าหมายหลักของระบบ ทางเลือกในการพัฒนา (เช่น ซื้อ COTS, ใช้ Open-Source, หรือพัฒนาใหม่) และข้อจำกัดด้านงบประมาณ เวลา และกฎระเบียบ`,
+          artifact: `Artifact: Concept of Operation & Initial Constraints`
+        },
+        2: {
+          title: `Loop 1 · Quadrant 2: วิเคราะห์ความเสี่ยงทางธุรกิจและเทคโนโลยี`,
+          body: `ประเมินว่าเทคโนโลยีที่เลือกทำได้จริงหรือไม่ และผู้ใช้ต้องการระบบนี้จริงหรือไม่ จัดทำ Throwaway Prototype หรือ Benchmark เพื่อลดความไม่แน่นอน`,
+          artifact: `Artifact: Risk Register & Feasibility Prototype`
+        },
+        3: {
+          title: `Loop 1 · Quadrant 3: ตรวจสอบผลการศึกษาความเป็นไปได้`,
+          body: `สรุปผลจาก Prototype และวิเคราะห์ความคุ้มค่าในการลงทุน (Cost-Benefit Analysis) พร้อมตรวจสอบว่าสามารถผ่านข้อจำกัดทางเทคนิคได้`,
+          artifact: `Artifact: Feasibility Study Report`
+        },
+        4: {
+          title: `Loop 1 · Quadrant 4: ทบทวนและตัดสินใจอนุมัติเข้าสู่รอบ Requirements`,
+          body: `ผู้มีส่วนได้ส่วนเสียประเมินผลลัพธ์ หากความเสี่ยงยอมรับได้จึงวางแผนทรัพยากรและกำหนดการสำหรับ Loop ถัดไป (Go / No-Go Gate)`,
+          artifact: `Artifact: Life-Cycle Plan (LCP) & Commitment`
+        }
+      },
+      2: {
+        1: {
+          title: `Loop 2 · Quadrant 1: กำหนดเป้าหมายด้าน Requirements และ UX`,
+          body: `รวบรวมความต้องการเชิงลึกจากผู้ใช้แต่ละกลุ่ม ระบุขอบเขตความต้องการที่ไม่แน่นอนและข้อกำหนดด้านความปลอดภัย/ความเป็นส่วนตัว`,
+          artifact: `Artifact: Draft User & System Requirements`
+        },
+        2: {
+          title: `Loop 2 · Quadrant 2: จัดการความเสี่ยงด้านความต้องการผิดพลาด`,
+          body: `สร้าง UI Mockup / Interactive Prototype ให้ผู้ใช้จริงทดลอง เพื่อค้นหาความต้องการแฝงและขจัดความกำกวมของ Spec ก่อนออกแบบระบบ`,
+          artifact: `Artifact: Validated UX Prototype & Risk Mitigation Log`
+        },
+        3: {
+          title: `Loop 2 · Quadrant 3: จัดทำข้อกำหนดและแบบจำลองระบบที่ตรวจสอบได้`,
+          body: `จัดทำ Requirements Specification ที่ผ่านเกณฑ์ Validity และ Verifiability พร้อมแผนทดสอบความยอมรับ (Acceptance Test Plan)`,
+          artifact: `Artifact: Requirements Specification & Simulation Model`
+        },
+        4: {
+          title: `Loop 2 · Quadrant 4: วางแผนรอบสถาปัตยกรรม (Architecture Loop)`,
+          body: `ลูกค้าและทีมวิศวกรทบทวน Spec ที่ผ่านการทดลองจาก Prototype แล้ววางแผนเข้าสู่รอบการออกแบบสถาปัตยกรรม`,
+          artifact: `Artifact: Signed-off Requirements Baseline & Sprint/Phase Plan`
+        }
+      },
+      3: {
+        1: {
+          title: `Loop 3 · Quadrant 1: กำหนดเป้าหมายด้านสถาปัตยกรรมและโครงสร้างระบบ`,
+          body: `เลือกสถาปัตยกรรม (เช่น Microservices, Layered, Event-driven) ที่รองรับ Non-functional Requirements อย่าง Performance และ Scalability`,
+          artifact: `Artifact: Architectural Alternatives & Quality Goals`
+        },
+        2: {
+          title: `Loop 3 · Quadrant 2: พิสูจน์ความเสี่ยงเชิงเทคนิค (Technical Spikes)`,
+          body: `ทดสอบภาระงาน (Load Test), การเชื่อมต่อ API ภายนอก หรือช่องโหว่ความปลอดภัยผ่าน Architectural Prototype เพื่อป้องกันปัญหาก่อนเขียนโค้ดเต็มรูปแบบ`,
+          artifact: `Artifact: Architectural Spike & Security Risk Assessment`
+        },
+        3: {
+          title: `Loop 3 · Quadrant 3: พัฒนาแกนหลัก (Core Architecture) และทดสอบบูรณาการ`,
+          body: `สร้างโครงสร้างหลักของระบบและโมดูลที่มีความเสี่ยงสูงสุด พร้อมเขียน Integration Tests ยืนยันการเชื่อมต่อ`,
+          artifact: `Artifact: Verified Core System & Detailed Design`
+        },
+        4: {
+          title: `Loop 3 · Quadrant 4: วางแผนรอบการพัฒนาเต็มรูปแบบและส่งมอบ`,
+          body: `ประเมินเสถียรภาพของแกนกลางและวางแผนการพัฒนาฟีเจอร์ส่วนที่เหลือแบบ Incremental หรือ Waterfall ตามความเหมาะสม`,
+          artifact: `Artifact: Integration & Test Plan for Operational Build`
+        }
+      },
+      4: {
+        1: {
+          title: `Loop 4 · Quadrant 1: กำหนดเป้าหมายการส่งมอบและติดตั้งใช้งานจริง`,
+          body: `กำหนดเกณฑ์ความพร้อมก่อนปล่อยระบบ (Release Readiness), แผนการย้ายข้อมูล (Data Migration) และการฝึกอบรมผู้ใช้`,
+          artifact: `Artifact: Release Criteria & Deployment Constraints`
+        },
+        2: {
+          title: `Loop 4 · Quadrant 2: จัดการความเสี่ยงช่วงส่งมอบและ Production`,
+          body: `วางแผน Rollback, ทดสอบ Stress/Penetration Testing และจำลองการย้ายข้อมูลจากระบบเก่าเพื่อไม่ให้กระทบธุรกิจ`,
+          artifact: `Artifact: Cutover Risk Mitigation & Contingency Plan`
+        },
+        3: {
+          title: `Loop 4 · Quadrant 3: พัฒนาส่วนที่สมบูรณ์ ทดสอบทั้งระบบ และติดตั้ง`,
+          body: `ดำเนินการ Coding, Automated Regression Testing, UAT และปล่อยระบบขึ้น Production พร้อมคู่มือผู้ใช้ครบถ้วน`,
+          artifact: `Artifact: Operational Software & User Acceptance Sign-off`
+        },
+        4: {
+          title: `Loop 4 · Quadrant 4: สรุปบทเรียนและวางแผนรอบ Maintenance / Evolution`,
+          body: `เก็บข้อมูลการใช้งานจริงหลังปล่อย (Telemetry/Feedback) เพื่อวางแผนรอบวิวัฒนาการระบบในอนาคต`,
+          artifact: `Artifact: Post-Release Review & Evolution Backlog`
+        }
+      }
+    };
+
+    function selectSpiralLoop(loopNum, btn) {
+      currentSpiralLoop = loopNum;
+      const btns = document.querySelectorAll('#loop-btn-1, #loop-btn-2, #loop-btn-3, #loop-btn-4');
+      btns.forEach(function(b) { b.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+      renderSpiralDetail();
+    }
+
+    function selectSpiralQuad(quadNum, btn) {
+      currentSpiralQuad = quadNum;
+      const btns = document.querySelectorAll('#quad-btn-1, #quad-btn-2, #quad-btn-3, #quad-btn-4');
+      btns.forEach(function(b) { b.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+      renderSpiralDetail();
+    }
+
+    function renderSpiralDetail() {
+      const titleEl = document.getElementById('spiral-detail-title');
+      const bodyEl = document.getElementById('spiral-detail-body');
+      const artEl = document.getElementById('spiral-detail-artifact');
+      if (!titleEl || !bodyEl || !artEl) return;
+
+      const data = spiralData[currentSpiralLoop][currentSpiralQuad];
+      titleEl.textContent = data.title;
+      bodyEl.textContent = data.body;
+      artEl.textContent = data.artifact;
+    }
+
+    // =====================================================
+    // 5. Module 4: User Story & INVEST Quality Checker
+    // =====================================================
+    function loadStoryExample(num, btn) {
+      const inputEl = document.getElementById('story-input');
+      const btns = document.querySelectorAll('#story-ex-1, #story-ex-2');
+      btns.forEach(function(b) { b.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+      if (!inputEl) return;
+
+      const cI = document.getElementById('chk-i');
+      const cN = document.getElementById('chk-n');
+      const cV = document.getElementById('chk-v');
+      const cE = document.getElementById('chk-e');
+      const cS = document.getElementById('chk-s');
+      const cT = document.getElementById('chk-t');
+
+      if (num === 1) {
+        inputEl.value = `As a clinic nurse, I want the Mentcare system to flag patients who missed 2 consecutive appointments, so that I can follow up before their condition worsens.`;
+        if (cI) cI.checked = true;
+        if (cN) cN.checked = true;
+        if (cV) cV.checked = true;
+        if (cE) cE.checked = true;
+        if (cS) cS.checked = true;
+        if (cT) cT.checked = true;
+      } else {
+        inputEl.value = `ระบบต้องสามารถสร้างรายงานผู้ป่วย วิเคราะห์ข้อมูลด้วย AI ส่งออก Excel/PDF และเชื่อมต่อระบบโรงพยาบาลทุกแห่งได้ทั้งหมด`;
+        if (cI) cI.checked = false;
+        if (cN) cN.checked = true;
+        if (cV) cV.checked = true;
+        if (cE) cE.checked = false;
+        if (cS) cS.checked = false;
+        if (cT) cT.checked = false;
+      }
+      evaluateStoryScore();
+    }
+
+    function evaluateStoryScore() {
+      const ids = ['chk-i', 'chk-n', 'chk-v', 'chk-e', 'chk-s', 'chk-t'];
+      let score = 0;
+      ids.forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el && el.checked) score++;
+      });
+
+      const scoreEl = document.getElementById('invest-score');
+      const fbEl = document.getElementById('invest-feedback');
+      const inputEl = document.getElementById('story-input');
+      if (!scoreEl || !fbEl) return;
+
+      const text = inputEl ? inputEl.value.toLowerCase() : '';
+      const hasFormat = (text.indexOf('as a') !== -1 && text.indexOf('so that') !== -1) ||
+                        (text.indexOf('ในฐานะ') !== -1 && text.indexOf('เพื่อให้') !== -1);
+
+      scoreEl.classList.remove('is-good', 'is-warn', 'is-danger');
+      if (score >= 5 && hasFormat) {
+        scoreEl.textContent = `${score} / 6 (Ready for Sprint)`;
+        scoreEl.classList.add('is-good');
+        fbEl.textContent = `Story มีโครงสร้างชัดเจนและผ่านหลัก INVEST เหมาะสมที่จะนำไปประเมิน Story Points และนำเข้า Sprint Backlog`;
+      } else if (score >= 4) {
+        scoreEl.textContent = `${score} / 6 (ควรปรับเกลาเพิ่ม)`;
+        scoreEl.classList.add('is-warn');
+        fbEl.textContent = hasFormat
+          ? `โครงสร้างประโยคถูกต้องแล้ว แต่ยังมีข้อที่ไม่ผ่าน INVEST ควรพูดคุยกับ PO เพื่อแตกขนาดงานหรือกำหนดเกณฑ์ทดสอบให้ชัด`
+          : `แนะนำให้เขียนระบุ Role, Action และ Business Value (As a... I want... So that...) ให้ชัดเจนเพื่อให้เห็นคุณค่าต่อผู้ใช้`;
+      } else {
+        scoreEl.textContent = `${score} / 6 (ยังไม่พร้อม — Epic/Too Vague)`;
+        scoreEl.classList.add('is-danger');
+        fbEl.textContent = `Story นี้มีขนาดใหญ่หรือคลุมเครือเกินไป (คล้าย Epic) ไม่สามารถประเมินเวลาหรือจบได้ใน 1 Sprint ต้องแตกออกเป็น User Stories ย่อยหลายใบก่อน`;
+      }
+    }
+
+    // =====================================================
+    // 6. Module 5: Agile Metrics Visualizer (Chart.js)
+    // =====================================================
+    let agileMetricsChartInstance = null;
+
+    function buildMetricsConfig(mode) {
+      const days = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7', 'Day 8', 'Day 9', 'Day 10'];
+      if (mode === 'burndown-healthy') {
+        return {
+          type: 'line',
+          data: {
+            labels: days,
+            datasets: [
+              {
+                label: 'Ideal Guideline (SP คงเหลือตามแผน)',
+                data: [40, 36, 32, 28, 24, 20, 16, 12, 6, 0],
+                borderColor: cssVar('--data-context'),
+                borderDash: [6, 4],
+                borderWidth: 2,
+                pointRadius: 3,
+                tension: 0
+              },
+              {
+                label: 'Actual Remaining Effort (SP คงเหลือจริง)',
+                data: [40, 38, 33, 29, 25, 19, 15, 10, 4, 0],
+                borderColor: cssVar('--data-1'),
+                backgroundColor: cssVar('--primary-container'),
+                borderWidth: 3,
+                pointRadius: 4,
+                fill: true,
+                tension: 0.2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: { beginAtZero: true, title: { display: true, text: 'Story Points Remaining' } }
+            }
+          }
+        };
+      } else if (mode === 'burndown-creep') {
+        return {
+          type: 'line',
+          data: {
+            labels: days,
+            datasets: [
+              {
+                label: 'Ideal Guideline',
+                data: [40, 36, 32, 28, 24, 20, 16, 12, 6, 0],
+                borderColor: cssVar('--data-context'),
+                borderDash: [6, 4],
+                borderWidth: 2,
+                pointRadius: 3
+              },
+              {
+                label: 'Actual Remaining (มีงานแทรกวันที่ 4 และ 7)',
+                data: [40, 37, 34, 42, 39, 35, 41, 34, 28, 22],
+                borderColor: cssVar('--error'),
+                backgroundColor: cssVar('--error-container'),
+                borderWidth: 3,
+                pointRadius: 4,
+                fill: true,
+                tension: 0.2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: { beginAtZero: true, title: { display: true, text: 'Story Points Remaining' } }
+            }
+          }
+        };
+      } else {
+        return {
+          type: 'line',
+          data: {
+            labels: days,
+            datasets: [
+              {
+                label: 'Done (ส่งมอบแล้ว)',
+                data: [0, 2, 5, 8, 12, 16, 21, 27, 33, 40],
+                borderColor: cssVar('--data-3'),
+                backgroundColor: cssVar('--positive-container'),
+                fill: true,
+                tension: 0.25
+              },
+              {
+                label: 'In Review (รอตรวจ Code Review)',
+                data: [0, 4, 9, 14, 19, 25, 31, 36, 39, 40],
+                borderColor: cssVar('--data-2'),
+                backgroundColor: cssVar('--violet-container'),
+                fill: true,
+                tension: 0.25
+              },
+              {
+                label: 'In Progress (กำลังทำ — คุม WIP)',
+                data: [6, 11, 16, 21, 26, 31, 36, 39, 40, 40],
+                borderColor: cssVar('--data-1'),
+                backgroundColor: cssVar('--primary-container'),
+                fill: true,
+                tension: 0.25
+              },
+              {
+                label: 'Total Scope (Backlog ทั้งหมด)',
+                data: [40, 40, 40, 40, 40, 40, 40, 40, 40, 40],
+                borderColor: cssVar('--data-4'),
+                backgroundColor: 'transparent',
+                borderDash: [5, 3],
+                fill: false
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: { beginAtZero: true, title: { display: true, text: 'Cumulative Work Items (Issues/SP)' } }
+            }
+          }
+        };
+      }
+    }
+
+    function setMetricsChart(mode, btn) {
+      const canvas = document.getElementById('agileMetricsChart');
+      const expEl = document.getElementById('metrics-explanation');
+      if (!canvas || typeof Chart === 'undefined') return;
+
+      const btns = document.querySelectorAll('#metric-btn-healthy, #metric-btn-creep, #metric-btn-cfd');
+      btns.forEach(function(b) { b.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+
+      if (agileMetricsChartInstance) {
+        agileMetricsChartInstance.destroy();
+      }
+      agileMetricsChartInstance = new Chart(canvas.getContext('2d'), buildMetricsConfig(mode));
+
+      if (expEl) {
+        if (mode === 'burndown-healthy') {
+          expEl.innerHTML = `<strong>Sprint Burn-down (สถานะปกติ):</strong> เส้นงานคงเหลือจริง (Actual) ลดลงเกาะใกล้เส้น Ideal Guideline อย่างสม่ำเสมอ สะท้อนว่าทีมแตก Tasks ได้พอดีและไม่มีงานค้างสะสมจนวันสุดท้าย`;
+        } else if (mode === 'burndown-creep') {
+          expEl.innerHTML = `<strong>Sprint Burn-down (เกิด Scope Creep):</strong> สังเกตเส้นกราฟดีดตัวสูงขึ้นในวันที่ 4 และ 7 เนื่องจากมีการแทรกงานใหม่เข้ามาระหว่าง Sprint ทำให้ปิดงานไม่ทันตาม Sprint Goal`;
+        } else {
+          expEl.innerHTML = `<strong>Cumulative Flow Diagram (CFD):</strong> ความหนาของแถบสีน้ำเงิน (In Progress) และม่วง (In Review) ที่สม่ำเสมอและไม่พองตัว แสดงว่าทีมควบคุม WIP Limit ได้ดี ทำให้แถบสีเขียว (Done) ไต่ระดับขึ้นอย่างต่อเนื่อง (Stable Throughput)`;
+        }
+      }
+    }
+
+    // Initialize interactive charts & models on load
+    window.addEventListener('DOMContentLoaded', function() {
+      updateScrollState();
+      updateTriangleModel();
+      initDefectCostChart();
+      renderSpiralDetail();
+      evaluateStoryScore();
+      const btnHealthy = document.getElementById('metric-btn-healthy');
+      setMetricsChart('burndown-healthy', btnHealthy);
+    });
+  </script>
+</body>
+</html>
