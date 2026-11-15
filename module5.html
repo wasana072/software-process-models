@@ -1,0 +1,2667 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="narrative">
+  <meta name="design-style" content="carbon">
+  <title>Module 5: Software House Simulation &amp; Modern Engineering Tooling</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Kanit:wght@300;400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* Page and surfaces (Clean Light Theme aligned with module1.html & index.html) */
+      --background: #f8fafc;               /* Slate-50 */
+      --surface-container-low: #f1f5f9;    /* Slate-100 */
+      --surface-container: #ffffff;        /* Pure white cards */
+      --surface-container-high: #e2e8f0;   /* Slate-200 hover/nested */
+      --surface-code: #0f172a;             /* Dark slate for code terminals */
+      --on-code: #f8fafc;
+
+      /* Ink */
+      --on-surface: #0f172a;               /* Slate-900 */
+      --on-surface-variant: #475569;       /* Slate-600 */
+      --on-surface-muted: #64748b;         /* Slate-500 */
+
+      /* Rules */
+      --outline: #94a3b8;                  /* Slate-400 */
+      --outline-variant: #e2e8f0;          /* Slate-200 */
+
+      /* Accents: Sky-blue & Purple */
+      --primary: #0284c7;                  /* Sky-600 */
+      --primary-hover: #0369a1;            /* Sky-700 */
+      --on-primary: #ffffff;
+      --primary-container: #e0f2fe;        /* Sky-100 */
+      --on-primary-container: #0c4a6e;     /* Sky-900 */
+
+      --secondary: #6d28d9;                /* Violet-700 */
+      --secondary-container: #ede9fe;      /* Violet-100 */
+      --on-secondary-container: #4c1d95;   /* Violet-900 */
+
+      /* Semantic */
+      --positive: #15803d;                 /* Green-700 */
+      --positive-container: #dcfce7;
+      --warning: #b45309;                  /* Amber-700 */
+      --warning-container: #fef3c7;
+      --error: #b91c1c;                    /* Red-700 */
+      --error-container: #fee2e2;
+      --on-error: #ffffff;
+      --focus: #0284c7;
+
+      /* Data visualization series */
+      --data-1: #0284c7;
+      --data-2: #6d28d9;
+      --data-3: #0d9488;
+      --data-4: #d97706;
+      --data-context: #94a3b8;
+
+      /* Fonts */
+      --font-headline: 'Kanit', sans-serif;
+      --font-body: 'Sarabun', sans-serif;
+      --font-label: 'IBM Plex Mono', 'Kanit', monospace;
+
+      /* Type Scale (Narrative) */
+      --display-size: clamp(2rem, 1.4rem + 2.4vw, 3rem);
+      --headline-size: clamp(1.5rem, 1.2rem + 1.1vw, 2rem);
+      --subhead-size: clamp(1.15rem, 1.05rem + 0.4vw, 1.35rem);
+      --body-size: clamp(1.02rem, 0.98rem + 0.18vw, 1.1rem);
+      --label-size: 0.78rem;
+
+      /* Spacing scale (4pt base) */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+
+      /* Shape & Effects */
+      --rounded: 0.375rem;
+      --rounded-lg: 0.625rem;
+      --rounded-full: 9999px;
+      --shadow-1: 0 1px 3px rgb(15 23 42 / 0.06), 0 1px 2px rgb(15 23 42 / 0.04);
+      --shadow-2: 0 4px 12px rgb(15 23 42 / 0.08);
+      --rule: 1px solid var(--outline-variant);
+      --indicator: 3px solid var(--primary);
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 140ms;
+      --dur-short: 240ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+      overflow-x: clip;
+    }
+    body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+    button, input, select, textarea { font-family: inherit; }
+
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      background: var(--surface-container);
+      border-bottom: var(--rule);
+      padding: var(--space-md) var(--space-lg);
+    }
+    .top-nav-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      color: var(--primary);
+      text-decoration: none;
+      font-family: var(--font-headline);
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded);
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+    .back-link:hover {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .module-tag {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 600;
+      color: var(--secondary);
+      background: var(--secondary-container);
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--rounded-full);
+      letter-spacing: 0.04em;
+    }
+
+    /* Page Grid Layout */
+    .page-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-xl);
+      padding: var(--space-xl) var(--space-lg) var(--space-2xl);
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Hero Masthead */
+    .hero-card {
+      background: var(--surface-container);
+      border: var(--rule);
+      border-top: 4px solid var(--primary);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-1);
+    }
+    .hero-eyebrow {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 600;
+      color: var(--primary);
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-sm);
+    }
+    .hero-title {
+      font-family: var(--font-headline);
+      font-size: var(--display-size);
+      font-weight: 600;
+      line-height: 1.2;
+      margin: 0 0 var(--space-sm) 0;
+      color: var(--on-surface);
+    }
+    .hero-subtitle {
+      font-family: var(--font-headline);
+      font-size: var(--subhead-size);
+      font-weight: 400;
+      color: var(--on-surface-variant);
+      margin: 0 0 var(--space-lg) 0;
+    }
+    .hero-lede {
+      max-width: 75ch;
+      color: var(--on-surface);
+      margin: 0 0 var(--space-lg) 0;
+    }
+    .meta-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+      gap: var(--space-md);
+      padding-top: var(--space-lg);
+      border-top: var(--rule);
+    }
+    .meta-tile {
+      background: var(--surface-container-low);
+      padding: var(--space-md);
+      border-radius: var(--rounded);
+      border-left: 3px solid var(--primary);
+    }
+    .meta-tile.purple { border-left-color: var(--secondary); }
+    .meta-tile-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      display: block;
+      margin-bottom: var(--space-xs);
+    }
+    .meta-tile-value {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--on-surface);
+    }
+
+    /* Section Index Navigation */
+    .toc-nav {
+      background: var(--surface-container);
+      border: var(--rule);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      box-shadow: var(--shadow-1);
+    }
+    .toc-title {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 var(--space-md) 0;
+      color: var(--on-surface);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+      gap: var(--space-sm);
+    }
+    .toc-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded);
+      border: var(--rule);
+      background: var(--background);
+      text-decoration: none;
+      color: var(--on-surface);
+      transition: background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+    .toc-item:hover {
+      background: var(--primary-container);
+      border-color: var(--primary);
+      color: var(--on-primary-container);
+    }
+    .toc-num {
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+    .toc-text {
+      font-family: var(--font-headline);
+      font-size: 0.9rem;
+      font-weight: 500;
+      line-height: 1.35;
+    }
+
+    /* Major Section Cards */
+    .lecture-section {
+      background: var(--surface-container);
+      border: var(--rule);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-1);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+    .section-header {
+      border-bottom: 2px solid var(--outline-variant);
+      padding-bottom: var(--space-md);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+    .section-badge-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-xs);
+    }
+    .section-num-badge {
+      font-family: var(--font-label);
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--primary);
+      color: var(--on-primary);
+      padding: 0.2rem 0.65rem;
+      border-radius: var(--rounded);
+    }
+    .section-num-badge.purple {
+      background: var(--secondary);
+    }
+    .section-source-tag {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      background: var(--surface-container-low);
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--rounded);
+    }
+    .section-title {
+      font-family: var(--font-headline);
+      font-size: var(--headline-size);
+      font-weight: 600;
+      line-height: 1.25;
+      margin: 0;
+      color: var(--on-surface);
+    }
+    .section-subtitle {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--on-surface-variant);
+      margin: var(--space-xs) 0 0 0;
+    }
+
+    /* Subsections & Prose */
+    .subsection {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    .subsection + .subsection {
+      padding-top: var(--space-lg);
+      border-top: var(--rule);
+    }
+    h3 {
+      font-family: var(--font-headline);
+      font-size: var(--subhead-size);
+      font-weight: 600;
+      color: var(--on-surface);
+      margin: 0;
+      line-height: 1.35;
+    }
+    h4 {
+      font-family: var(--font-headline);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin: var(--space-sm) 0 var(--space-xs) 0;
+    }
+    p {
+      margin: 0;
+      max-width: 78ch;
+      color: var(--on-surface);
+    }
+    ul, ol {
+      margin: 0;
+      padding-left: 1.4rem;
+      max-width: 76ch;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    li strong {
+      font-family: var(--font-headline);
+      font-weight: 500;
+      color: var(--on-surface);
+    }
+    .inline-code {
+      font-family: var(--font-label);
+      font-size: 0.88em;
+      background: var(--surface-container-low);
+      color: var(--secondary);
+      padding: 0.1rem 0.4rem;
+      border-radius: var(--rounded);
+      border: 1px solid var(--outline-variant);
+    }
+
+    /* Cards & Grids */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(270px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+    .card-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr));
+      gap: var(--space-lg);
+    }
+    .info-card {
+      background: var(--background);
+      border: var(--rule);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .info-card.accent-blue { border-top: 3px solid var(--primary); }
+    .info-card.accent-purple { border-top: 3px solid var(--secondary); }
+    .info-card.accent-green { border-top: 3px solid var(--positive); }
+    .info-card.accent-amber { border-top: 3px solid var(--warning); }
+    .card-kicker {
+      font-family: var(--font-label);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--primary);
+      letter-spacing: 0.04em;
+    }
+    .info-card.accent-purple .card-kicker { color: var(--secondary); }
+    .card-title {
+      font-family: var(--font-headline);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--on-surface);
+      margin: 0;
+    }
+    .card-body {
+      font-size: 0.95rem;
+      color: var(--on-surface-variant);
+      line-height: 1.6;
+    }
+
+    /* Callout & Workflow Boxes */
+    .callout {
+      background: var(--surface-container-low);
+      border-left: 4px solid var(--primary);
+      border-radius: 0 var(--rounded) var(--rounded) 0;
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .callout.purple {
+      border-left-color: var(--secondary);
+      background: var(--secondary-container);
+    }
+    .callout.warning {
+      border-left-color: var(--warning);
+      background: var(--warning-container);
+    }
+    .callout.positive {
+      border-left-color: var(--positive);
+      background: var(--positive-container);
+    }
+    .callout-title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--on-surface);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* Tables */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: var(--rule);
+      border-radius: var(--rounded);
+      background: var(--surface-container);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.94rem;
+      text-align: left;
+    }
+    thead th {
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      font-family: var(--font-headline);
+      font-weight: 600;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid var(--outline-variant);
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 0.75rem 1rem;
+      border-bottom: var(--rule);
+      vertical-align: top;
+      color: var(--on-surface);
+    }
+    tbody tr:nth-child(even) {
+      background: var(--background);
+    }
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Code / Terminal Blocks */
+    .code-block {
+      background: var(--surface-code);
+      color: var(--on-code);
+      border-radius: var(--rounded);
+      overflow: hidden;
+      border: 1px solid var(--on-surface);
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-xs) var(--space-md);
+      background: var(--on-surface);
+      border-bottom: 1px solid var(--on-surface-variant);
+      font-family: var(--font-label);
+      font-size: 0.75rem;
+      color: var(--outline-variant);
+    }
+    .copy-btn {
+      background: var(--primary);
+      color: var(--on-primary);
+      border: none;
+      border-radius: var(--rounded);
+      padding: 0.25rem 0.7rem;
+      font-family: var(--font-headline);
+      font-size: 0.78rem;
+      cursor: pointer;
+      min-height: 30px;
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+    .copy-btn:hover { background: var(--primary-hover); }
+    pre {
+      margin: 0;
+      padding: var(--space-md);
+      overflow-x: auto;
+      font-family: var(--font-label);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      tab-size: 2;
+    }
+
+    /* Summary Badges */
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      padding-top: var(--space-sm);
+    }
+    .summary-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--font-headline);
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 0.3rem 0.75rem;
+      border-radius: var(--rounded-full);
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border: 1px solid var(--primary);
+    }
+    .summary-badge.purple {
+      background: var(--secondary-container);
+      color: var(--on-secondary-container);
+      border-color: var(--secondary);
+    }
+    .summary-badge.green {
+      background: var(--positive-container);
+      color: var(--positive);
+      border-color: var(--positive);
+    }
+
+    /* Interactive Sandbox Panels */
+    .lab-panel {
+      background: var(--background);
+      border: 1px solid var(--primary);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    .lab-panel.purple-border {
+      border-color: var(--secondary);
+    }
+    .lab-panel-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      padding-bottom: var(--space-sm);
+      border-bottom: var(--rule);
+    }
+    .lab-panel-title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--primary);
+      margin: 0;
+    }
+    .lab-panel.purple-border .lab-panel-title { color: var(--secondary); }
+    .lab-tag {
+      font-family: var(--font-label);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--rounded);
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+
+    /* Controls & Buttons */
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0.5rem 1rem;
+      border-radius: var(--rounded);
+      font-family: var(--font-headline);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--outline-variant);
+      background: var(--surface-container);
+      color: var(--on-surface);
+      transition: background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+    .btn:hover { background: var(--surface-container-low); border-color: var(--primary); }
+    .btn.active, .btn.primary {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+    .btn.primary:hover { background: var(--primary-hover); }
+    .btn.purple.active {
+      background: var(--secondary);
+      color: var(--on-primary);
+      border-color: var(--secondary);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Interactive Section 1: Team Friction Slider */
+    .slider-control {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .slider-label {
+      font-family: var(--font-headline);
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--on-surface);
+    }
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+    input[type="range"] {
+      flex: 1;
+      min-width: 180px;
+      accent-color: var(--primary);
+      height: 6px;
+    }
+    input[type="number"] {
+      width: 84px;
+      min-height: 44px;
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--outline);
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      font-size: 1rem;
+      background: var(--surface-container);
+      color: var(--on-surface);
+    }
+    .stat-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+    .stat-box {
+      background: var(--surface-container);
+      border: var(--rule);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+    }
+    .stat-box-label {
+      font-family: var(--font-label);
+      font-size: 0.72rem;
+      color: var(--on-surface-variant);
+      display: block;
+    }
+    .stat-box-val {
+      font-family: var(--font-label);
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    /* Interactive Section 2: Kanban Simulator */
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+      gap: var(--space-sm);
+    }
+    .kanban-col {
+      background: var(--surface-container-low);
+      border: var(--rule);
+      border-radius: var(--rounded);
+      padding: var(--space-sm);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      min-height: 220px;
+    }
+    .kanban-col.at-limit {
+      border-color: var(--warning);
+      background: var(--warning-container);
+    }
+    .kanban-col-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-headline);
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding-bottom: var(--space-xs);
+      border-bottom: var(--rule);
+    }
+    .wip-pill {
+      font-family: var(--font-label);
+      font-size: 0.72rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--rounded);
+      background: var(--surface-container);
+      border: var(--rule);
+    }
+    .kanban-card {
+      background: var(--surface-container);
+      border: var(--rule);
+      border-left: 3px solid var(--primary);
+      border-radius: var(--rounded);
+      padding: var(--space-sm);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      box-shadow: var(--shadow-1);
+    }
+    .kanban-card.bug { border-left-color: var(--error); }
+    .kanban-card-id {
+      font-family: var(--font-label);
+      font-size: 0.72rem;
+      color: var(--on-surface-variant);
+    }
+    .kanban-card-title {
+      font-family: var(--font-headline);
+      font-size: 0.86rem;
+      font-weight: 500;
+      line-height: 1.3;
+    }
+    .kanban-card-actions {
+      display: flex;
+      gap: var(--space-xs);
+      margin-top: var(--space-xs);
+    }
+    .mini-btn {
+      min-height: 32px;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.75rem;
+      font-family: var(--font-headline);
+      border-radius: var(--rounded);
+      border: 1px solid var(--outline-variant);
+      background: var(--background);
+      color: var(--on-surface);
+      cursor: pointer;
+    }
+    .mini-btn:hover { background: var(--primary-container); border-color: var(--primary); }
+    .inline-status-msg {
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded);
+      font-size: 0.9rem;
+      background: var(--surface-container-low);
+      border-left: 3px solid var(--primary);
+    }
+    .inline-status-msg.warn {
+      background: var(--warning-container);
+      border-left-color: var(--warning);
+      color: var(--on-surface);
+    }
+
+    /* Lifecycle Stepper */
+    .lifecycle-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      align-items: center;
+    }
+    .lifecycle-node {
+      min-height: 44px;
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--rounded);
+      border: 1px solid var(--outline-variant);
+      background: var(--surface-container);
+      font-family: var(--font-label);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--on-surface);
+    }
+    .lifecycle-node.active {
+      background: var(--secondary);
+      color: var(--on-primary);
+      border-color: var(--secondary);
+    }
+    .lifecycle-arrow {
+      color: var(--on-surface-muted);
+      font-family: var(--font-label);
+      font-weight: 600;
+    }
+
+    /* SVG Diagram Containers */
+    .svg-box {
+      background: var(--surface-container);
+      border: var(--rule);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      overflow-x: auto;
+    }
+    .svg-box svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      min-width: 560px;
+    }
+
+    /* Chart Container */
+    .chart-box {
+      background: var(--surface-container);
+      border: var(--rule);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      min-height: 340px;
+      position: relative;
+    }
+
+    /* Workshop Step Cards & Checklist */
+    .workshop-step {
+      border: var(--rule);
+      border-radius: var(--rounded-lg);
+      background: var(--background);
+      padding: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      border-left: 5px solid var(--primary);
+    }
+    .workshop-step.purple { border-left-color: var(--secondary); }
+    .step-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+    }
+    .step-badge-title {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .step-square {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: var(--primary);
+      color: var(--on-primary);
+      font-family: var(--font-label);
+      font-weight: 600;
+      border-radius: var(--rounded);
+      flex-shrink: 0;
+    }
+    .workshop-step.purple .step-square { background: var(--secondary); }
+    .check-label {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--rounded);
+      border: 1px solid var(--outline-variant);
+      background: var(--surface-container);
+      cursor: pointer;
+      font-family: var(--font-headline);
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+    .check-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--positive);
+    }
+    .progress-track {
+      width: 100%;
+      height: 12px;
+      background: var(--surface-container-low);
+      border-radius: var(--rounded-full);
+      overflow: hidden;
+      border: var(--rule);
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width var(--dur-short) var(--ease-out);
+    }
+
+    /* Footer */
+    .doc-footer {
+      background: var(--surface-container);
+      border: var(--rule);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      font-size: 0.9rem;
+      color: var(--on-surface-variant);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    /* Print / Reduced Motion / Responsive */
+    @media (max-width: 640px) {
+      .page-grid { padding: var(--space-md) var(--space-sm); gap: var(--space-lg); }
+      .hero-card, .lecture-section { padding: var(--space-md); }
+      .workshop-step { padding: var(--space-md); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+    @media print {
+      body { background: var(--surface-container); }
+      .top-nav, .copy-btn, .lab-panel button { display: none; }
+      .lecture-section { box-shadow: none; break-inside: avoid-page; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="top-nav">
+    <div class="top-nav-inner">
+      <a href="index.html" class="back-link">
+        <span aria-hidden="true">&#8592;</span> กลับหน้าหลัก Software Process Models
+      </a>
+      <span class="module-tag">MODULE 05 • SOFTWARE HOUSE &amp; ENGINEERING TOOLING</span>
+    </div>
+  </header>
+
+  <main class="page-grid">
+
+    <!-- HERO SECTION -->
+    <section class="hero-card" aria-labelledby="doc-title">
+      <div class="hero-eyebrow">LECTURE NOTES &amp; LAB HANDBOOK • COMPUTER SCIENCE / SOFTWARE ENGINEERING</div>
+      <h1 id="doc-title" class="hero-title">Module 5: การจำลองสภาพแวดล้อม Software House และการประยุกต์ใช้เครื่องมือวิศวกรรมซอฟต์แวร์ยุคใหม่</h1>
+      <p class="hero-subtitle">Software House Simulation &amp; Modern Engineering Tooling</p>
+      <p class="hero-lede">
+        เอกสารประกอบการบรรยายและปฏิบัติการฉบับสมบูรณ์นี้ออกแบบมาเพื่อเชื่อมช่องว่างระหว่าง “การเขียนโปรแกรมคนเดียว” (Individual Programming) กับ “การพัฒนาซอฟต์แวร์ระดับมืออาชีพ” (Professional Software Engineering) โดยจำลองโครงสร้างองค์กร วัฒนธรรมทีมแบบ Soft-Aware กระบวนการติดตามงาน การควบคุมเวอร์ชันแบบกระจาย การผสานระบบอัตโนมัติ (CI/CD) และตัววัดคุณภาพซอฟต์แวร์ เพื่อเตรียมความพร้อมให้นักศึกษาทำงานโครงงาน Senior Project ได้เสมือนทีมวิศวกรรมใน Software House จริง
+      </p>
+      <div class="meta-strip">
+        <div class="meta-tile">
+          <span class="meta-tile-label">TEXTBOOK FOUNDATION 01</span>
+          <span class="meta-tile-value">Ian Sommerville (2016) — Software Engineering, 10th Ed.</span>
+        </div>
+        <div class="meta-tile purple">
+          <span class="meta-tile-label">TEXTBOOK FOUNDATION 02</span>
+          <span class="meta-tile-value">Dooley &amp; Kazakova (2024) — Software Development, Design, and Coding</span>
+        </div>
+        <div class="meta-tile">
+          <span class="meta-tile-label">TARGET AUDIENCE</span>
+          <span class="meta-tile-value">นิสิต/นักศึกษา CS &amp; SE (Senior Project Kickoff)</span>
+        </div>
+        <div class="meta-tile purple">
+          <span class="meta-tile-label">STRUCTURE</span>
+          <span class="meta-tile-value">5 บทหลัก + 4 Interactive Labs + Workshop 5</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABLE OF CONTENTS -->
+    <nav class="toc-nav" aria-label="สารบัญเนื้อหาในบทเรียน">
+      <h2 class="toc-title">โครงสร้างบทเรียน (Module 5 Curriculum Map)</h2>
+      <div class="toc-grid">
+        <a href="#section-1" class="toc-item">
+          <span class="toc-num">01</span>
+          <span class="toc-text">โครงสร้างองค์กร บทบาท และวัฒนธรรม Soft-Aware</span>
+        </a>
+        <a href="#section-2" class="toc-item">
+          <span class="toc-num">02</span>
+          <span class="toc-text">ระบบติดตามงาน Defect Lifecycle และ Kanban/Jira</span>
+        </a>
+        <a href="#section-3" class="toc-item">
+          <span class="toc-num">03</span>
+          <span class="toc-text">กลยุทธ์ Version Control, Git Workflows &amp; Code Review</span>
+        </a>
+        <a href="#section-4" class="toc-item">
+          <span class="toc-num">04</span>
+          <span class="toc-text">CI/CD, Process Metrics &amp; Release Management</span>
+        </a>
+        <a href="#section-5" class="toc-item">
+          <span class="toc-num">05</span>
+          <span class="toc-text">Workshop 5: คู่มือปฏิบัติการ Software House Kickoff</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 1 -->
+    <!-- =================================================================== -->
+    <section id="section-1" class="lecture-section" aria-labelledby="s1-title">
+      <div class="section-header">
+        <div>
+          <div class="section-badge-row">
+            <span class="section-num-badge">SECTION 01</span>
+            <span class="section-source-tag">Sommerville Ch. 1, 3, 22 • Dooley &amp; Kazakova Ch. 2, 3, 4</span>
+          </div>
+          <h2 id="s1-title" class="section-title">โครงสร้างองค์กร บทบาท และวัฒนธรรมการทำงานใน Software House</h2>
+          <p class="section-subtitle">Software House Organization, Cross-Functional Roles &amp; Soft-Aware Team Dynamics</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>1.1 จากการเขียนโค้ดส่วนบุคคลสู่ทีมข้ามสายงาน (Cross-Functional Teams)</h3>
+        <p>
+          Ian Sommerville (2016, บทที่ 1) เน้นย้ำความแตกต่างสำคัญระหว่าง <em>Individual Programming</em> กับ <em>Professional Software Development</em> ว่า ซอฟต์แวร์ระดับอาชีพไม่ได้ถูกเขียนขึ้นเพื่อผู้พัฒนาใช้งานเอง แต่ถูกสร้างโดย <strong>ทีมงาน (Teams)</strong> เพื่อส่งมอบให้ผู้ใช้กลุ่มอื่น และต้องได้รับการบำรุงรักษาและวิวัฒนาการไปตลอดอายุการใช้งาน ดังนั้น ซอฟต์แวร์จึงไม่ได้หมายถึงเพียงตัวโปรแกรม (Source Code) เท่านั้น แต่รวมถึงเอกสารระบบ เอกสารผู้ใช้ ไลบรารี การตั้งค่า (Configuration Data) และโครงสร้างพื้นฐานที่ทำให้ระบบทำงานได้จริง
+        </p>
+        <p>
+          ใน Software House ยุคใหม่ การจัดโครงสร้างทีมมักยึดแนวทาง <strong>Cross-Functional Self-Organizing Team</strong> ที่รวมผู้เชี่ยวชาญหลายบทบาทไว้ในทีมเดียว เพื่อให้สามารถส่งมอบ Product Increment ที่สมบูรณ์และพร้อมใช้งาน (Potentially Shippable Product Increment) ได้โดยไม่ต้องรอส่งงานข้ามแผนกให้เกิดคอขวด บทบาทหลักภายในทีมจำลอง Software House ประกอบด้วย:
+        </p>
+
+        <div class="card-grid">
+          <article class="info-card accent-blue">
+            <span class="card-kicker">VALUE &amp; PRIORITY</span>
+            <h4 class="card-title">Product Owner (PO)</h4>
+            <p class="card-body">
+              ตัวแทนผู้มีส่วนได้ส่วนเสียหรือลูกค้า มีหน้าที่กำหนด Product Goal เขียนและจัดลำดับความสำคัญของ <strong>Product Backlog</strong> (ในรูป User Stories) ตรวจสอบให้ทีมเข้าใจบริบทธุรกิจเบื้องหลังแต่ละ Story และกำหนด Acceptance Criteria เพื่อตรวจรับงาน (Dooley &amp; Kazakova, 2024; Sommerville, 2016)
+            </p>
+          </article>
+
+          <article class="info-card accent-purple">
+            <span class="card-kicker">PROCESS FACILITATOR</span>
+            <h4 class="card-title">Scrum Master</h4>
+            <p class="card-body">
+              ผู้เชี่ยวชาญกระบวนการ Agile/Scrum ทำหน้าที่โค้ชทีมให้ยึดค่านิยม Scrum (Commitment, Focus, Openness, Respect, Courage) เพิ่มความโปร่งใส ขจัดอุปสรรค (Blockers) และปกป้องทีมจากการแทรกแซงภายนอกระหว่าง Sprint <strong>ไม่ใช่หัวหน้าหรือผู้จัดการทีม</strong> เพราะทีม Scrum ตัดสินใจร่วมกันบนความเท่าเทียม
+            </p>
+          </article>
+
+          <article class="info-card accent-blue">
+            <span class="card-kicker">TECHNICAL DESIGN</span>
+            <h4 class="card-title">Software / Product Architect</h4>
+            <p class="card-body">
+              รับผิดชอบการออกแบบสถาปัตยกรรมระบบ (Architecture in the Small สำหรับโครงสร้างภายในโปรแกรม และ Architecture in the Large สำหรับระบบองค์กร/บริการกระจายศูนย์) เมื่อโครงการขยายเป็น Multi-team Scrum แต่ละทีมจะมี Product Architect มาร่วมกันกำหนดทิศทางสถาปัตยกรรมภาพรวม (Sommerville Ch. 3, 6)
+            </p>
+          </article>
+
+          <article class="info-card accent-purple">
+            <span class="card-kicker">IMPLEMENTATION</span>
+            <h4 class="card-title">Frontend &amp; Backend Developers</h4>
+            <p class="card-body">
+              สมาชิกแกนหลักของ Development Team ที่แปลง User Stories เป็น Implementation Tasks ประเมินแรงงาน ออกแบบ API/UI เขียนโค้ดควบคู่การทดสอบระดับหน่วย (Unit Testing / TDD) และร่วมกันถือครองโค้ดทั้งหมดแบบ Collective Code Ownership
+            </p>
+          </article>
+
+          <article class="info-card accent-green">
+            <span class="card-kicker">QUALITY ASSURANCE</span>
+            <h4 class="card-title">QA / Testing Engineers</h4>
+            <p class="card-body">
+              ออกแบบ Gray-box Integration Tests ทดสอบจุดเชื่อมต่อระหว่างโมดูล (Dooley &amp; Kazakova Ch. 18) วางแผน Release Testing และทำหน้าที่ตรวจสอบคุณภาพอิสระ (Independent Quality Management) รวมถึงกำกับดูแล Defect Tracking และการทบทวนรหัส (Inspections)
+            </p>
+          </article>
+
+          <article class="info-card accent-amber">
+            <span class="card-kicker">AUTOMATION &amp; OPS</span>
+            <h4 class="card-title">DevOps / Infrastructure Engineers</h4>
+            <p class="card-body">
+              จัดการ Configuration Management, Automated Build Servers, สภาพแวดล้อม Host-Target Development, CI/CD Pipelines, ความปลอดภัยของ Branch และกระบวนการ Release Management เพื่อให้การ Build และ Deploy เกิดขึ้นซ้ำได้อย่างแม่นยำ (Sommerville Ch. 25)
+            </p>
+          </article>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>1.2 การแยกความเป็นผู้นำเชิงเทคนิคออกจากการบริหารจัดการ (Technical vs. Managerial Leadership)</h3>
+        <p>
+          Sommerville (2016, บทที่ 22: Project Management) ชี้ให้เห็นปัญหาคลาสสิกในอุตสาหกรรมซอฟต์แวร์ว่า วิศวกรซอฟต์แวร์ที่เก่งด้านเทคนิคมาก ๆ อาจขาดทักษะด้านการบริหารคน (People Management) และการเจรจากับผู้มีส่วนได้ส่วนเสียภายนอก ในทางกลับกัน ผู้จัดการโครงการที่เชี่ยวชาญด้านงบประมาณและตารางเวลาอาจไม่เข้าใจความซับซ้อนเชิงสถาปัตยกรรมของโค้ด
+        </p>
+        <p>
+          นอกจากนี้ โครงสร้างทีมแบบลำดับชั้นตายตัว (<strong>Hierarchical Groups</strong> แบบทหารที่สั่งการจากบนลงล่าง) มักล้มเหลวในงานวิศวกรรมซอฟต์แวร์ที่ซับซ้อนด้วยเหตุผล 2 ประการ คือ (1) การแก้ไขซอฟต์แวร์ส่วนหนึ่งมักกระทบหลายโมดูล จึงต้องการการสื่อสารและต่อรองระหว่างทุกสายงานทุกระดับ และ (2) เทคโนโลยีซอฟต์แวร์เปลี่ยนแปลงเร็วมากจนวิศวกรรุ่นใหม่อาจรู้เครื่องมือสมัยใหม่ดีกว่าผู้บริหารระดับสูง การปิดกั้นการสื่อสารแบบ Top-down จึงทำให้องค์กรพลาดโอกาสทางเทคโนโลยีและทำให้คนรุ่นใหม่หมดไฟ ดังนั้น สำหรับโครงการขนาดกลางถึงใหญ่ ควรแยกบทบาท <strong>Project Manager</strong> และ <strong>System Architect</strong> ออกจากกันอย่างชัดเจน:
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>มิติการเปรียบเทียบ</th>
+                <th>Project Manager (Managerial Leadership)</th>
+                <th>System Architect (Technical Leadership)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>ขอบเขตความรับผิดชอบหลัก</strong></td>
+                <td>แผนงานโครงการ (Schedule), งบประมาณ, การวิเคราะห์ความเสี่ยง (Risk Management), การจัดสรรทรัพยากร และการส่งมอบตามสัญญา</td>
+                <td>สถาปัตยกรรมระบบ (Architectural Design), การเลือก Tech Stack, มาตรฐาน API/ฐานข้อมูล, คุณสมบัติไม่พึงประสงค์ (Non-functional Attributes: Security, Reliability, Performance)</td>
+              </tr>
+              <tr>
+                <td><strong>การตัดสินใจสำคัญ</strong></td>
+                <td>การปรับขอบเขตงาน (Scope), การจัดการเวลา Sprint/Milestone, การคัดเลือกรูปแบบกระบวนการ (Plan-driven vs Agile/Hybrid)</td>
+                <td>การตัดสินใจเชิงเทคนิคระดับวิกฤต, การแก้ปัญหา Technical Debt, การออกแบบโครงสร้างโมดูล (Tight Integration, Loose Coupling)</td>
+              </tr>
+              <tr>
+                <td><strong>จุดเน้นด้านการสื่อสาร</strong></td>
+                <td>ผู้บริหารระดับสูง, ลูกค้า, Product Owner, การรักษาขวัญกำลังใจและความร่วมมือของทีม</td>
+                <td>Developers, QA, DevOps และการประสานงานสถาปัตยกรรมระหว่างทีมย่อย (Product Architects Collaboration)</td>
+              </tr>
+              <tr>
+                <td><strong>ข้อควรระวัง</strong></td>
+                <td>ห้ามทำตัวเป็น Back-seat Driver หรือแทรกแซงวิธีเขียนโค้ดของนักพัฒนา (Dooley &amp; Kazakova Ch. 3)</td>
+                <td>ต้องเปิดรับความเห็นของสมาชิกทุกระดับและหลีกเลี่ยงการสร้างคอขวดเชิงความรู้ (Knowledge Silo)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>1.3 Soft-Aware Development และพลวัตของทีมวิศวกรรม (Dooley &amp; Kazakova, Ch. 3 &amp; 4)</h3>
+        <p>
+          ดร. เวรา คาซาโควา และ จอห์น ดูลีย์ (2024) นำเสนอกระบวนทัศน์ใหม่ชื่อ <strong>Soft-Aware Development</strong> ที่วางปัจเจกบุคคล ความสัมพันธ์ระหว่างบุคคล และวัฒนธรรมองค์กรเป็นหัวใจของการสร้างซอฟต์แวร์ที่ยั่งยืน โดยมีแก่นแนวคิดสำคัญว่า <em>“Learning to work together while attempting to make software”</em> สำคัญยิ่งกว่าการเรียนรู้วิธีเขียนซอฟต์แวร์เพียงอย่างเดียว เพราะเทคโนโลยีเปลี่ยนแปลงตลอดเวลา แต่ทักษะ <strong>Social-Emotional Learning (SEL)</strong> — การรู้จักตนเอง จัดการอารมณ์ แสดงความเห็นอกเห็นใจ สร้างความสัมพันธ์ที่เกื้อกูล และตัดสินใจอย่างรับผิดชอบ — คือรากฐานที่ทำให้งานวิจัยและผลผลิตของทีมเกิดขึ้นได้จริง
+        </p>
+
+        <div class="card-grid-2">
+          <div class="callout positive">
+            <div class="callout-title">Psychological Safety &amp; “Accountable but Blameless”</div>
+            <p>
+              วัฒนธรรมที่เน้นเฉพาะผลลัพธ์ (Output-only culture) จะทำให้การเรียนรู้และการลองผิดลองถูกกลายเป็นเรื่องไม่ปลอดภัย นักพัฒนาจะเกิดพฤติกรรมหลีกเลี่ยงความเสี่ยง (Risk Aversion) เลือกทำแต่ Task ง่ายๆ เพื่อให้ดูเหมือนทำงานเร็ว และปิดบังปัญหาไว้จนสายเกินแก้ หลักการ <strong>Accountable but Blameless</strong> (Iqbal, 2023) ช่วยให้ทีมรับผิดชอบต่อความผิดพลาดร่วมกันโดยไม่ชี้นิ้วกล่าวโทษตัวบุคคล เช่น หากเกิด Merge Conflict รุนแรงก่อนวัน Demo ทีมจะไม่ตำหนินักพัฒนาคนเดียว แต่จะทบทวนใน Retrospective ว่าเหตุใดเขาจึงไม่กล้าขอความช่วยเหลือ หรือเหตุใดทีมจึงข้าม Daily Standup จนมองไม่เห็นสัญญาณเตือน
+            </p>
+          </div>
+
+          <div class="callout purple">
+            <div class="callout-title">Egoless Programming vs. “Beer Truck Problem”</div>
+            <p>
+              ในการพัฒนาแบบมืออาชีพ โค้ดไม่ใช่สมบัติส่วนตัวของคนเขียนคนเดียว แนวคิด <strong>Collective Code Ownership</strong> (Sommerville Ch. 3) และ Egoless Programming กำหนดให้สมาชิกทุกคนมีสิทธิ์และหน้าที่ร่วมกันปรับปรุงและ Refactor โค้ดทุกส่วนในระบบ เพื่อขจัด “Islands of Expertise” (เกาะแห่งความเชี่ยวชาญเฉพาะบุคคล) ซึ่งเป็นต้นตอของ <strong>Beer Truck Problem (Bus Factor)</strong> — ภาวะที่โครงการต้องหยุดชะงักทันทีหากนักพัฒนาคนสำคัญป่วย ลาออก หรือประสบอุบัติเหตุ การทำ Pair Programming, Code Review และการจัดทำ Documentation ที่เข้าถึงได้ทั่วถึงจึงเป็นการกระจายความรู้อย่างเป็นระบบ
+            </p>
+          </div>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-title">การกำจัด “Dark Scrum” และ Micromanagement (อุปมาการขับรถในภูมิประเทศที่ไม่รู้จัก)</div>
+          <p>
+            Ron Jeffries เรียกการนำ Agile/Scrum ไปใช้แบบบิดเบือนโดยผู้มีอำนาจสั่งการทุกขั้นตอนว่า <strong>Dark Scrum</strong> ซึ่งทำลายแรงจูงใจและความเป็นเจ้าของงาน (Agency) ของนักพัฒนา Dooley &amp; Kazakova (2024) เปรียบเทียบการพัฒนาซอฟต์แวร์ว่าเหมือนการขับรถผ่านภูมิประเทศที่ไม่รู้จัก: <strong>ลูกค้าและ Product Owner เป็นผู้กำหนดจุดหมายปลายทาง (Destination)</strong> ส่วน <strong>Developers คือคนขับรถที่เลือกเส้นทาง (Path)</strong> ตามความถนัด สภาพรถ และอุปสรรคตรงหน้า ขณะที่ Project Manager หรือ Scrum Master ต้องไม่ทำตัวเป็น <em>คนสั่งการจากเบาะหลัง (Back-seat driving)</em> หน้าที่ของผู้นำคือติดตามความคืบหน้าและให้ข้อมูลโดยไม่รบกวนสมาธิคนขับ พร้อมจัดสรรเวลาที่ปลอดภัยให้นักพัฒนาได้ลองผิดลองถูกและเรียนรู้จากความผิดพลาด
+          </p>
+        </div>
+
+        <h4>การจัดการความขัดแย้งและด้านมืดของทีมเวิร์ก (The Dark Side of Teamwork)</h4>
+        <ul>
+          <li><strong>Social Comfort Zones:</strong> การจับคู่หรือปรึกษางานเฉพาะคนที่สนิทหรือมีภูมิหลังเหมือนกัน ทำให้สมาชิกคนอื่นถูกกีดกันออกจากกระบวนการตัดสินใจ</li>
+          <li><strong>Inaccessible Project Information:</strong> การคุยประเด็นเทคนิคหรือเปลี่ยนสเปกในแชทส่วนตัว/อีเมลลับ ทำให้ทีมขาดบริบทร่วม ควรใช้ช่องทางเปิดที่ค้นหาได้ (Open Multi-directional Channels)</li>
+          <li><strong>Task Conflicts vs. Personal Conflicts:</strong> ความขัดแย้งเชิงงาน (เห็นต่างเรื่องสถาปัตยกรรมหรือวิธีแก้ปัญหา) ช่วยยกระดับคุณภาพผลิตภัณฑ์หากใช้การถกเถียงเชิงสร้างสรรค์ (Constructive Controversy / <em>Rumble</em> ตามแนวคิด Brené Brown) แต่ความขัดแย้งเชิงบุคคล (สไตล์การสื่อสาร อคติ) จะกัดกินพลังงานทีม จึงต้องจัดทำ <strong>Team Contract</strong> ตั้งแต่เริ่มโครงการและทำ <strong>Self &amp; Peer Evaluations</strong> เป็นระยะ</li>
+        </ul>
+      </div>
+
+      <!-- INTERACTIVE LAB 1: TEAM SIZE & COMMUNICATION FRICTION -->
+      <div class="lab-panel" aria-labelledby="lab1-title">
+        <div class="lab-panel-header">
+          <h4 id="lab1-title" class="lab-panel-title">Interactive Lab 1.1: เครื่องคำนวณช่องทางการสื่อสารและขนาดทีมที่เหมาะสม</h4>
+          <span class="lab-tag">COMMUNICATION FRICTION MODEL</span>
+        </div>
+        <p style="font-size: 0.94rem; color: var(--on-surface-variant);">
+          ทดลองปรับขนาดทีมพัฒนา (<em>n</em>) เพื่อสังเกตการเพิ่มขึ้นแบบกำลังสองของช่องทางการสื่อสาร <em>C = n(n − 1) / 2</em> และดูคำแนะนำโครงสร้างทีมตามหลัก Sommerville (Ch. 3, 22) และ Dooley &amp; Kazakova (Ch. 3)
+        </p>
+
+        <div class="slider-control">
+          <label for="team-size-slider" class="slider-label">จำนวนสมาชิกในทีมพัฒนา (คน) — แนะนำ 4–6 คน (Scrum สูงสุด ~7 คน, ขีดจำกัดทีมเดียว 12 คน)</label>
+          <div class="range-row">
+            <input type="range" id="team-size-slider" min="2" max="16" value="5" oninput="syncTeamFromSlider(this.value)">
+            <input type="number" id="team-size-number" min="2" max="16" value="5" oninput="syncTeamFromNumber(this.value)" aria-label="ระบุจำนวนสมาชิกทีม">
+          </div>
+        </div>
+
+        <div class="stat-grid-3">
+          <div class="stat-box">
+            <span class="stat-box-label">TEAM MEMBERS (n)</span>
+            <span id="stat-team-n" class="stat-box-val">5</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-box-label">COMMUNICATION CHANNELS n(n-1)/2</span>
+            <span id="stat-channels" class="stat-box-val">10</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-box-label">COHESION &amp; GOVERNANCE RISK</span>
+            <span id="stat-risk" class="stat-box-val" style="font-size: 1.15rem;">Optimal</span>
+          </div>
+        </div>
+        <div id="team-advice-box" class="inline-status-msg">
+          ขนาดทีม 5 คน (10 ช่องทางสื่อสาร) อยู่ในช่วง Core Team ที่เหมาะที่สุดสำหรับการทำ Daily Scrum 15 นาที รักษา Osmotic Communication ได้ดี และลดภาระการประสานงาน
+        </div>
+      </div>
+
+      <div class="badge-row">
+        <span class="summary-badge">Cross-Functional Team (PO / SM / Arch / Dev / QA / DevOps)</span>
+        <span class="summary-badge purple">Soft-Aware &amp; Blameless Culture</span>
+        <span class="summary-badge green">Optimal Size: 4–6 Core (Max 7–12)</span>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 2 -->
+    <!-- =================================================================== -->
+    <section id="section-2" class="lecture-section" aria-labelledby="s2-title">
+      <div class="section-header">
+        <div>
+          <div class="section-badge-row">
+            <span class="section-num-badge">SECTION 02</span>
+            <span class="section-source-tag">Sommerville Ch. 3, 23, 25 • Dooley &amp; Kazakova Ch. 2, 4, 19</span>
+          </div>
+          <h2 id="s2-title" class="section-title">ระบบติดตามงานและการบริหารโครงการ (Issue Tracking &amp; Project Management Tools)</h2>
+          <p class="section-subtitle">From INVEST User Stories &amp; SMART Tasks to Defect Lifecycles and Kanban WIP Limits</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>2.1 การแปลงความต้องการเป็นงานวิศวกรรม: User Stories (INVEST) และ SMART Tasks</h3>
+        <p>
+          ในแนวทาง Agile ความต้องการของผู้ใช้จะถูกถ่ายทอดในรูปของ <strong>User Story</strong> ด้วยโครงสร้างมาตรฐาน: <span class="inline-code">As a &lt;role&gt;, I want to &lt;action&gt;, so that &lt;reason/benefit&gt;.</span> เพื่อตอบคำถามว่า <em>ใคร (Who)</em> ต้องการทำ <em>อะไร (What)</em> และ <em>ทำไมถึงเกิดคุณค่า (Why)</em> ตามหลักการ <strong>The Three Cs</strong> ของ Ron Jeffries (2001) ได้แก่ (1) <strong>Card</strong> บัตรสรุปความต้องการสั้นๆ, (2) <strong>Conversation</strong> การสนทนาเจรจาระหว่าง PO, Developer และ QA เพื่อคลี่คลายรายละเอียดและประเมินขนาด, และ (3) <strong>Confirmation</strong> เกณฑ์การยอมรับ (Acceptance Criteria) ที่แปลงเป็น Automated Acceptance Tests ได้
+        </p>
+        <p>
+          เพื่อคัดกรองคุณภาพของ User Story ก่อนนำเข้าสู่การพัฒนา Bill Wake ได้เสนอหลักการ <strong>INVEST</strong> และเมื่อทีมพัฒนาแตก User Story ออกเป็นงานย่อยระดับเทคนิค (Implementation Tasks) ใน Sprint Planning งานย่อยแต่ละชิ้นต้องเป็นไปตามหลัก <strong>SMART</strong> โดยใช้เวลาทำไม่เกิน 4–16 ชั่วโมง (Sommerville Ch. 23) หรือแนะนำไม่เกิน 1 วัน / ≤ 8 ชั่วโมงทำงาน (Dooley &amp; Kazakova Ch. 4) เพื่อให้ประเมินเวลาได้แม่นยำและเสร็จภายในหนึ่งช่วงการทำงานโดยไม่เกิด Task Switching:
+        </p>
+
+        <div class="card-grid-2">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th colspan="2">INVEST Criteria สำหรับประเมิน User Story</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>I — Independent</strong></td>
+                  <td>เป็นอิสระต่อกันมากที่สุด สามารถหยิบไปพัฒนาและทดสอบแยกได้เหมือนตัดเค้กหนึ่งชิ้น (Loose Coupling)</td>
+                </tr>
+                <tr>
+                  <td><strong>N — Negotiable</strong></td>
+                  <td>เป็นจุดตั้งต้นการเจรจารายละเอียดทางเทคนิคระหว่าง PO กับทีม ไม่ใช่สัญญาข้อกำหนดที่แข็งทื่อ</td>
+                </tr>
+                <tr>
+                  <td><strong>V — Valuable</strong></td>
+                  <td>ต้องส่งมอบคุณค่าที่จับต้องได้แก่ผู้ใช้หรือลูกค้าจริง แม้ต้องแตก Story ใหญ่ก็ต้องแบ่งตามคุณค่าไม่ใช่แบ่งตามชั้นเทคโนโลยี</td>
+                </tr>
+                <tr>
+                  <td><strong>E — Estimable</strong></td>
+                  <td>ทีมสามารถประเมินความพยายาม (Story Points / Hours) เพื่อจัดลำดับความสำคัญได้ หากประเมินไม่ได้แสดงว่า Story คลุมเครือหรือใหญ่เกินไป</td>
+                </tr>
+                <tr>
+                  <td><strong>S — Small</strong></td>
+                  <td>ขนาดเล็กพอที่จะพัฒนา ทดสอบ และจบได้ภายในหนึ่ง Sprint เพื่อลดภาระการประเมินซ้ำ</td>
+                </tr>
+                <tr>
+                  <td><strong>T — Testable</strong></td>
+                  <td>เขียน Acceptance Criteria และ Unit/Acceptance Tests เพื่อยืนยันความถูกต้องได้ชัดเจน (เชื่อมโยงสู่ Traceability)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th colspan="2">SMART Criteria สำหรับแตก Implementation Tasks</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>S — Specific</strong></td>
+                  <td>ระบุรายละเอียดเชิงเทคนิคชัดเจน เช่น โครงสร้างข้อมูล, Endpoint หรือ Component UI ที่ต้องสร้าง การแตก Task มักช่วยเผยให้เห็นข้อกำหนดที่ซ่อนอยู่</td>
+                </tr>
+                <tr>
+                  <td><strong>M — Measurable</strong></td>
+                  <td>วัดความสำเร็จตาม <strong>Definition of Done (DoD)</strong> เช่น ฟีเจอร์ทำงานครบ Unit Tests ผ่านทั้งหมด และผ่าน Code Review แล้ว</td>
+                </tr>
+                <tr>
+                  <td><strong>A — Achievable</strong></td>
+                  <td>ทำได้จริงภายในขอบเขต Sprint ด้วยทักษะของทีม (หรือเรียนรู้เสริมผ่าน Pair Programming)</td>
+                </tr>
+                <tr>
+                  <td><strong>R — Relevant</strong></td>
+                  <td>ทุก Task ต้องผลักดันให้ User Story ต้นทางเข้าใกล้ความสมบูรณ์และสร้างคุณค่าต่อ Sprint Goal</td>
+                </tr>
+                <tr>
+                  <td><strong>T — Time-boxed</strong></td>
+                  <td>กำหนดเวลาแล้วเสร็จชัดเจน (≤ 8 ชม. หรือ 4–16 ชม.) หากประเมินแล้วใหญ่กว่านี้ให้แบ่งย่อยเป็นหลาย Task และรวมคะแนนให้พอดีกับ Team Velocity</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>2.2 การจัดการข้อบกพร่องและวงจรชีวิตของ Defect (Defect Management &amp; Lifecycle)</h3>
+        <p>
+          ในระบบวิศวกรรมซอฟต์แวร์ที่เติบโตขึ้น ข้อบกพร่อง (Defects) และคำขอเปลี่ยนแปลง (Change Requests) ต้องถูกบันทึกและควบคุมอย่างเป็นระบบผ่าน <strong>Defect Tracking System</strong> (เช่น GitHub Issues, Jira, Bugzilla, YouTrack) ในกระบวนการแบบ Plan-driven จะมีเอกสาร Change Request Form (CRF) ส่งให้คณะกรรมการ <strong>Change Control Board (CCB)</strong> พิจารณาอนุมัติ (Sommerville Ch. 25) ขณะที่ในกระบวนการ Agile ทีมพัฒนาและ PO จะควบคุมรายการผ่าน Product Backlog เพื่อป้องกันการแทรกงานใหม่เข้ากลาง Sprint โดยไม่เข้าใจผลกระทบด้านเวลา (Dooley &amp; Kazakova Ch. 3)
+        </p>
+        <p>
+          ตามแบบจำลองใน Dooley &amp; Kazakova (2024, บทที่ 19) ทุก Defect ต้องถูกจำแนกความรุนแรง (<strong>Defect Severity Levels</strong>) 5 ระดับ และเคลื่อนที่ผ่านสถานะมาตรฐานตั้งแต่เริ่มต้นจนปิดงาน (<strong>Defect Lifecycle</strong>):
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ระดับความรุนแรง (Severity)</th>
+                <th>Fagan Classification</th>
+                <th>คำอธิบายและอาการ</th>
+                <th>นโยบายการปล่อยซอฟต์แวร์ (Release Policy)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1. Fatal</strong></td>
+                <td>Major Defect</td>
+                <td>โปรแกรมล่ม (Crash) สูญเสียข้อมูล หรือระบบหยุดทำงานทั้งหมด</td>
+                <td><strong>ห้าม Release เด็ดขาด</strong> ต้องแก้ไขเป็นลำดับแรกสุด</td>
+              </tr>
+              <tr>
+                <td><strong>2. Severe</strong></td>
+                <td>Major Defect</td>
+                <td>ฟังก์ชันหลักของระบบพัง ใช้งานไม่ได้ และไม่มีวิธีเลี่ยง</td>
+                <td><strong>ห้าม Release เด็ดขาด</strong> ไม่อนุญาตให้ส่งมอบถึงผู้ใช้</td>
+              </tr>
+              <tr>
+                <td><strong>3. Serious</strong></td>
+                <td>Major Defect</td>
+                <td>ฟังก์ชันทำงานผิดพลาด แต่ยังมีทางเลี่ยง (Workaround) ให้ใช้งานต่อได้</td>
+                <td>ไม่ควร Release หากยังทราบว่ามีบั๊กระดับ 1–3 ค้างอยู่</td>
+              </tr>
+              <tr>
+                <td><strong>4. Trivial</strong></td>
+                <td>Minor Defect</td>
+                <td>จุดบกพร่องเล็กน้อยที่ไม่ทำให้ระบบล่ม เช่น คำสะกดผิด หรือระยะขอบ UI คลาดเคลื่อน</td>
+                <td>อนุญาตให้เลื่อนไปแก้ในรอบถัดไปได้ (Postpone to Backlog)</td>
+              </tr>
+              <tr>
+                <td><strong>5. Feature Request</strong></td>
+                <td>Enhancement</td>
+                <td>ไม่ใช่ข้อบกพร่อง แต่เป็นข้อเสนอเพิ่มความสามารถใหม่ในอนาคต</td>
+                <td>ส่งเข้า Product Backlog เพื่อจัดลำดับความสำคัญโดย PO</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- INTERACTIVE LAB 2A: DEFECT LIFECYCLE EXPLORER -->
+        <div class="lab-panel purple-border" aria-labelledby="lab2a-title">
+          <div class="lab-panel-header">
+            <h4 id="lab2a-title" class="lab-panel-title">Interactive Lab 2.1: สำรวจวงจรชีวิตข้อบกพร่อง (Defect Lifecycle State Machine)</h4>
+            <span class="lab-tag">DOOLEY &amp; KAZAKOVA FIG 19-1</span>
+          </div>
+          <p style="font-size: 0.92rem; color: var(--on-surface-variant);">
+            คลิกที่แต่ละสถานะเพื่อตรวจสอบบทบาทผู้รับผิดชอบ เงื่อนไขการเปลี่ยนสถานะ และทางแยก (Duplicate / Rejected / Postponed) ตามวงจร Defect Tracking System
+          </p>
+          <div class="lifecycle-strip" role="group" aria-label="สถานะในวงจรชีวิต Defect">
+            <button type="button" class="lifecycle-node active" onclick="selectDefectState('new', this)">1. New</button>
+            <span class="lifecycle-arrow" aria-hidden="true">&#8594;</span>
+            <button type="button" class="lifecycle-node" onclick="selectDefectState('assigned', this)">2. Assigned</button>
+            <span class="lifecycle-arrow" aria-hidden="true">&#8594;</span>
+            <button type="button" class="lifecycle-node" onclick="selectDefectState('analyzing', this)">3. Analyzing</button>
+            <span class="lifecycle-arrow" aria-hidden="true">&#8594;</span>
+            <button type="button" class="lifecycle-node" onclick="selectDefectState('working', this)">4. Working</button>
+            <span class="lifecycle-arrow" aria-hidden="true">&#8594;</span>
+            <button type="button" class="lifecycle-node" onclick="selectDefectState('resolved', this)">5. Resolved</button>
+            <span class="lifecycle-arrow" aria-hidden="true">&#8594;</span>
+            <button type="button" class="lifecycle-node" onclick="selectDefectState('approved', this)">6. Approved</button>
+            <span class="lifecycle-arrow" aria-hidden="true">&#8594;</span>
+            <button type="button" class="lifecycle-node" onclick="selectDefectState('integrated', this)">7. Integrated</button>
+            <span class="lifecycle-arrow" aria-hidden="true">&#8594;</span>
+            <button type="button" class="lifecycle-node" onclick="selectDefectState('closed', this)">8. Closed</button>
+          </div>
+          <div id="defect-state-detail" class="callout purple">
+            <div class="callout-title">สถานะ 1: New — การแจ้งข้อบกพร่องเข้าสู่ระบบ</div>
+            <p>ผู้ทดสอบ ลูกค้า หรือระบบอัตโนมัติบันทึกข้อมูล Defect (Unique ID, ขั้นตอนการเกิดซ้ำ, Severity, สภาพแวดล้อม) ก่อนส่งให้ผู้จัดการ/ทีมคัดกรอง</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>2.3 การบริหารงานแบบเห็นภาพ: Product Backlog vs. Sprint Backlog และ Kanban WIP Limits</h3>
+        <p>
+          เครื่องมือบริหารโครงการอย่าง <strong>GitHub Projects</strong> และ <strong>Jira</strong> ผสานการทำงานของกระดาน Scrum และ Kanban เข้าด้วยกัน โดยมีข้อแตกต่างเชิงวินัยที่ทีม Software House ต้องแยกให้ขาด:
+        </p>
+        <ul>
+          <li><strong>Product Backlog vs. Sprint Backlog:</strong> Product Backlog คือรายการงานทั้งหมดของโครงการที่ PO ปรับปรุงและจัดลำดับอยู่เสมอ ส่วน Sprint Backlog คือชุดงานที่ทีมพัฒนาเลือกมารับผิดชอบในรอบ Sprint ปัจจุบัน (2–4 สัปดาห์) <strong>กฎเหล็กของ Scrum คือ เมื่อ Sprint เริ่มต้นแล้ว ห้ามบุคคลภายนอกเพิ่มงานเข้า Sprint Backlog โดยเด็ดขาด</strong> มีเพียง Development Team เท่านั้นที่เพิ่ม Sub-tasks หรือ Bug ที่พบระหว่างทดสอบได้ งานใหม่จากภายนอกต้องไปรอใน Product Backlog เพื่อปกป้อง Sprint Goal (Dooley &amp; Kazakova Ch. 2; Sommerville Ch. 3)</li>
+          <li><strong>Kanban Swimlanes &amp; Pull System:</strong> ต่างจาก Scrum ที่มีรอบเวลาตายตัว Kanban เน้นการไหลของงานอย่างต่อเนื่อง (Continuous Flow) โดยใช้ <strong>Swimlanes</strong> (เส้นแบ่งแนวนอน) แยกประเภทงาน เช่น Bug เร่งด่วน, ฟีเจอร์ใหม่, หรืองานแต่ละทีมย่อย ระบบทำงานแบบ <strong>Pull System</strong> คือวิศวกรจะดึงงานจากคอลัมน์ก่อนหน้าเข้ามาทำเฉพาะเมื่อตนมีกำลังว่างเท่านั้น</li>
+          <li><strong>Work-In-Progress (WIP) Limits:</strong> คือเพดานจำนวนงานสูงสุดที่อนุญาตให้อยู่ในแต่ละคอลัมน์พร้อมกัน (แนะนำ <strong>1–2 งานต่อคน</strong>) หากคอลัมน์ <em>Review/QA</em> เต็มเพดาน WIP Limit นักพัฒนาที่เขียนโค้ดเสร็จจะไม่สามารถดันงานใหม่เข้า Review และห้ามดึงงานใหม่เข้า <em>In Progress</em> แต่ต้องกระโดดเข้าไปช่วย Review งานที่ค้างอยู่ การจำกัด WIP เช่นนี้ช่วยเปิดโปงคอขวด (Bottlenecks) ทันที ลดการสลับบริบท (Context Switching) และทำให้ <strong>Lead Time</strong> (เวลาตั้งแต่ ToDo จนถึง Done) สั้นลงอย่างมีนัยสำคัญ</li>
+        </ul>
+
+        <!-- INTERACTIVE LAB 2B: KANBAN WIP SIMULATOR -->
+        <div class="lab-panel" aria-labelledby="lab2b-title">
+          <div class="lab-panel-header">
+            <h4 id="lab2b-title" class="lab-panel-title">Interactive Lab 2.2: จำลองกระดาน Kanban และการบังคับใช้ WIP Limits (Pull System)</h4>
+            <span class="lab-tag">WIP LIMIT SIMULATOR</span>
+          </div>
+          <p style="font-size: 0.92rem; color: var(--on-surface-variant);">
+            ทดลองย้ายการ์ดงานข้ามคอลัมน์ สังเกตว่าเมื่อคอลัมน์ <strong>In Progress (WIP Limit = 2)</strong> หรือ <strong>Code Review / QA (WIP Limit = 2)</strong> เต็ม ระบบ Pull จะบล็อกการดึงงานใหม่จนกว่าคอขวดจะถูกคลี่คลาย
+          </p>
+          <div class="btn-row">
+            <button type="button" class="btn" onclick="resetKanbanBoard()">รีเซ็ตกระดานจำลอง</button>
+          </div>
+          <div id="kanban-status-msg" class="inline-status-msg">
+            สถานะปกติ: กดปุ่มลูกศรบนการ์ดเพื่อทดลองย้ายสถานะงานตามหลัก Pull System
+          </div>
+          <div id="kanban-board-container" class="kanban-board"></div>
+        </div>
+      </div>
+
+      <div class="badge-row">
+        <span class="summary-badge">INVEST Stories &amp; SMART Tasks (≤ 8–16 hrs)</span>
+        <span class="summary-badge purple">5 Severity Levels &amp; 8-State Defect Lifecycle</span>
+        <span class="summary-badge green">WIP Limits (1–2 Tasks/Dev) Eliminate Bottlenecks</span>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 3 -->
+    <!-- =================================================================== -->
+    <section id="section-3" class="lecture-section" aria-labelledby="s3-title">
+      <div class="section-header">
+        <div>
+          <div class="section-badge-row">
+            <span class="section-num-badge purple">SECTION 03</span>
+            <span class="section-source-tag">Sommerville Ch. 25 • Dooley &amp; Kazakova Ch. 17, 19</span>
+          </div>
+          <h2 id="s3-title" class="section-title">กลยุทธ์การจัดการเวอร์ชันและการทำงานร่วมกัน (Version Control Workflows &amp; Branching Strategies)</h2>
+          <p class="section-subtitle">DVCS Architecture, Collision Resolution, Gitflow vs. GitHub Flow &amp; Code Review Culture</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>3.1 ระบบควบคุมเวอร์ชันแบบกระจายศูนย์ (DVCS) เทียบกับระบบรวมศูนย์ (Centralized VCS)</h3>
+        <p>
+          ในบทที่ 25 ของ Sommerville (2016) ได้เปรียบเทียบวิวัฒนาการของระบบจัดการเวอร์ชันจากยุค <strong>Centralized Version Control Systems</strong> (เช่น Subversion / SVN, CVS) มาสู่ <strong>Distributed Version Control Systems (DVCS)</strong> เช่น Git และ Mercurial ซึ่งกลายเป็นมาตรฐานอุตสาหกรรมและโครงการ Open-Source ทั่วโลก
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>มิติเปรียบเทียบ</th>
+                <th>Centralized VCS (เช่น Subversion)</th>
+                <th>Distributed VCS (เช่น Git)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>สถาปัตยกรรม Repository</strong></td>
+                <td>มี Master Repository ศูนย์กลางเพียงแห่งเดียว เครื่องนักพัฒนามีเพียง Working Copy ของเวอร์ชันล่าสุด</td>
+                <td>นักพัฒนาทุกคน Clone <strong>Local Repository</strong> ที่มีประวัติการแก้ไขและ Metadata ครบถ้วนสมบูรณ์ แล้วซิงค์กับ <strong>Remote Master Repository</strong></td>
+              </tr>
+              <tr>
+                <td><strong>การจัดเก็บข้อมูล</strong></td>
+                <td>นิยมเก็บแบบ <strong>Deltas</strong> (บันทึกความแตกต่างทีละบรรทัดย้อนหลังไปยังเวอร์ชันตั้งต้น)</td>
+                <td>Git เก็บ Snapshot ของโครงสร้างโปรเจกต์และอ้างอิงผ่าน <strong>Object Checksums (SHA-1/SHA-256 Hash)</strong> ทำให้ตรวจสอบความถูกต้อง (Integrity) และสลับ Branch ได้รวดเร็ว</td>
+              </tr>
+              <tr>
+                <td><strong>การทำงาน Offline &amp; ความทนทาน</strong></td>
+                <td>ต้องเชื่อมต่อเซิร์ฟเวอร์กลางจึงจะ Commit หรือดูประวัติได้ หากเซิร์ฟเวอร์ล่มทีมทำงานต่อไม่ได้</td>
+                <td>Commit, สร้าง Branch และดูประวัติบน Local Repo ได้แบบ Offline เต็มรูปแบบ และ Local Repo ของทุกคนทำหน้าที่เป็น Backup ของระบบ</td>
+              </tr>
+              <tr>
+                <td><strong>การรองรับการทดลอง (Branching)</strong></td>
+                <td>การสร้าง Branch และ Merge ทำได้ช้าและซับซ้อน</td>
+                <td>Branch เป็นเพียง Pointer ขนาดเล็ก (41 bytes) ชี้ไปยัง Commit Checksum ทำให้สร้างและ Merge Branch ได้ในเสี้ยววินาที</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>3.2 แบบจำลองการแก้ปัญหาการแก้ไขไฟล์ชนกัน (Collision Resolution Models)</h3>
+        <p>
+          เมื่อวิศวกรหลายคนใน Software House แก้ไขซอร์สโค้ดชุดเดียวกันพร้อมกัน ระบบควบคุมเวอร์ชันมี 2 แนวทางหลักในการจัดการการชนกัน (Sommerville Ch. 25):
+        </p>
+        <div class="card-grid-2">
+          <article class="info-card accent-amber">
+            <span class="card-kicker">PESSIMISTIC MODEL</span>
+            <h4 class="card-title">Lock-Modify-Unlock</h4>
+            <p class="card-body">
+              นักพัฒนาต้องขอ <strong>Check-out พร้อมล็อกไฟล์</strong> จากเซิร์ฟเวอร์ก่อนแก้ไข ระหว่างนั้นคนอื่นอ่านได้อย่างเดียวจนกว่าเจ้าของจะ Commit และปลดล็อก ข้อดีคือไม่มีวันเกิด Merge Conflict แต่ข้อเสียร้ายแรงคือทำให้เกิดคอขวด หากคนถือล็อกลืมปลดล็อกหรือแก้ไฟล์ศูนย์กลางร่วมกัน ทีมที่เหลือทั้งหมดจะหยุดชะงัก
+            </p>
+          </article>
+          <article class="info-card accent-blue">
+            <span class="card-kicker">OPTIMISTIC MODEL (GIT STANDARD)</span>
+            <h4 class="card-title">Copy-Modify-Merge</h4>
+            <p class="card-body">
+              ทุกคนแก้ไขสำเนาไฟล์พร้อมกันได้อย่างอิสระ เมื่อนำงานมารวมกัน หากแก้ไขคนละไฟล์หรือคนละช่วงบรรทัด ระบบจะทำ <strong>Automatic Merge</strong> ให้โดยอัตโนมัติ แต่หากแก้ไขบรรทัดเดียวกัน ระบบจะหยุดและแจ้ง <strong>Merge Conflict</strong> เพื่อให้นักพัฒนาตรวจสอบความหมายเชิงตรรกะและผสานโค้ดด้วยตนเอง (Manual Merge)
+            </p>
+          </article>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span>ตัวอย่าง Merge Conflict Markers ที่นักพัฒนาต้องตัดสินใจแก้ไขด้วยตนเอง (Manual Merge)</span>
+            <button type="button" class="copy-btn" onclick="copyCodeBlock(this)">คัดลอก</button>
+          </div>
+          <pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD (main)
+const MAX_WIP_LIMIT = 4; // ค่ามาตรฐานของทีม
+=======
+const MAX_WIP_LIMIT = 2; // ปรับลดลงเพื่อแก้คอขวดใน Sprint 3
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/adjust-wip-limit</code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>3.3 กลยุทธ์การแตก Branch: GitHub Flow vs. Gitflow</h3>
+        <p>
+          การเลือกกลยุทธ์ Branching ขึ้นอยู่กับลักษณะผลิตภัณฑ์และรอบการส่งมอบ (Sommerville Ch. 1 &amp; 25): ระบบเว็บหรือ SaaS ที่ส่งมอบต่อเนื่องนิยมใช้ <strong>GitHub Flow</strong> ในขณะที่ระบบองค์กร ซอฟต์แวร์แพ็กเกจ หรือแอปมือถือที่มีรอบการปล่อยเวอร์ชันและต้องดูแลหลายเวอร์ชันพร้อมกันนิยมใช้ <strong>Gitflow</strong>
+        </p>
+
+        <!-- INTERACTIVE LAB 3: BRANCHING WORKFLOW VISUALIZER -->
+        <div class="lab-panel purple-border" aria-labelledby="lab3-title">
+          <div class="lab-panel-header">
+            <h4 id="lab3-title" class="lab-panel-title">Interactive Lab 3.1: เปรียบเทียบสถาปัตยกรรม Branching (GitHub Flow vs. Gitflow)</h4>
+            <span class="lab-tag">BRANCHING ARCHITECTURE</span>
+          </div>
+          <div class="btn-row">
+            <button type="button" id="btn-wf-github" class="btn purple active" onclick="switchBranchWorkflow('github')">GitHub Flow (Continuous Delivery)</button>
+            <button type="button" id="btn-wf-gitflow" class="btn purple" onclick="switchBranchWorkflow('gitflow')">Gitflow (Structured Releases)</button>
+          </div>
+          <div id="branch-svg-container" class="svg-box"></div>
+          <div id="branch-desc-box" class="callout"></div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>3.4 วัฒนธรรม Code Review, การตรวจสอบแบบ Fagan และ Branch Protection Rules</h3>
+        <p>
+          การเขียนโค้ดเสร็จไม่ได้หมายความว่าพร้อมรวมเข้า Mainline ใน Software House มืออาชีพต้องยึดกฎ <strong>Check-before-check-in</strong> (ตรวจสอบและรันทดสอบบนเครื่องตนเองให้ผ่านก่อน Push) ตามด้วยกระบวนการทบทวนโค้ด (Static Analysis / Reviews) ซึ่ง Dooley &amp; Kazakova (2024, บทที่ 17 &amp; 19) และ Sommerville (2016, บทที่ 24) แบ่งระดับความเข้มข้นไว้ 3 รูปแบบ:
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>รูปแบบการทบทวนโค้ด</th>
+                <th>ลักษณะการดำเนินการ</th>
+                <th>ระดับความเป็นทางการ &amp; กรณีใช้งาน</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1. Code Walkthrough</strong></td>
+                <td>ผู้เขียนโค้ดเป็นผู้อธิบายตรรกะทีละส่วนให้เพื่อนร่วมทีมฟังแบบไม่เป็นทางการเพื่อค้นหาจุดบกพร่องและแลกเปลี่ยนความรู้</td>
+                <td>เป็นทางการน้อย เหมาะกับทีมขนาดเล็กหรือการ Rework โค้ดที่แก้ไขไม่ถึง 10%</td>
+              </tr>
+              <tr>
+                <td><strong>2. Peer Code Review (Pull Request)</strong></td>
+                <td>นักพัฒนาเปิด Pull Request (PR) บน GitHub/GitLab เพื่อขอให้เพื่อนร่วมทีมอย่างน้อย 1–2 คนอ่าน Diff ตรวจสอบ Style, Logic, Edge Cases และ Security แบบ Asynchronous</td>
+                <td>เป็นทางการปานกลาง เป็นมาตรฐานหลักของ Software House และโครงการ Agile ยุคใหม่</td>
+              </tr>
+              <tr>
+                <td><strong>3. Fagan Inspection (6 Phases)</strong></td>
+                <td>การตรวจพินิจเชิงวิศวกรรมแบบเข้มงวด 6 ขั้นตอน: <em>Planning → Overview → Preparation → Inspection Meeting (≤ 2 ชม.) → Inspection Report → Rework &amp; Follow-up</em> โดยแยกบทบาท <strong>Moderator</strong> (คุมการประชุม), <strong>Reader</strong> (อ่านถอดความโค้ด), <strong>Recorder</strong> (จดบันทึก Severity &amp; Metrics) และ <strong>Author</strong> (ห้ามโต้เถียง ตอบคำถามอย่างเดียว และห้ามแก้ปัญหาในห้องประชุม) หากต้องแก้โค้ดเกิน 10% ต้องจัด Inspection ใหม่</td>
+                <td>เป็นทางการสูงสุด ใช้กับระบบ Safety-critical (เช่น ปั๊มอินซูลิน ระบบการบิน) หรือโมดูลแกนหลักที่มีความเสี่ยงสูง</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout positive">
+          <div class="callout-title">การตั้งค่า Branch Protection Rules เพื่อบังคับใช้คุณภาพระดับองค์กร</div>
+          <p>
+            เครื่องมืออย่าง GitHub ช่วยเปลี่ยนกฎเกณฑ์ทางวิศวกรรมให้เป็นกลไกบังคับอัตโนมัติ (Automated Gatekeeping) บน Branch <span class="inline-code">main</span> (และ <span class="inline-code">develop</span>): (1) <strong>Require a pull request before merging</strong> ห้าม Push ตรงเข้า <span class="inline-code">main</span> เด็ดขาด, (2) <strong>Require approvals</strong> ต้องมี Peer Review อนุมัติอย่างน้อย 1–2 คนและยกเลิกการอนุมัติอัตโนมัติเมื่อมีการ Push โค้ดใหม่, (3) <strong>Require status checks to pass</strong> บังคับให้ CI Build และ Unit Tests ผ่าน 100%, และ (4) <strong>Require conversation resolution</strong> ต้องเคลียร์คอมเมนต์ Review ทั้งหมดก่อนกด Merge
+          </p>
+        </div>
+      </div>
+
+      <div class="badge-row">
+        <span class="summary-badge purple">Git DVCS: Local History &amp; SHA Checksums</span>
+        <span class="summary-badge">Copy-Modify-Merge + Manual Conflict Resolution</span>
+        <span class="summary-badge green">PR Reviews + Fagan 6-Phase Inspection</span>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 4 -->
+    <!-- =================================================================== -->
+    <section id="section-4" class="lecture-section" aria-labelledby="s4-title">
+      <div class="section-header">
+        <div>
+          <div class="section-badge-row">
+            <span class="section-num-badge">SECTION 04</span>
+            <span class="section-source-tag">Sommerville Ch. 7, 23, 24, 25 • Dooley &amp; Kazakova Ch. 2</span>
+          </div>
+          <h2 id="s4-title" class="section-title">วิศวกรรมซอฟต์แวร์สมัยใหม่และตัววัดกระบวนการ (Modern Engineering &amp; Process Metrics)</h2>
+          <p class="section-subtitle">CI/CD Automation, Agile &amp; Static Quality Metrics, System Building &amp; Release Management</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>4.1 Continuous Integration (CI) และ Continuous Delivery (CD) (Sommerville Ch. 25)</h3>
+        <p>
+          ปัญหาใหญ่ของการพัฒนาเป็นทีมคือ “Integration Hell” เมื่อนักพัฒนาแยกกันเขียนโค้ดหลายสัปดาห์แล้วนำมารวมกันก่อนวันส่งงาน ทำให้ระบบพังพร้อมกันหลายจุด แนวคิด <strong>Continuous Integration (CI)</strong> จึงกำหนดให้นักพัฒนาผสานโค้ดเข้าสู่ Mainline บ่อยที่สุด (อย่างน้อยวันละครั้งหรือทุกครั้งที่จบ Task) โดยมี <strong>Automated Build Server</strong> (เช่น GitHub Actions, Jenkins) ทำงานตามลำดับอัตโนมัติ:
+        </p>
+        <ol>
+          <li>นักพัฒนารันทดสอบบนเครื่องตนเองก่อน Push (Check-before-check-in)</li>
+          <li>เมื่อ Push หรือเปิด Pull Request ระบบ CI Server จะ Checkout โค้ดเวอร์ชันล่าสุดมาสร้าง Build ใหม่ในสภาพแวดล้อมสะอาด (Clean Environment)</li>
+          <li>รันชุดทดสอบอัตโนมัติ (Unit Tests, Integration Tests และ Regression Tests เพื่อยืนยันว่าของใหม่ไม่ทำของเดิมพัง)</li>
+          <li>ยึดกฎเหล็ก <strong>“Never Break the Build”</strong>: หาก Pipeline ล้มเหลว ทีมต้องหยุดเพิ่มฟีเจอร์ใหม่และรีบแก้ไข Build ให้กลับมาเขียวทันที</li>
+        </ol>
+        <p>
+          ต่อยอดจาก CI คือ <strong>Continuous Delivery (CD)</strong> ที่รับประกันว่าซอฟต์แวร์ใน Mainline อยู่ในสถานะที่พร้อมนำไป Deploy ขึ้นระบบจริง (Staging/Production) ได้ตลอดเวลาด้วยการกดอนุมัติเพียงครั้งเดียว หรือขยับไปสู่ <strong>Continuous Deployment</strong> ที่ปล่อยขึ้น Production อัตโนมัติเมื่อผ่านทุก Quality Gates
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span>ตัวอย่าง GitHub Actions CI Workflow (.github/workflows/ci.yml)</span>
+            <button type="button" class="copy-btn" onclick="copyCodeBlock(this)">คัดลอก</button>
+          </div>
+          <pre><code>name: Software House CI Gate
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js Runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies cleanly
+        run: npm ci
+      - name: Run Static Linter &amp; Type Check
+        run: npm run lint
+      - name: Execute Unit &amp; Regression Tests
+        run: npm test -- --coverage</code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>4.2 ตัววัดกระบวนการพัฒนาและคุณภาพซอฟต์แวร์ (Software Process &amp; Quality Metrics)</h3>
+        <p>
+          Sommerville (2016, บทที่ 24: Quality Management) ระบุว่าการบริหารคุณภาพที่ดีต้องอาศัยการวัดผลเชิงปริมาณ (Software Measurement) ทั้ง <strong>Process Metrics</strong> (ใช้วัดความเร็วและความเสถียรของกระบวนการ) และ <strong>Product Metrics</strong> (ใช้วัดความซับซ้อนและข้อบกพร่องภายในตัวซอฟต์แวร์) เพื่อใช้ควบคุมโครงการและพยากรณ์ปัญหาล่วงหน้า:
+        </p>
+
+        <div class="card-grid">
+          <article class="info-card accent-blue">
+            <span class="card-kicker">AGILE CAPACITY</span>
+            <h4 class="card-title">Velocity</h4>
+            <p class="card-body">
+              ปริมาณงาน (Story Points) ที่ทีมทำเสร็จสมบูรณ์ตาม Definition of Done ใน 1 Sprint ใช้เป็นฐานพยากรณ์กำลังการผลิตใน Sprint ถัดไป (Sommerville Ch. 3, 23) ห้ามนำ Velocity ข้ามทีมมาเปรียบเทียบแข่งขันกันเพราะสเกลคะแนนแต่ละทีมต่างกัน
+            </p>
+          </article>
+
+          <article class="info-card accent-purple">
+            <span class="card-kicker">FLOW EFFICIENCY</span>
+            <h4 class="card-title">Lead Time vs. Cycle Time</h4>
+            <p class="card-body">
+              <strong>Lead Time</strong> วัดตั้งแต่ Task ถูกสร้างเข้า ToDo จนถึง Done (มุมมองลูกค้า) ส่วน <strong>Cycle Time</strong> วัดตั้งแต่ทีมเริ่มลงมือทำจริง (In Progress) จนถึง Done (มุมมองประสิทธิภาพวิศวกรรม) การลด WIP Limit ช่วยลด Cycle Time โดยตรง
+            </p>
+          </article>
+
+          <article class="info-card accent-blue">
+            <span class="card-kicker">SPRINT TRACKING</span>
+            <h4 class="card-title">Burn-down &amp; Burn-up Charts</h4>
+            <p class="card-body">
+              <strong>Burn-down</strong> แสดงปริมาณงานที่เหลือเทียบกับเส้นอุดมคติรายวัน; <strong>Burn-up</strong> แยกเส้น “งานที่เสร็จสะสม” ออกจากเส้น “ขอบเขตงานรวม (Total Scope)” ทำให้เห็นชัดทันทีหากความล่าช้าเกิดจาก Scope Creep
+            </p>
+          </article>
+
+          <article class="info-card accent-purple">
+            <span class="card-kicker">BOTTLENECK RADAR</span>
+            <h4 class="card-title">Cumulative Flow Diagram (CFD)</h4>
+            <p class="card-body">
+              กราฟพื้นที่ซ้อนทับแสดงจำนวน Ticket ในทุกคอลัมน์ตามเวลา หากแถบสีของสถานะ <em>In Review</em> พองตัวหนาขึ้นเรื่อยๆ แปลว่าเกิดคอขวดในขั้นตอน Code Review หรือ QA ต้องรีบปรับสมดุลทีม
+            </p>
+          </article>
+
+          <article class="info-card accent-amber">
+            <span class="card-kicker">RELIABILITY QUALITY</span>
+            <h4 class="card-title">Defect Density</h4>
+            <p class="card-body">
+              อัตราส่วนจำนวนข้อบกพร่องที่พบต่อขนาดซอฟต์แวร์ (เช่น <span class="inline-code">Defects / KLOC</span> หรือ <span class="inline-code">Defects / Story Point</span>) ใช้ประเมินความน่าเชื่อถือของโมดูลและระบุไฟล์ที่เป็นจุดเสี่ยง (Bug Hotspots) เพื่อส่งไป Refactor
+            </p>
+          </article>
+
+          <article class="info-card accent-green">
+            <span class="card-kicker">STRUCTURAL COMPLEXITY</span>
+            <h4 class="card-title">Fan-in / Fan-out &amp; Cyclomatic Complexity</h4>
+            <p class="card-body">
+              <strong>Fan-in</strong> สูงแปลว่าโมดูลถูกเรียกใช้มาก (แก้กระทบกว้าง) <strong>Fan-out</strong> สูงแปลว่าโมดูลพึ่งพาผู้อื่นมาก (ซับซ้อน/เปราะบาง) ส่วน <strong>Cyclomatic Complexity</strong> <span class="inline-code">V(G) = E - N + 2</span> (Sommerville Ch. 24) วัดจำนวนเส้นทางตรรกะอิสระและกำหนดจำนวน Test Cases ขั้นต่ำที่ต้องเขียน
+            </p>
+          </article>
+        </div>
+
+        <!-- INTERACTIVE LAB 4: METRICS VISUALIZER & COMPLEXITY CALCULATOR -->
+        <div class="lab-panel" aria-labelledby="lab4-title">
+          <div class="lab-panel-header">
+            <h4 id="lab4-title" class="lab-panel-title">Interactive Lab 4.1: แดชบอร์ดจำลองตัววัด Agile (Burn-down / Burn-up / CFD) และเครื่องคำนวณ Cyclomatic Complexity</h4>
+            <span class="lab-tag">CHART.JS PROCESS ANALYTICS</span>
+          </div>
+          <div class="btn-row">
+            <button type="button" id="btn-chart-burndown" class="btn primary" onclick="renderMetricsChart('burndown')">Sprint Burn-down &amp; Scope</button>
+            <button type="button" id="btn-chart-cfd" class="btn" onclick="renderMetricsChart('cfd')">Cumulative Flow Diagram (CFD)</button>
+            <button type="button" id="btn-chart-velocity" class="btn" onclick="renderMetricsChart('velocity')">Multi-Sprint Velocity Trend</button>
+          </div>
+          <div id="metrics-chart-container" class="chart-box" style="min-height: 340px;">
+            <canvas id="metrics-canvas" aria-label="กราฟตัววัดกระบวนการซอฟต์แวร์"></canvas>
+          </div>
+          <div id="chart-insight-box" class="inline-status-msg">
+            กราฟ Burn-down แสดงให้เห็นว่าวันที่ 5–6 มี Scope เพิ่มกลาง Sprint (เส้น Actual เด้งขึ้น) ก่อนที่ทีมจะเร่งปิดงานได้ทันในวันที่ 10
+          </div>
+
+          <div style="border-top: var(--rule); padding-top: var(--space-md);">
+            <h4 style="margin-top: 0;">คำนวณ Cyclomatic Complexity V(G) และ Defect Density</h4>
+            <div class="stat-grid-3">
+              <div class="slider-control">
+                <label for="cc-edges" class="slider-label">Edges (E) ใน Control Flow Graph</label>
+                <input type="number" id="cc-edges" min="1" max="200" value="14" oninput="calcQualityMetrics()">
+              </div>
+              <div class="slider-control">
+                <label for="cc-nodes" class="slider-label">Nodes (N) ใน Control Flow Graph</label>
+                <input type="number" id="cc-nodes" min="1" max="200" value="11" oninput="calcQualityMetrics()">
+              </div>
+              <div class="slider-control">
+                <label for="dd-defects" class="slider-label">จำนวน Defects ที่พบ (ตัว)</label>
+                <input type="number" id="dd-defects" min="0" max="500" value="6" oninput="calcQualityMetrics()">
+              </div>
+              <div class="slider-control">
+                <label for="dd-kloc" class="slider-label">ขนาดโค้ด (KLOC — พันบรรทัด)</label>
+                <input type="number" id="dd-kloc" min="0.1" step="0.1" max="500" value="2.5" oninput="calcQualityMetrics()">
+              </div>
+            </div>
+            <div class="stat-grid-3" style="margin-top: var(--space-md);">
+              <div class="stat-box">
+                <span class="stat-box-label">CYCLOMATIC COMPLEXITY V(G) = E - N + 2</span>
+                <span id="out-vg" class="stat-box-val">5</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-box-label">COMPLEXITY RISK ASSESSMENT</span>
+                <span id="out-vg-risk" class="stat-box-val" style="font-size: 1.1rem;">Low (Testable)</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-box-label">DEFECT DENSITY (DEFECTS / KLOC)</span>
+                <span id="out-dd" class="stat-box-val">2.40</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>4.3 ระบบ Build อัตโนมัติและการจัดการการปล่อยเวอร์ชัน (System Building &amp; Release Management)</h3>
+        <p>
+          Sommerville (2016, บทที่ 7 &amp; 25) อธิบายว่าการสร้างระบบ (<strong>System Building</strong>) คือกระบวนการคอมไพล์และเชื่อมโยงไฟล์ซอร์สโค้ด ไลบรารีภายนอก และไฟล์ตั้งค่าให้เป็น Executable System โดยอาศัยองค์ประกอบสำคัญ 3 ประการ:
+        </p>
+        <ul>
+          <li><strong>Baselines &amp; Semantic Tagging:</strong> เมื่อซอฟต์แวร์ผ่านการทดสอบระบบ (System Testing) แล้ว ทีมจะแช่แข็งเวอร์ชันขององค์ประกอบทั้งหมดเป็น <strong>Baseline</strong> และติดป้ายกำกับด้วย Git Tag ตามมาตรฐาน Semantic Versioning (<span class="inline-code">vMAJOR.MINOR.PATCH</span> เช่น <span class="inline-code">v1.2.0</span>) เพื่อให้สามารถย้อนกลับมาสร้างซอฟต์แวร์เวอร์ชันเดิมซ้ำได้ทุกเมื่อ (Reproducible Build)</li>
+          <li><strong>Release Notes:</strong> เอกสารสรุปการเปลี่ยนแปลงสำหรับผู้ใช้และทีมสนับสนุน ระบุฟีเจอร์ใหม่ บั๊กที่แก้ไข ข้อจำกัดที่ยังทราบ (Known Issues) และวิธีอัปเกรด ซึ่งเครื่องมือสมัยใหม่สามารถสร้างอัตโนมัติจาก Merged Pull Requests และ Conventional Commits</li>
+          <li><strong>Host-Target Development Platforms:</strong> การพัฒนาซอฟต์แวร์มักเกิดขึ้นบนเครื่อง <strong>Host</strong> (แล็ปท็อปนักพัฒนาหรือ Cloud CI Runner) ซึ่งมีสถาปัตยกรรม CPU หรือระบบปฏิบัติการต่างจากเครื่อง <strong>Target</strong> (เช่น Embedded Hardware อย่างเครื่องปั๊มอินซูลิน, สถานีอากาศ, มือถือ หรือ Docker Container บน Production Server) การใช้ Cross-compilers, Containerization (Docker) และ Hardware Emulators ใน CI จึงสำคัญอย่างยิ่งเพื่อรับประกันว่าโค้ดที่รันผ่านบนเครื่องนักพัฒนาจะทำงานบนเครื่องเป้าหมายได้จริง</li>
+        </ul>
+      </div>
+
+      <div class="badge-row">
+        <span class="summary-badge">CI/CD: Never Break the Build</span>
+        <span class="summary-badge purple">Velocity, CFD, Cyclomatic Complexity V(G)</span>
+        <span class="summary-badge green">Baselines, Tags &amp; Host-Target Parity</span>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 5: WORKSHOP 5 LAB GUIDE -->
+    <!-- =================================================================== -->
+    <section id="section-5" class="lecture-section" aria-labelledby="s5-title">
+      <div class="section-header">
+        <div>
+          <div class="section-badge-row">
+            <span class="section-num-badge purple">SECTION 05 • WORKSHOP 5</span>
+            <span class="section-source-tag">Hands-on Senior Project Kickoff Guide</span>
+          </div>
+          <h2 id="s5-title" class="section-title">คู่มือปฏิบัติการ Workshop 5: การจำลองเปิดโครงการ Software House (Hands-on Project Kickoff)</h2>
+          <p class="section-subtitle">Step-by-Step Practical Guide for Undergraduate Senior Project Teams (4–6 Members)</p>
+        </div>
+      </div>
+
+      <p>
+        ปฏิบัติการนี้ออกแบบมาให้กลุ่มโครงงาน Senior Project (4–6 คน) ลงมือตั้งค่าสภาพแวดล้อม Software House มาตรฐานอุตสาหกรรมตั้งแต่ศูนย์จนสามารถจำลอง Feature Sprint แรกได้สำเร็จ โดยความคืบหน้าของการติ๊กเช็กแต่ละขั้นตอนจะถูกบันทึกอัตโนมัติในเซสชันของนักศึกษา
+      </p>
+
+      <!-- Workshop Progress Tracker -->
+      <div class="lab-panel" aria-labelledby="ws-progress-title">
+        <div class="lab-panel-header">
+          <h4 id="ws-progress-title" class="lab-panel-title">Workshop 5 Readiness Progress Tracker</h4>
+          <span id="ws-progress-label" class="lab-tag">0 / 5 STEPS COMPLETED (0%)</span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="ws-progress-bar-wrap">
+          <div id="ws-progress-fill" class="progress-fill"></div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn" onclick="exportWorkshopSummary()">ดาวน์โหลดรายงานสรุป Workshop (.txt)</button>
+          <button type="button" id="ws-reset-btn" class="btn" onclick="resetWorkshopProgress(this)">ล้างสถานะการเช็กทั้งหมด</button>
+        </div>
+        <div id="ws-status-banner" class="inline-status-msg">
+          เริ่มต้นติ๊กทำเครื่องหมายเมื่อทีมของคุณดำเนินการแต่ละ Step เสร็จสิ้น ระบบจะบันทึกสถานะให้อัตโนมัติ
+        </div>
+      </div>
+
+      <!-- STEP 1 -->
+      <article class="workshop-step" id="ws-step-1">
+        <div class="step-head">
+          <div class="step-badge-title">
+            <span class="step-square">01</span>
+            <h3 style="margin: 0;">Setting up GitHub Organization &amp; Central Repository</h3>
+          </div>
+          <label class="check-label">
+            <input type="checkbox" id="chk-step-1" onchange="toggleWorkshopStep(1, this.checked)">
+            <span>Step 1 เสร็จสมบูรณ์</span>
+          </label>
+        </div>
+        <p>
+          สร้าง <strong>GitHub Organization</strong> ประจำกลุ่ม (แทนการใช้บัญชีส่วนตัวคนใดคนหนึ่ง เพื่อป้องกัน Beer Truck Problem) กำหนดบทบาทสมาชิกทุกคนเป็นทีมงานเดียวกัน ตั้งค่า Repository หลักแบบ Private หรือ Public พร้อมไฟล์พื้นฐาน: <span class="inline-code">README.md</span> (อธิบายสถาปัตยกรรมและวิธีรัน Host-Target), <span class="inline-code">.gitignore</span> (ป้องกันไฟล์ลับ <span class="inline-code">.env</span> และโฟลเดอร์ <span class="inline-code">node_modules/</span> หลุดเข้า Repo) และ <span class="inline-code">.github/CODEOWNERS</span> เพื่อระบุผู้รับผิดชอบ Code Review อัตโนมัติตามโมดูล
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span>CLI Setup: Clone &amp; Initial Structure (.github/CODEOWNERS)</span>
+            <button type="button" class="copy-btn" onclick="copyCodeBlock(this)">คัดลอก</button>
+          </div>
+          <pre><code># 1. Clone central repository (ใช้ SSH หรือ GitHub CLI)
+gh repo clone se-team-alpha/senior-project-core
+cd senior-project-core
+
+# 2. สร้างโครงสร้างไฟล์มาตรฐาน Software House
+mkdir -p .github/workflows .github/ISSUE_TEMPLATE docs src tests
+touch README.md .gitignore .github/CODEOWNERS
+
+# 3. ตัวอย่างเนื้อหาใน .github/CODEOWNERS
+# *       @team-architect @tech-lead
+# /src/api/  @backend-lead
+# /src/ui/   @frontend-lead
+# /tests/    @qa-engineer</code></pre>
+        </div>
+      </article>
+
+      <!-- STEP 2 -->
+      <article class="workshop-step purple" id="ws-step-2">
+        <div class="step-head">
+          <div class="step-badge-title">
+            <span class="step-square">02</span>
+            <h3 style="margin: 0;">Configuring Branch Protection Rules &amp; PR Templates</h3>
+          </div>
+          <label class="check-label">
+            <input type="checkbox" id="chk-step-2" onchange="toggleWorkshopStep(2, this.checked)">
+            <span>Step 2 เสร็จสมบูรณ์</span>
+          </label>
+        </div>
+        <p>
+          เข้าไปที่ <strong>Settings &rarr; Branches &rarr; Add branch ruleset / protection rule</strong> สำหรับ Branch <span class="inline-code">main</span> เปิดใช้งานกฎป้องกัน 4 ข้อหลัก: (1) <em>Require a pull request before merging</em>, (2) <em>Require approvals = 1</em> (หรือ 2 สำหรับทีม 5–6 คน), (3) <em>Require status checks to pass before merging</em> (ผูกกับ Job <span class="inline-code">build-and-test</span> ใน GitHub Actions), และ (4) <em>Do not allow bypassing the above settings</em> จากนั้นสร้างไฟล์เทมเพลต PR เพื่อบังคับให้นักพัฒนาอธิบายบริบทและผลทดสอบทุกครั้งที่ขอ Merge
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span>Template: .github/pull_request_template.md</span>
+            <button type="button" class="copy-btn" onclick="copyCodeBlock(this)">คัดลอก</button>
+          </div>
+          <pre><code>## สรุปการเปลี่ยนแปลง (Summary)
+- อธิบายสิ่งที่แก้ไขหรือฟีเจอร์ที่เพิ่มโดยย่อ
+- เชื่อมโยง Issue: Closes #&lt;issue-number&gt;
+
+## ประเภทของงาน (Type of Change)
+- [ ] Feature (User Story ใหม่)
+- [ ] Bug Fix (Severity: Fatal / Severe / Serious / Trivial)
+- [ ] Refactor / Technical Debt
+
+## Checklist ก่อนขอ Code Review (Check-before-check-in)
+- [ ] รัน Unit Tests บนเครื่อง Local ผ่านทั้งหมดแล้ว
+- [ ] ไม่มีการ Hardcode Secrets หรือ API Keys
+- [ ] อัปเดตเอกสาร / Comments สำหรับโมดูลที่แก้ไขแล้ว</code></pre>
+        </div>
+      </article>
+
+      <!-- STEP 3 -->
+      <article class="workshop-step" id="ws-step-3">
+        <div class="step-head">
+          <div class="step-badge-title">
+            <span class="step-square">03</span>
+            <h3 style="margin: 0;">Setting up GitHub Projects Board, Swimlanes &amp; WIP Limits</h3>
+          </div>
+          <label class="check-label">
+            <input type="checkbox" id="chk-step-3" onchange="toggleWorkshopStep(3, this.checked)">
+            <span>Step 3 เสร็จสมบูรณ์</span>
+          </label>
+        </div>
+        <p>
+          สร้าง <strong>GitHub Projects (Board &amp; Table View)</strong> เชื่อมกับ Organization Repository ตั้งค่าคอลัมน์ตามการไหลของงานจริงพร้อมกำหนด <strong>WIP Limit</strong> ไว้บนชื่อคอลัมน์เพื่อกำกับทีม (สำหรับทีม 5 คน):
+        </p>
+        <ul>
+          <li><strong>Backlog:</strong> รายการ User Stories ทั้งหมดที่จัดลำดับโดย PO</li>
+          <li><strong>Sprint Ready:</strong> งานที่ผ่านเกณฑ์ INVEST และถูกเลือกเข้า Sprint ปัจจุบันแล้ว</li>
+          <li><strong>In Progress [WIP: 4]:</strong> งานที่กำลังพัฒนาอยู่จริง (ไม่เกิน 1 งานต่อ 1 นักพัฒนา)</li>
+          <li><strong>In Review / QA [WIP: 2]:</strong> งานที่เปิด PR แล้วและรอเพื่อน Review + ทดสอบ หากเต็มเพดาน ให้หยุดเขียนฟีเจอร์ใหม่แล้วมาช่วย Review ทันที</li>
+          <li><strong>Done:</strong> ผ่านเกณฑ์ DoD และ Merge เข้า <span class="inline-code">main</span> เรียบร้อย</li>
+        </ul>
+        <p>
+          นอกจากนี้ ให้สร้าง Custom Fields สำหรับ <strong>Priority (P0–P3)</strong>, <strong>Story Points (1, 2, 3, 5, 8)</strong>, <strong>Severity</strong> และตั้งค่า <strong>Swimlanes</strong> แยกกลุ่มตาม <span class="inline-code">Iteration / Sprint</span> หรือ <span class="inline-code">Module</span> เพื่อให้ง่ายต่อการติดตามใน Daily Standup
+        </p>
+      </article>
+
+      <!-- STEP 4 -->
+      <article class="workshop-step purple" id="ws-step-4">
+        <div class="step-head">
+          <div class="step-badge-title">
+            <span class="step-square">04</span>
+            <h3 style="margin: 0;">Mapping User Stories to Issues &amp; Milestones</h3>
+          </div>
+          <label class="check-label">
+            <input type="checkbox" id="chk-step-4" onchange="toggleWorkshopStep(4, this.checked)">
+            <span>Step 4 เสร็จสมบูรณ์</span>
+          </label>
+        </div>
+        <p>
+          จัดประชุม Sprint 1 Planning: Product Owner นำ User Stories ที่ผ่านการตรวจสอบตามหลัก <strong>INVEST</strong> มาสร้างเป็น GitHub Issues พร้อมกำหนด Labels (<span class="inline-code">type:story</span>, <span class="inline-code">type:bug</span>, <span class="inline-code">severity:severe</span>) และผูกเข้ากับ <strong>Milestone: Sprint 1 (MVP Kickoff)</strong> จากนั้น Development Team ร่วมกันแตกแต่ละ Story เป็น <strong>SMART Tasklist</strong> (≤ 8 ชม./Task) ภายใน Issue นั้นๆ และประเมิน Story Points ตามหลัก Planning Poker
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span>ตัวอย่าง GitHub Issue สำหรับ User Story (INVEST + SMART Sub-tasks)</span>
+            <button type="button" class="copy-btn" onclick="copyCodeBlock(this)">คัดลอก</button>
+          </div>
+          <pre><code>Title: [US-01] ระบบลงชื่อเข้าใช้ด้วยอีเมลมหาวิทยาลัยสำหรับนักศึกษา
+Labels: type:story, priority:P1, module:auth
+Milestone: Sprint 1 - Core MVP
+
+### User Story
+As an **Undergraduate Student**,
+I want to **sign in with my university email and password**,
+so that **I can access my team's project workspace securely**.
+
+### Acceptance Criteria (Confirmation)
+- [ ] อีเมลที่ไม่ได้ลงท้ายด้วยโดเมนมหาวิทยาลัยต้องถูกปฏิเสธด้วย HTTP 400
+- [ ] รหัสผ่านต้องถูก Hash ด้วย bcrypt ก่อนบันทึกลงฐานข้อมูล
+- [ ] Login สำเร็จต้องคืนค่า JWT Token ที่มีอายุ 24 ชั่วโมง
+
+### SMART Implementation Tasks (≤ 8 hrs each)
+- [ ] Task 1.1: ออกแบบ Schema ตาราง users และ Migration script (3 hrs)
+- [ ] Task 1.2: พัฒนา POST /api/auth/login + Validation (4 hrs)
+- [ ] Task 1.3: เขียน Unit Tests ครอบคลุม Valid/Invalid cases (3 hrs)</code></pre>
+        </div>
+      </article>
+
+      <!-- STEP 5 -->
+      <article class="workshop-step" id="ws-step-5">
+        <div class="step-head">
+          <div class="step-badge-title">
+            <span class="step-square">05</span>
+            <h3 style="margin: 0;">Simulating a Feature Sprint (Branch &rarr; Code &rarr; PR &rarr; Review &rarr; CI &rarr; Merge)</h3>
+          </div>
+          <label class="check-label">
+            <input type="checkbox" id="chk-step-5" onchange="toggleWorkshopStep(5, this.checked)">
+            <span>Step 5 เสร็จสมบูรณ์</span>
+          </label>
+        </div>
+        <p>
+          ให้นักพัฒนาในกลุ่มจับคู่ (หรือทำคนละ 1 Issue) จำลองวงจรการทำงานจริงครบ Loop ตั้งแต่ต้นจนจบ: แตก Branch จาก <span class="inline-code">main</span>, เขียนโค้ดพร้อม Unit Test, Commit ด้วยข้อความสื่อความหมาย, Push ขึ้น Remote, เปิด Pull Request พร้อมเชื่อม <span class="inline-code">Closes #1</span>, ให้เพื่อนร่วมทีมทำ Peer Code Review อย่างน้อย 2 ความเห็นเชิงสร้างสรรค์, รอให้ GitHub Actions CI ขึ้นเครื่องหมายถูกสีเขียว แล้วจึงกด Merge และลบบ้านเดิม (Delete Feature Branch)
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span>Feature Sprint CLI Simulation Script</span>
+            <button type="button" class="copy-btn" onclick="copyCodeBlock(this)">คัดลอก</button>
+          </div>
+          <pre><code># 1. อัปเดต main ให้ล่าสุดก่อนแตก Branch เสมอ
+git checkout main
+git pull origin main
+
+# 2. แตก Feature Branch ตามชื่อ Issue
+git checkout -b feature/us01-student-login
+
+# 3. เขียนโค้ด + รันทดสอบบนเครื่องตนเอง (Check-before-check-in)
+npm test
+
+# 4. Stage และ Commit ตามมาตรฐาน Conventional Commits
+git add src/auth.js tests/auth.test.js
+git commit -m "feat(auth): implement university email login validation (#1)"
+
+# 5. Push ขึ้น Remote Repository และเปิด Pull Request
+git push -u origin feature/us01-student-login
+gh pr create --base main --title "feat(auth): Student Login (#1)" --body "Closes #1"
+
+# 6. หลังผ่าน Peer Code Review + GitHub Actions CI สีเขียว -> Merge &amp; Cleanup
+gh pr merge --squash --delete-branch</code></pre>
+        </div>
+      </article>
+
+      <div class="badge-row">
+        <span class="summary-badge">Org Repo + CODEOWNERS</span>
+        <span class="summary-badge purple">Branch Protection + CI Gate</span>
+        <span class="summary-badge green">Full Sprint Loop Practicum</span>
+      </div>
+    </section>
+
+    <!-- FOOTER / SOURCES -->
+    <footer class="doc-footer">
+      <strong>แหล่งอ้างอิงหลัก (Primary Textbook Grounding):</strong>
+      <span>1. Sommerville, I. (2016). <em>Software Engineering</em> (10th ed., Global Edition). Pearson Education Limited. (Chapters 1, 3, 6, 7, 8, 22, 23, 24, 25).</span>
+      <span>2. Dooley, J. F., &amp; Kazakova, V. A. (2024). <em>Software Development, Design, and Coding: With Patterns, Debugging, Unit Testing, and Refactoring</em> (3rd ed.). Apress / Springer. (Chapters 2, 3, 4, 17, 18, 19).</span>
+    </footer>
+
+  </main>
+
+  <api-shim></api-shim>
+  <script>
+    // =========================================================================
+    // GLOBAL STATE & PERSISTENCE (notebookAppApi)
+    // =========================================================================
+    const APP_STATE_DEFAULT = {
+      teamSize: 5,
+      workshopSteps: { 1: false, 2: false, 3: false, 4: false, 5: false },
+      activeChartMode: `burndown`,
+      activeBranchWorkflow: `github`
+    };
+
+    let currentAppState = JSON.parse(JSON.stringify(APP_STATE_DEFAULT));
+    let metricsChartInstance = null;
+
+    async function loadPersistedState() {
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === `function`) {
+          const saved = await window.notebookAppApi.getAppState();
+          if (saved && typeof saved === `object`) {
+            if (typeof saved.teamSize === `number`) {
+              currentAppState.teamSize = saved.teamSize;
+            }
+            if (saved.workshopSteps && typeof saved.workshopSteps === `object`) {
+              currentAppState.workshopSteps = Object.assign({}, APP_STATE_DEFAULT.workshopSteps, saved.workshopSteps);
+            }
+            if (typeof saved.activeChartMode === `string`) {
+              currentAppState.activeChartMode = saved.activeChartMode;
+            }
+            if (typeof saved.activeBranchWorkflow === `string`) {
+              currentAppState.activeBranchWorkflow = saved.activeBranchWorkflow;
+            }
+          }
+        }
+      } catch (err) {
+        // Fallback silently to defaults
+      }
+    }
+
+    async function savePersistedState() {
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === `function`) {
+          await window.notebookAppApi.setAppState(currentAppState);
+        }
+      } catch (err) {
+        // Ignore persistence write errors in preview mode
+      }
+    }
+
+    // =========================================================================
+    // LAB 1.1: TEAM SIZE & COMMUNICATION FRICTION
+    // =========================================================================
+    function updateTeamMetrics(rawVal) {
+      const n = Math.max(2, Math.min(16, parseInt(rawVal, 10) || 5));
+      currentAppState.teamSize = n;
+      const channels = (n * (n - 1)) / 2;
+
+      const elN = document.getElementById(`stat-team-n`);
+      const elC = document.getElementById(`stat-channels`);
+      const elR = document.getElementById(`stat-risk`);
+      const elAdv = document.getElementById(`team-advice-box`);
+
+      if (elN) elN.textContent = String(n);
+      if (elC) elC.textContent = String(channels);
+
+      let riskText = `Optimal`;
+      let riskColor = `var(--positive)`;
+      let advice = `ขนาดทีม ${n} คน (${channels} ช่องทางสื่อสาร) อยู่ในช่วง Core Team ที่เหมาะที่สุดสำหรับการทำ Daily Scrum 15 นาที รักษา Osmotic Communication ได้ดี และลดภาระการประสานงาน`;
+      let warnClass = false;
+
+      if (n <= 3) {
+        riskText = `Low Bus Factor`;
+        riskColor = `var(--warning)`;
+        advice = `ขนาดทีม ${n} คน (${channels} ช่องทาง) คล่องตัวมาก แต่ต้องระวัง Beer Truck Problem (Bus Factor ต่ำ) ควรทำ Pair Programming และเอกสารให้ครบ`;
+      } else if (n > 7 && n <= 12) {
+        riskText = `Elevated Friction`;
+        riskColor = `var(--warning)`;
+        warnClass = true;
+        advice = `ขนาดทีม ${n} คน ทำให้ช่องทางสื่อสารพุ่งเป็น ${channels} ช่องทาง เกินขนาดมาตรฐาน Scrum (≤ 7 คน) ควรแต่งตั้ง System Architect แยกจาก PM และใช้เครื่องมือติดตาม Dependency อย่างเข้มงวด`;
+      } else if (n > 12) {
+        riskText = `Split Recommended`;
+        riskColor = `var(--error)`;
+        warnClass = true;
+        advice = `ขนาดทีม ${n} คน (${channels} ช่องทางสื่อสาร!) เกินขีดจำกัดทีมเดี่ยว (Max 12) ตามหลัก Sommerville Ch. 3 ควรแตกเป็น Multi-team Scrum ที่มี Product Architect และ Scrum of Scrums`;
+      }
+
+      if (elR) {
+        elR.textContent = riskText;
+        elR.style.color = riskColor;
+      }
+      if (elAdv) {
+        elAdv.textContent = advice;
+        elAdv.className = warnClass ? `inline-status-msg warn` : `inline-status-msg`;
+      }
+    }
+
+    function syncTeamFromSlider(val) {
+      const numInput = document.getElementById(`team-size-number`);
+      if (numInput) numInput.value = val;
+      updateTeamMetrics(val);
+      savePersistedState();
+    }
+
+    function syncTeamFromNumber(val) {
+      const sliderInput = document.getElementById(`team-size-slider`);
+      if (sliderInput) sliderInput.value = val;
+      updateTeamMetrics(val);
+      savePersistedState();
+    }
+
+    // =========================================================================
+    // LAB 2.1: DEFECT LIFECYCLE STATE MACHINE
+    // =========================================================================
+    const DEFECT_STATES = {
+      new: {
+        title: `สถานะ 1: New — การแจ้งข้อบกพร่องเข้าสู่ระบบ`,
+        desc: `ผู้ทดสอบ ลูกค้า หรือระบบอัตโนมัติบันทึกข้อมูล Defect (Unique ID, ขั้นตอนการเกิดซ้ำ, Severity, สภาพแวดล้อม) ก่อนส่งให้ผู้จัดการหรือทีมคัดกรอง`
+      },
+      assigned: {
+        title: `สถานะ 2: Assigned — การมอบหมายผู้วิเคราะห์`,
+        desc: `หัวหน้าทีม QA หรือ Technical Lead มอบหมาย Defect ให้วิศวกรที่รับผิดชอบโมดูลนั้นตรวจสอบสาเหตุ (Root Cause)`
+      },
+      analyzing: {
+        title: `สถานะ 3: Analyzing — การคัดกรองและตัดสินใจ (Triage)`,
+        desc: `ผู้พัฒนาตรวจสอบว่าข้อบกพร่องนี้เป็น (ก) Duplicate ซ้ำกับใบแจ้งเดิม, (ข) Not a defect / Rejected, (ค) Real defect ที่ต้องแก้ทันที, หรือ (ง) Postponed เลื่อนไป Sprint หน้า`
+      },
+      working: {
+        title: `สถานะ 4: Working — การลงมือแก้ไขและเขียน Regression Test`,
+        desc: `นักพัฒนาสร้าง Branch แก้ไขโค้ด บันทึกไฟล์ที่เปลี่ยนแปลง และเขียน Unit Test ใหม่เพื่อป้องกันบั๊กเดิมกลับมาซ้ำอีก`
+      },
+      resolved: {
+        title: `สถานะ 5: Resolved — แก้ไขเสร็จสิ้น รอการทบทวนโค้ด`,
+        desc: `นักพัฒนาทำเครื่องหมายว่าแก้เสร็จแล้วและเปิด Pull Request เพื่อให้เพื่อนร่วมทีมหรือ Moderator ทำ Code Review / Inspection`
+      },
+      approved: {
+        title: `สถานะ 6: Approved — ผ่านการตรวจสอบโค้ด (Code Review Passed)`,
+        desc: `ผู้ตรวจสอบยืนยันว่าวิธีแก้ถูกต้องตามมาตรฐานและไม่สร้างผลข้างเคียง จึงอนุมัติให้นำเข้าสู่คิวการรวมระบบ`
+      },
+      integrated: {
+        title: `สถานะ 7: Integrated — รวมเข้าสู่ Baseline และทดสอบ Integration`,
+        desc: `โค้ดที่แก้ถูก Merge เข้า Baseline ถัดไปและผ่านการทดสอบระดับ Integration Testing เรียบร้อยแล้ว`
+      },
+      closed: {
+        title: `สถานะ 8: Closed — ปิดงานอย่างสมบูรณ์`,
+        desc: `QA ยืนยันผลบนระบบจริงหรือ Staging และปิด Defect Report อย่างเป็นทางการ พร้อมเก็บ Metrics เวลาที่ใช้ในการแก้ไขเพื่อวางแผนในอนาคต`
+      }
+    };
+
+    function selectDefectState(stateKey, btnEl) {
+      const info = DEFECT_STATES[stateKey];
+      if (!info) return;
+      const nodes = document.querySelectorAll(`.lifecycle-node`);
+      nodes.forEach(function(n) { n.classList.remove(`active`); });
+      if (btnEl) btnEl.classList.add(`active`);
+
+      const detailBox = document.getElementById(`defect-state-detail`);
+      if (detailBox) {
+        detailBox.innerHTML = `<div class="callout-title">${info.title}</div><p>${info.desc}</p>`;
+      }
+    }
+
+    // =========================================================================
+    // LAB 2.2: KANBAN BOARD & WIP LIMIT SIMULATOR
+    // =========================================================================
+    const INITIAL_KANBAN_TASKS = [
+      { id: `US-12`, title: `API สมัครสมาชิก + Email Validation`, type: `story`, col: `todo` },
+      { id: `BUG-04`, title: `[Severe] Session หลุดเมื่อรีเฟรชหน้า`, type: `bug`, col: `doing` },
+      { id: `US-14`, title: `หน้าตารางสรุปยอดรายเดือน`, type: `story`, col: `doing` },
+      { id: `US-09`, title: `Export รายงาน PDF ภาษาไทย`, type: `story`, col: `review` },
+      { id: `US-05`, title: `เชื่อมต่อระบบยืนยันตัวตน OAuth`, type: `story`, col: `done` }
+    ];
+
+    const KANBAN_COLS = [
+      { key: `todo`, label: `Sprint ToDo`, limit: null },
+      { key: `doing`, label: `In Progress`, limit: 2 },
+      { key: `review`, label: `Review / QA`, limit: 2 },
+      { key: `done`, label: `Done`, limit: null }
+    ];
+
+    let kanbanTasks = JSON.parse(JSON.stringify(INITIAL_KANBAN_TASKS));
+
+    function renderKanbanBoard() {
+      const container = document.getElementById(`kanban-board-container`);
+      if (!container) return;
+
+      let html = ``;
+      KANBAN_COLS.forEach(function(col, colIdx) {
+        const colTasks = kanbanTasks.filter(function(t) { return t.col === col.key; });
+        const atLimit = col.limit !== null && colTasks.length >= col.limit;
+        const limitText = col.limit !== null ? `${colTasks.length}/${col.limit}` : `${colTasks.length}`;
+
+        html += `<div class="kanban-col ${atLimit ? `at-limit` : ``}">`;
+        html += `<div class="kanban-col-head"><span>${col.label}</span><span class="wip-pill">WIP: ${limitText}</span></div>`;
+
+        colTasks.forEach(function(task) {
+          const prevKey = colIdx > 0 ? KANBAN_COLS[colIdx - 1].key : null;
+          const nextKey = colIdx < KANBAN_COLS.length - 1 ? KANBAN_COLS[colIdx + 1].key : null;
+
+          html += `<div class="kanban-card ${task.type === `bug` ? `bug` : ``}">`;
+          html += `<span class="kanban-card-id">${task.id} • ${task.type === `bug` ? `BUG` : `STORY`}</span>`;
+          html += `<span class="kanban-card-title">${task.title}</span>`;
+          html += `<div class="kanban-card-actions">`;
+          if (prevKey) {
+            html += `<button type="button" class="mini-btn" onclick="moveKanbanTask('${task.id}', '${prevKey}')">&#8592; ย้อน</button>`;
+          }
+          if (nextKey) {
+            html += `<button type="button" class="mini-btn" onclick="moveKanbanTask('${task.id}', '${nextKey}')">ถัดไป &#8594;</button>`;
+          }
+          html += `</div></div>`;
+        });
+
+        html += `</div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function moveKanbanTask(taskId, targetColKey) {
+      const task = kanbanTasks.find(function(t) { return t.id === taskId; });
+      const targetCol = KANBAN_COLS.find(function(c) { return c.key === targetColKey; });
+      const statusEl = document.getElementById(`kanban-status-msg`);
+      if (!task || !targetCol) return;
+
+      const currentInTarget = kanbanTasks.filter(function(t) { return t.col === targetColKey; }).length;
+      if (targetCol.limit !== null && currentInTarget >= targetCol.limit) {
+        if (statusEl) {
+          statusEl.className = `inline-status-msg warn`;
+          statusEl.textContent = `WIP Limit Blocked! คอลัมน์ "${targetCol.label}" เต็มเพดาน (${currentInTarget}/${targetCol.limit}) ตามหลัก Kanban Pull System ห้ามดึงงานเพิ่ม — กรุณาช่วยเคลียร์งานใน "${targetCol.label}" ก่อน!`;
+        }
+        return;
+      }
+
+      task.col = targetColKey;
+      if (statusEl) {
+        statusEl.className = `inline-status-msg`;
+        statusEl.textContent = `ย้าย ${task.id} ไปยัง "${targetCol.label}" สำเร็จ — การไหลของงาน (Flow) ยังคล่องตัว`;
+      }
+      renderKanbanBoard();
+    }
+
+    function resetKanbanBoard() {
+      kanbanTasks = JSON.parse(JSON.stringify(INITIAL_KANBAN_TASKS));
+      const statusEl = document.getElementById(`kanban-status-msg`);
+      if (statusEl) {
+        statusEl.className = `inline-status-msg`;
+        statusEl.textContent = `รีเซ็ตกระดานเรียบร้อย: สังเกตว่าคอลัมน์ In Progress เต็มเพดาน WIP 2/2 อยู่แล้ว`;
+      }
+      renderKanbanBoard();
+    }
+
+    // =========================================================================
+    // LAB 3.1: BRANCHING WORKFLOW VISUALIZER (SVG)
+    // =========================================================================
+    function switchBranchWorkflow(mode) {
+      currentAppState.activeBranchWorkflow = mode;
+      const btnGh = document.getElementById(`btn-wf-github`);
+      const btnGf = document.getElementById(`btn-wf-gitflow`);
+      const svgBox = document.getElementById(`branch-svg-container`);
+      const descBox = document.getElementById(`branch-desc-box`);
+
+      if (btnGh) btnGh.classList.toggle(`active`, mode === `github`);
+      if (btnGf) btnGf.classList.toggle(`active`, mode === `gitflow`);
+
+      if (mode === `github`) {
+        if (svgBox) {
+          svgBox.innerHTML = `
+            <svg viewBox="0 0 760 210" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <line x1="60" y1="60" x2="700" y2="60" stroke="#0284c7" stroke-width="4"/>
+              <path d="M 160 60 C 190 60, 190 140, 220 140 L 460 140 C 490 140, 490 60, 520 60" fill="none" stroke="#6d28d9" stroke-width="3.5"/>
+              <circle cx="80" cy="60" r="9" fill="#0284c7"/>
+              <circle cx="160" cy="60" r="9" fill="#0284c7"/>
+              <circle cx="240" cy="140" r="8" fill="#6d28d9"/>
+              <circle cx="340" cy="140" r="8" fill="#6d28d9"/>
+              <circle cx="440" cy="140" r="8" fill="#6d28d9"/>
+              <circle cx="520" cy="60" r="10" fill="#15803d"/>
+              <circle cx="640" cy="60" r="9" fill="#0284c7"/>
+              <text x="60" y="34" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600" fill="#0f172a">main (Always Deployable)</text>
+              <text x="220" y="175" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600" fill="#6d28d9">feature/us01-login</text>
+              <text x="485" y="34" font-family="Kanit, sans-serif" font-size="12" font-weight="600" fill="#15803d">PR Approved + CI Pass -&gt; Merge &amp; Deploy</text>
+              <text x="612" y="90" font-family="IBM Plex Mono, monospace" font-size="11" fill="#475569">v1.1.0</text>
+            </svg>
+          `;
+        }
+        if (descBox) {
+          descBox.innerHTML = `<div class="callout-title">GitHub Flow: เรียบง่าย คล่องตัว สำหรับ Web Apps &amp; Continuous Delivery</div><p>มี Branch ถาวรเพียงเส้นเดียวคือ <strong>main</strong> ซึ่งต้องพร้อม Deploy เสมอ งานใหม่ทุกชิ้นแตกออกเป็น <span class="inline-code">feature/*</span> เมื่อเสร็จให้เปิด Pull Request เพื่อทำ Peer Code Review และรอ CI ผ่าน จึง Merge เข้า main แล้วปล่อยขึ้นระบบทันที เหมาะกับทีม Senior Project 4–6 คน</p>`;
+        }
+      } else {
+        if (svgBox) {
+          svgBox.innerHTML = `
+            <svg viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <line x1="50" y1="45" x2="710" y2="45" stroke="#0284c7" stroke-width="4"/>
+              <line x1="120" y1="125" x2="710" y2="125" stroke="#0d9488" stroke-width="3.5"/>
+              <path d="M 150 125 C 175 125, 175 215, 200 215 L 360 215 C 385 215, 385 125, 410 125" fill="none" stroke="#6d28d9" stroke-width="3"/>
+              <path d="M 430 125 C 455 125, 455 170, 480 170 L 560 170 C 585 170, 585 45, 610 45" fill="none" stroke="#b45309" stroke-width="3"/>
+              <path d="M 250 45 C 270 45, 270 85, 290 85 L 340 85 C 360 85, 360 45, 380 45" fill="none" stroke="#b91c1c" stroke-width="3"/>
+              <circle cx="80" cy="45" r="8" fill="#0284c7"/>
+              <circle cx="380" cy="45" r="9" fill="#b91c1c"/>
+              <circle cx="610" cy="45" r="9" fill="#15803d"/>
+              <circle cx="150" cy="125" r="7" fill="#0d9488"/>
+              <circle cx="410" cy="125" r="7" fill="#0d9488"/>
+              <circle cx="280" cy="215" r="7" fill="#6d28d9"/>
+              <circle cx="520" cy="170" r="7" fill="#b45309"/>
+              <text x="50" y="25" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="#0284c7">main (Production Releases)</text>
+              <text x="275" y="102" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#b91c1c">hotfix/v1.0.1</text>
+              <text x="50" y="114" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="#0d9488">develop</text>
+              <text x="465" y="192" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#b45309">release/v1.1</text>
+              <text x="220" y="240" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="#6d28d9">feature/* (Integrated to develop)</text>
+            </svg>
+          `;
+        }
+        if (descBox) {
+          descBox.innerHTML = `<div class="callout-title">Gitflow: โครงสร้างเข้มงวดสำหรับระบบที่มีรอบ Release และบำรุงรักษาหลายเวอร์ชัน</div><p>แยก Branch ถาวรเป็น <strong>main</strong> (เฉพาะโค้ดที่ปล่อยใช้งานจริง) และ <strong>develop</strong> (จุดรวมงานระหว่างพัฒนา) เสริมด้วย <span class="inline-code">feature/*</span>, <span class="inline-code">release/*</span> (สำหรับเทสต์และแก้บั๊กก่อนปล่อย) และ <span class="inline-code">hotfix/*</span> (แก้บั๊กเร่งด่วนจาก main แล้ว Merge กลับทั้ง main และ develop) เหมาะกับซอฟต์แวร์แพ็กเกจ ระบบองค์กร หรือแอปมือถือ</p>`;
+        }
+      }
+      savePersistedState();
+    }
+
+    // =========================================================================
+    // LAB 4.1: CHART.JS METRICS & COMPLEXITY CALCULATOR
+    // =========================================================================
+    function renderMetricsChart(mode) {
+      currentAppState.activeChartMode = mode;
+      const canvas = document.getElementById(`metrics-canvas`);
+      const insightEl = document.getElementById(`chart-insight-box`);
+      if (!canvas || typeof Chart === `undefined`) return;
+
+      const btnBd = document.getElementById(`btn-chart-burndown`);
+      const btnCfd = document.getElementById(`btn-chart-cfd`);
+      const btnVel = document.getElementById(`btn-chart-velocity`);
+      if (btnBd) btnBd.className = mode === `burndown` ? `btn primary` : `btn`;
+      if (btnCfd) btnCfd.className = mode === `cfd` ? `btn primary` : `btn`;
+      if (btnVel) btnVel.className = mode === `velocity` ? `btn primary` : `btn`;
+
+      if (metricsChartInstance) {
+        metricsChartInstance.destroy();
+        metricsChartInstance = null;
+      }
+
+      const ctx = canvas.getContext(`2d`);
+      if (!ctx) return;
+
+      if (mode === `burndown`) {
+        metricsChartInstance = new Chart(ctx, {
+          type: `line`,
+          data: {
+            labels: [`Day 1`, `Day 2`, `Day 3`, `Day 4`, `Day 5`, `Day 6`, `Day 7`, `Day 8`, `Day 9`, `Day 10`],
+            datasets: [
+              {
+                label: `Ideal Remaining Points`,
+                data: [40, 36, 32, 28, 24, 20, 16, 12, 8, 0],
+                borderColor: `#94a3b8`,
+                borderDash: [6, 4],
+                borderWidth: 2,
+                tension: 0
+              },
+              {
+                label: `Actual Remaining Points`,
+                data: [40, 38, 33, 28, 31, 27, 19, 13, 6, 0],
+                borderColor: `#0284c7`,
+                backgroundColor: `rgba(2, 132, 199, 0.1)`,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.2
+              },
+              {
+                label: `Completed Points (Burn-up)`,
+                data: [0, 2, 7, 12, 14, 18, 26, 32, 39, 45],
+                borderColor: `#6d28d9`,
+                borderWidth: 2.5,
+                tension: 0.2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: `top` } },
+            scales: { y: { beginAtZero: true, title: { display: true, text: `Story Points` } } }
+          }
+        });
+        if (insightEl) {
+          insightEl.textContent = `กราฟ Burn-down & Burn-up: สังเกตวันที่ 5 ที่เส้นสีน้ำเงินดีดตัวขึ้น (Scope เพิ่ม +5 pts) ขณะที่เส้น Burn-up สีม่วงชี้ให้เห็นว่าทีมยังคงส่งมอบงานต่อเนื่องได้จริง`;
+        }
+      } else if (mode === `cfd`) {
+        metricsChartInstance = new Chart(ctx, {
+          type: `line`,
+          data: {
+            labels: [`Day 1`, `Day 2`, `Day 3`, `Day 4`, `Day 5`, `Day 6`, `Day 7`, `Day 8`, `Day 9`, `Day 10`],
+            datasets: [
+              { label: `Done`, data: [0, 2, 4, 6, 8, 10, 14, 18, 21, 24], backgroundColor: `rgba(21, 128, 61, 0.35)`, borderColor: `#15803d`, fill: true },
+              { label: `In Review / QA (Bottleneck!)`, data: [1, 2, 4, 7, 9, 10, 8, 5, 3, 1], backgroundColor: `rgba(180, 83, 9, 0.35)`, borderColor: `#b45309`, fill: true },
+              { label: `In Progress`, data: [5, 7, 8, 6, 5, 4, 3, 2, 1, 0], backgroundColor: `rgba(2, 132, 199, 0.3)`, borderColor: `#0284c7`, fill: true },
+              { label: `ToDo`, data: [18, 13, 8, 5, 3, 1, 0, 0, 0, 0], backgroundColor: `rgba(148, 163, 184, 0.25)`, borderColor: `#64748b`, fill: true }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: `top` } },
+            scales: { y: { stacked: true, beginAtZero: true, title: { display: true, text: `Cumulative Tasks` } } }
+          }
+        });
+        if (insightEl) {
+          insightEl.textContent = `Cumulative Flow Diagram (CFD): แถบสีส้ม (In Review / QA) ขยายตัวหนาในช่วงวันที่ 4–6 แสดงถึงคอขวดในการตรวจ PR ก่อนลดลงเมื่อทีมนำ WIP Limit มาช่วย`;
+        }
+      } else {
+        metricsChartInstance = new Chart(ctx, {
+          type: `bar`,
+          data: {
+            labels: [`Sprint 1`, `Sprint 2`, `Sprint 3`, `Sprint 4`, `Sprint 5`],
+            datasets: [
+              { label: `Committed Points`, data: [30, 32, 35, 34, 38], backgroundColor: `#cbd5e1` },
+              { label: `Completed Velocity`, data: [22, 29, 33, 34, 37], backgroundColor: `#0284c7` }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: `top` } },
+            scales: { y: { beginAtZero: true, title: { display: true, text: `Story Points` } } }
+          }
+        });
+        if (insightEl) {
+          insightEl.textContent = `Multi-Sprint Velocity Trend: ตามหลัก Dooley & Kazakova Ch. 2 ค่า Velocity ของทีมจะนิ่งและแม่นยำขึ้นตั้งแต่ Sprint 3 เป็นต้นไปหลังทีมเรียนรู้กำลังผลิตจริงผ่าน Retrospective`;
+        }
+      }
+      savePersistedState();
+    }
+
+    function calcQualityMetrics() {
+      const edgesEl = document.getElementById(`cc-edges`);
+      const nodesEl = document.getElementById(`cc-nodes`);
+      const defEl = document.getElementById(`dd-defects`);
+      const klocEl = document.getElementById(`dd-kloc`);
+
+      const e = parseInt(edgesEl ? edgesEl.value : `14`, 10) || 1;
+      const n = parseInt(nodesEl ? nodesEl.value : `11`, 10) || 1;
+      const defects = Math.max(0, parseFloat(defEl ? defEl.value : `6`) || 0);
+      const kloc = Math.max(0.1, parseFloat(klocEl ? klocEl.value : `2.5`) || 0.1);
+
+      const vg = Math.max(1, e - n + 2);
+      const dd = (defects / kloc).toFixed(2);
+
+      const outVg = document.getElementById(`out-vg`);
+      const outRisk = document.getElementById(`out-vg-risk`);
+      const outDd = document.getElementById(`out-dd`);
+
+      if (outVg) outVg.textContent = String(vg);
+      if (outDd) outDd.textContent = String(dd);
+      if (outRisk) {
+        if (vg <= 10) {
+          outRisk.textContent = `Low (Simple / Testable)`;
+          outRisk.style.color = `var(--positive)`;
+        } else if (vg <= 20) {
+          outRisk.textContent = `Moderate (Needs Unit Tests)`;
+          outRisk.style.color = `var(--warning)`;
+        } else {
+          outRisk.textContent = `High Risk (Refactor Now!)`;
+          outRisk.style.color = `var(--error)`;
+        }
+      }
+    }
+
+    // =========================================================================
+    // SECTION 5: WORKSHOP 5 CHECKLIST & PERSISTENCE
+    // =========================================================================
+    function renderWorkshopProgress() {
+      let doneCount = 0;
+      for (let i = 1; i <= 5; i++) {
+        const checked = Boolean(currentAppState.workshopSteps[i]);
+        if (checked) doneCount++;
+        const chk = document.getElementById(`chk-step-${i}`);
+        if (chk) chk.checked = checked;
+      }
+
+      const pct = Math.round((doneCount / 5) * 100);
+      const lbl = document.getElementById(`ws-progress-label`);
+      const fill = document.getElementById(`ws-progress-fill`);
+      const wrap = document.getElementById(`ws-progress-bar-wrap`);
+      const banner = document.getElementById(`ws-status-banner`);
+
+      if (lbl) lbl.textContent = `${doneCount} / 5 STEPS COMPLETED (${pct}%)`;
+      if (fill) fill.style.width = `${pct}%`;
+      if (wrap) wrap.setAttribute(`aria-valuenow`, String(pct));
+      if (banner) {
+        if (doneCount === 5) {
+          banner.textContent = `ยอดเยี่ยม! ทีมของคุณตั้งค่าโครงสร้างพื้นฐาน Software House และจำลอง Feature Sprint ครบทั้ง 5 ขั้นตอนแล้ว พร้อมสำหรับ Senior Project เต็มรูปแบบ`;
+        } else if (doneCount > 0) {
+          banner.textContent = `ดำเนินการแล้ว ${doneCount} จาก 5 ขั้นตอน (${pct}%) — สถานะถูกบันทึกไว้ในระบบเรียบร้อย`;
+        } else {
+          banner.textContent = `เริ่มต้นติ๊กทำเครื่องหมายเมื่อทีมของคุณดำเนินการแต่ละ Step เสร็จสิ้น ระบบจะบันทึกสถานะให้อัตโนมัติ`;
+        }
+      }
+    }
+
+    function toggleWorkshopStep(stepNum, isChecked) {
+      currentAppState.workshopSteps[stepNum] = Boolean(isChecked);
+      renderWorkshopProgress();
+      savePersistedState();
+    }
+
+    function resetWorkshopProgress(btn) {
+      if (btn && btn.dataset.armed !== `true`) {
+        btn.dataset.armed = `true`;
+        btn.textContent = `กดอีกครั้งเพื่อยืนยันการล้างสถานะ`;
+        setTimeout(function() {
+          if (btn.dataset.armed === `true`) {
+            btn.dataset.armed = `false`;
+            btn.textContent = `ล้างสถานะการเช็กทั้งหมด`;
+          }
+        }, 4000);
+        return;
+      }
+      if (btn) {
+        btn.dataset.armed = `false`;
+        btn.textContent = `ล้างสถานะการเช็กทั้งหมด`;
+      }
+      for (let i = 1; i <= 5; i++) {
+        currentAppState.workshopSteps[i] = false;
+      }
+      renderWorkshopProgress();
+      savePersistedState();
+    }
+
+    function exportWorkshopSummary() {
+      const lines = [
+        `Workshop 5: Software House Project Kickoff Readiness Report`,
+        `==========================================================`,
+        `1. GitHub Organization & Central Repo: ${currentAppState.workshopSteps[1] ? `[DONE]` : `[PENDING]`}`,
+        `2. Branch Protection Rules & PR Templates: ${currentAppState.workshopSteps[2] ? `[DONE]` : `[PENDING]`}`,
+        `3. GitHub Projects Board, Swimlanes & WIP: ${currentAppState.workshopSteps[3] ? `[DONE]` : `[PENDING]`}`,
+        `4. User Stories -> Issues & Milestones: ${currentAppState.workshopSteps[4] ? `[DONE]` : `[PENDING]`}`,
+        `5. Feature Sprint Simulation (PR + CI + Merge): ${currentAppState.workshopSteps[5] ? `[DONE]` : `[PENDING]`}`,
+        ``,
+        `Configured Core Team Size: ${currentAppState.teamSize} members`
+      ];
+      const textContent = lines.join(`\n`);
+
+      if (window.notebookAppApi && typeof window.notebookAppApi.triggerFileDownload === `function`) {
+        window.notebookAppApi.triggerFileDownload({
+          content: textContent,
+          contentType: `text/plain`,
+          encoding: `UTF-8`,
+          filename: `workshop5-readiness.txt`
+        });
+      } else {
+        const blob = new Blob([textContent], { type: `text/plain;charset=utf-8` });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement(`a`);
+        a.href = url;
+        a.download = `workshop5-readiness.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    // =========================================================================
+    // UTILITY: COPY CODE BLOCK
+    // =========================================================================
+    function copyCodeBlock(btnEl) {
+      if (!btnEl) return;
+      const block = btnEl.closest(`.code-block`);
+      if (!block) return;
+      const pre = block.querySelector(`pre`);
+      if (!pre) return;
+      const text = pre.textContent || ``;
+
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === `function`) {
+        navigator.clipboard.writeText(text).then(function() {
+          const orig = btnEl.textContent;
+          btnEl.textContent = `คัดลอกแล้ว!`;
+          setTimeout(function() { btnEl.textContent = orig; }, 1600);
+        }).catch(function() {});
+      }
+    }
+
+    // =========================================================================
+    // BOOTSTRAP
+    // =========================================================================
+    document.addEventListener(`DOMContentLoaded`, async function() {
+      await loadPersistedState();
+
+      const slider = document.getElementById(`team-size-slider`);
+      const num = document.getElementById(`team-size-number`);
+      if (slider) slider.value = String(currentAppState.teamSize);
+      if (num) num.value = String(currentAppState.teamSize);
+
+      updateTeamMetrics(currentAppState.teamSize);
+      renderKanbanBoard();
+      switchBranchWorkflow(currentAppState.activeBranchWorkflow || `github`);
+      renderMetricsChart(currentAppState.activeChartMode || `burndown`);
+      calcQualityMetrics();
+      renderWorkshopProgress();
+
+      if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === `function`) {
+        window.notebookAppApi.notifyAppReady();
+      }
+    });
+  </script>
+</body>
+</html>
