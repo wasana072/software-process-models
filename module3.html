@@ -1,0 +1,2706 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="narrative">
+  <meta name="design-style" content="briefing">
+  <title>บทที่ 3: โมเดลกระบวนการพัฒนาซอฟต์แวร์แบบทำซ้ำและเพิ่มเติมทีละส่วน — วิศวกรรมซอฟต์แวร์</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Serif+Thai:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* 1. Briefing style tokens */
+      --background: #faf9f5;
+      --surface-container-low: #ffffff;
+      --surface-container: #f1efe8;
+      --surface-container-high: #e6e2d6;
+
+      --on-surface: #17181a;
+      --on-surface-variant: #56585c;
+
+      --outline: #17181a;
+      --outline-variant: #dedad0;
+      --border-muted: #c8c4b8;
+
+      --primary: #17181a;
+      --on-primary: #faf9f5;
+      --primary-container: #f2b705;
+      --on-primary-container: #17181a;
+      --secondary: #1f4e5f;
+      --secondary-soft: #e8f0f3;
+      --tertiary: #785008;
+      --tag-gold-bg: #f5e6c4;
+      --error: #b42318;
+      --error-soft: #fbeae8;
+      --on-error: #ffffff;
+
+      --data-1: #1f4e5f;
+      --data-2: #d99000;
+      --data-3: #2b6e52;
+      --data-4: #b84a39;
+      --data-context: #c4bfb2;
+
+      /* 2. Non-Latin (Thai) font overrides listed first */
+      --font-headline: 'Noto Serif Thai', 'Source Serif 4', serif;
+      --font-body: 'Noto Sans Thai', 'Plus Jakarta Sans', sans-serif;
+      --font-label: 'Noto Sans Thai', 'Geist Mono', monospace;
+      --font-mono-en: 'Geist Mono', 'Noto Sans Thai', monospace;
+
+      --rounded: 0.25rem;
+      --rounded-lg: 0.375rem;
+      --rounded-full: 0.25rem;
+
+      --section-rule: 1.5px solid var(--outline);
+      --card-border: 1px solid var(--outline-variant);
+      --card-border-strong: 1px solid var(--border-muted);
+      --badge-radius: 2px;
+      --heading-tracking: 0;
+      --label-tracking: 0.08em;
+
+      /* 3. Shared tokens */
+      --positive: #2b6e52;
+      --positive-soft: #e7f3ed;
+      --warning: #d99000;
+      --warning-soft: #fdf4e3;
+      --focus: #1f4e5f;
+
+      /* Type scale (Narrative) */
+      --display-size: clamp(2.1rem, 1.4rem + 2.4vw, 3.25rem);
+      --headline-size: clamp(1.5rem, 1.15rem + 1.3vw, 2.15rem);
+      --subhead-size: clamp(1.15rem, 1.05rem + 0.45vw, 1.375rem);
+      --body-size: clamp(1.025rem, 0.98rem + 0.2vw, 1.125rem);
+      --label-size: 0.78rem;
+
+      /* Spacing scale */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.72;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+    button, input, select, textarea { font-family: inherit; }
+
+    .page-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-xl);
+      padding: var(--space-lg);
+      max-width: 1120px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Focus states */
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    /* Briefing Defining Treatments */
+    .dossier-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      border-bottom: var(--section-rule);
+      padding-bottom: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    .dossier-bar-left {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .dossier-pill {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      font-family: var(--font-mono-en);
+      font-weight: 700;
+      font-size: 0.72rem;
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      padding: 0.22rem 0.6rem;
+      border-radius: var(--badge-radius);
+      display: inline-block;
+    }
+    .dossier-meta {
+      font-family: var(--font-mono-en);
+      font-size: 0.74rem;
+      font-weight: 500;
+      color: var(--on-surface-variant);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .title {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: var(--display-size);
+      line-height: 1.24;
+      color: var(--on-surface);
+      margin: var(--space-sm) 0 var(--space-md) 0;
+    }
+    .section-title {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: var(--headline-size);
+      line-height: 1.3;
+      color: var(--on-surface);
+      margin: 0 0 var(--space-sm) 0;
+    }
+    .subhead {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: var(--subhead-size);
+      line-height: 1.4;
+      color: var(--on-surface);
+      margin: var(--space-lg) 0 var(--space-sm) 0;
+    }
+    .standfirst {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+      line-height: 1.6;
+      color: var(--secondary);
+      margin: 0 0 var(--space-lg) 0;
+      max-width: 72ch;
+    }
+    .prose {
+      max-width: 70ch;
+      margin: 0 0 var(--space-md) 0;
+      color: var(--on-surface);
+    }
+    .prose-wide {
+      margin: 0 0 var(--space-md) 0;
+      color: var(--on-surface);
+    }
+
+    .figure-card {
+      background: var(--surface-container-low);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+    }
+    .figure-card-tight {
+      background: var(--surface-container-low);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md) var(--space-lg);
+    }
+    .figure-card .value {
+      font-family: var(--font-mono-en);
+      font-weight: 600;
+      font-size: 1.75rem;
+      line-height: 1.15;
+      color: var(--on-surface);
+      font-variant-numeric: tabular-nums;
+      margin: var(--space-xs) 0;
+    }
+    .index-num {
+      font-family: var(--font-mono-en);
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: var(--secondary);
+      letter-spacing: 0.06em;
+      display: inline-block;
+    }
+    .aside-box {
+      background: var(--surface-container);
+      border-top: var(--section-rule);
+      padding: var(--space-lg);
+      border-radius: 0 0 var(--rounded-lg) var(--rounded-lg);
+    }
+
+    /* Tags & Chips */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      background: var(--tag-gold-bg);
+      color: var(--tertiary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--rounded);
+    }
+    .chip-slate {
+      background: var(--secondary-soft);
+      color: var(--secondary);
+    }
+    .chip-positive {
+      background: var(--positive-soft);
+      color: var(--positive);
+    }
+    .chip-error {
+      background: var(--error-soft);
+      color: var(--error);
+    }
+    .en-term {
+      font-family: var(--font-mono-en);
+      font-size: 0.88em;
+      color: var(--secondary);
+      font-weight: 500;
+    }
+
+    /* Layout Grids */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+    .two-col-asym {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+    .two-col-equal {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-lg);
+      align-items: stretch;
+    }
+    .three-col-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+      gap: var(--space-sm);
+    }
+
+    /* Interactive Controls & Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: 0.55rem 1.1rem;
+      border-radius: var(--rounded);
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      text-decoration: none;
+      transition: background-color var(--dur-micro) var(--ease-out),
+                  color var(--dur-micro) var(--ease-out),
+                  box-shadow var(--dur-micro) var(--ease-out),
+                  transform var(--dur-micro) var(--ease-out);
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--secondary);
+      border-color: var(--secondary);
+    }
+    .btn-secondary {
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      border: var(--card-border-strong);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--surface-container);
+    }
+    .btn-secondary.is-active {
+      background: var(--secondary);
+      color: var(--on-primary);
+      border-color: var(--secondary);
+    }
+    .btn-gold {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border-color: var(--primary-container);
+    }
+    .btn-gold:hover:not(:disabled) {
+      background: var(--warning);
+    }
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+    }
+
+    /* Form elements */
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .field-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+    .field-input, .field-select, .field-textarea {
+      min-height: 44px;
+      padding: 0.5rem 0.75rem;
+      background: var(--surface-container-low);
+      border: var(--card-border-strong);
+      border-radius: var(--rounded);
+      color: var(--on-surface);
+      font-size: 0.95rem;
+      transition: box-shadow var(--dur-micro) var(--ease-out),
+                  background-color var(--dur-micro) var(--ease-out);
+    }
+    .field-select {
+      padding-right: 2rem;
+    }
+    .field-textarea {
+      min-height: 88px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+    .field-input:focus-visible, .field-select:focus-visible, .field-textarea:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--secondary);
+    }
+
+    /* Navigation links inside TOC */
+    .toc-link {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--surface-container-low);
+      border: var(--card-border);
+      border-radius: var(--rounded);
+      color: var(--on-surface);
+      text-decoration: none;
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+    .toc-link:hover {
+      background: var(--surface-container-high);
+    }
+    .toc-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      display: block;
+    }
+    .toc-sub {
+      font-size: 0.82rem;
+      color: var(--on-surface-variant);
+      display: block;
+    }
+
+    /* Tables */
+    .table-scroll {
+      overflow-x: auto;
+      background: var(--surface-container-low);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+    }
+    .briefing-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      text-align: left;
+    }
+    .briefing-table thead th {
+      font-family: var(--font-label);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--on-surface);
+      padding: var(--space-md) var(--space-md);
+      border-bottom: var(--section-rule);
+      background: var(--surface-container);
+      vertical-align: bottom;
+    }
+    .briefing-table tbody td {
+      padding: var(--space-md);
+      border-bottom: var(--card-border);
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    .briefing-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .briefing-table tbody tr:hover td {
+      background: var(--background);
+    }
+
+    /* Academic Callouts & Pull Quotes */
+    .callout-rule {
+      border-left: 4px solid var(--secondary);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--surface-container-low);
+      margin: var(--space-md) 0;
+    }
+    .callout-warning {
+      border-left: 4px solid var(--data-2);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--warning-soft);
+      margin: var(--space-md) 0;
+    }
+    .callout-danger {
+      border-left: 4px solid var(--error);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--error-soft);
+      margin: var(--space-md) 0;
+    }
+    .callout-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--on-surface);
+      margin-bottom: var(--space-xs);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    /* Ordered / Bulleted academic lists */
+    .academic-list {
+      margin: var(--space-sm) 0 var(--space-md) 0;
+      padding-left: 1.35rem;
+      max-width: 70ch;
+    }
+    .academic-list li {
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Interactive SVG diagrams */
+    .svg-stage {
+      width: 100%;
+      background: var(--surface-container-low);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md);
+    }
+    .svg-stage svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .spiral-node {
+      cursor: pointer;
+      transition: opacity var(--dur-micro) var(--ease-out);
+    }
+    .spiral-node:hover {
+      opacity: 0.85;
+    }
+    .spiral-ring {
+      fill: none;
+      stroke-linecap: round;
+      cursor: pointer;
+      transition: stroke-width var(--dur-micro) var(--ease-out), opacity var(--dur-micro) var(--ease-out);
+    }
+
+    /* Progress bar */
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: var(--surface-container-high);
+      border-radius: var(--rounded);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--secondary);
+      transition: width var(--dur-short) var(--ease-out);
+    }
+
+    /* Checklist & Quiz styles */
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      border: var(--card-border);
+      border-radius: var(--rounded);
+      background: var(--surface-container-low);
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+    .check-item:hover {
+      background: var(--surface-container);
+    }
+    .check-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: var(--secondary);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .quiz-option {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      width: 100%;
+      text-align: left;
+      padding: var(--space-sm) var(--space-md);
+      min-height: 44px;
+      background: var(--surface-container-low);
+      border: var(--card-border-strong);
+      border-radius: var(--rounded);
+      cursor: pointer;
+      color: var(--on-surface);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      transition: background-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+    }
+    .quiz-option:hover:not(:disabled) {
+      background: var(--surface-container);
+    }
+    .quiz-option.selected-correct {
+      background: var(--positive-soft);
+      box-shadow: inset 4px 0 0 var(--positive);
+    }
+    .quiz-option.selected-wrong {
+      background: var(--error-soft);
+      box-shadow: inset 4px 0 0 var(--error);
+    }
+
+    /* Details / Collapsible */
+    details.deep-dive {
+      background: var(--surface-container);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md) var(--space-lg);
+      margin: var(--space-md) 0;
+    }
+    details.deep-dive summary {
+      font-weight: 700;
+      color: var(--secondary);
+      cursor: pointer;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    details.deep-dive[open] summary {
+      margin-bottom: var(--space-md);
+      border-bottom: var(--card-border);
+      padding-bottom: var(--space-sm);
+    }
+
+    /* Section spacing */
+    section.lecture-section {
+      padding-top: var(--space-xl);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    /* Chart wrapper */
+    .chart-box {
+      position: relative;
+      min-height: 310px;
+      width: 100%;
+    }
+
+    /* Status banner */
+    .status-toast {
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded);
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: none;
+    }
+    .status-toast.show {
+      display: block;
+    }
+    .status-toast.info {
+      background: var(--secondary-soft);
+      color: var(--secondary);
+    }
+    .status-toast.success {
+      background: var(--positive-soft);
+      color: var(--positive);
+    }
+
+    /* Responsive adaptations */
+    .card-wrapper { container-type: inline-size; }
+    @container (max-width: 520px) {
+      .two-col-equal { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 820px) {
+      .two-col-asym, .two-col-equal, .three-col-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 640px) {
+      .page-grid {
+        padding: var(--space-md);
+        gap: var(--space-lg);
+      }
+      .figure-card {
+        padding: var(--space-md);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-grid">
+
+    <!-- MASTHEAD / HEADER -->
+    <header>
+      <div class="dossier-bar">
+        <div class="dossier-bar-left">
+          <span class="dossier-pill">MODULE 03</span>
+          <span class="dossier-meta">SOFTWARE ENGINEERING LECTURE • UNDERGRADUATE CS/SE</span>
+        </div>
+        <span class="dossier-meta">SOMMERVILLE (2016) &amp; DOOLEY &amp; KAZAKOVA (2024)</span>
+      </div>
+
+      <h1 class="title">โมเดลกระบวนการพัฒนาซอฟต์แวร์แบบทำซ้ำและเพิ่มเติมทีละส่วน</h1>
+      <p class="standfirst">
+        Iterative &amp; Incremental Process Models: กลไกการลดความเสี่ยงจากความไม่แน่นอนของความต้องการ การสร้างต้นแบบเพื่อการค้นพบ การบริหารความเสี่ยงเชิงระบบด้วยโมเดลสไปรัล และการส่งมอบคุณค่าด้วย Minimum Viable Product และการปรับโครงสร้างโค้ด
+      </p>
+
+      <!-- 4 Key Figures / Scope Summary -->
+      <div class="card-grid" aria-label="ภาพรวมโครงสร้างบทเรียน">
+        <div class="figure-card-tight">
+          <span class="index-num">01 • REALITY OF CHANGE</span>
+          <div class="value">100%</div>
+          <p class="prose-wide" style="margin:0; font-size:0.9rem; color:var(--on-surface-variant);">
+            โครงการซอฟต์แวร์จริงเผชิญ <span class="en-term">Requirements Churn</span> เสมอ ทีมไม่เคยรู้ความต้องการทั้งหมดตั้งแต่วันแรก
+          </p>
+        </div>
+        <div class="figure-card-tight">
+          <span class="index-num">02 • PROTOTYPING MODES</span>
+          <div class="value">2 Modes</div>
+          <p class="prose-wide" style="margin:0; font-size:0.9rem; color:var(--on-surface-variant);">
+            <span class="en-term">Throwaway</span> เพื่อลดความไม่แน่นอนก่อนสร้างจริง กับ <span class="en-term">Evolutionary</span> ที่วิวัฒนาการสู่ระบบจริง
+          </p>
+        </div>
+        <div class="figure-card-tight">
+          <span class="index-num">03 • BOEHM'S SPIRAL</span>
+          <div class="value">4 Quadrants</div>
+          <p class="prose-wide" style="margin:0; font-size:0.9rem; color:var(--on-surface-variant);">
+            กำหนดเป้าหมาย ประเมินความเสี่ยง พัฒนาและทวนสอบ และวางแผนรอบถัดไปตามหลัก <span class="en-term">Risk-Driven</span>
+          </p>
+        </div>
+        <div class="figure-card-tight">
+          <span class="index-num">04 • VALUE &amp; QUALITY</span>
+          <div class="value">MVP + Refactor</div>
+          <p class="prose-wide" style="margin:0; font-size:0.9rem; color:var(--on-surface-variant);">
+            ส่งมอบคุณค่าที่ทดสอบสมบูรณ์ทุก 1–4 สัปดาห์ ควบคู่การป้องกันโครงสร้างโค้ดเสื่อมสลาย
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- LEARNING OBJECTIVES & READING PROGRESS -->
+    <aside class="aside-box" aria-label="วัตถุประสงค์การเรียนรู้และสารบัญบทเรียน">
+      <div class="two-col-asym">
+        <div>
+          <span class="index-num">LEARNING OBJECTIVES • วัตถุประสงค์การเรียนรู้</span>
+          <h2 class="subhead" style="margin-top:var(--space-xs);">สิ่งที่นิสิตจะสามารถวิเคราะห์และปฏิบัติได้หลังจบบทเรียนนี้</h2>
+          <ol class="academic-list" style="margin-bottom:0;">
+            <li><strong>จำแนกและประสานแนวคิด</strong>ระหว่างการพัฒนาแบบทำซ้ำ (<span class="en-term">Iterative</span>) และการเพิ่มเติมทีละส่วน (<span class="en-term">Incremental</span>) เพื่อลดความเสี่ยงจากการส่งมอบแบบรวมศูนย์ครั้งเดียว (<span class="en-term">Big Bang</span>)</li>
+            <li><strong>ออกแบบและเลือกใช้โมเดลต้นแบบ</strong>ระหว่าง <span class="en-term">Throwaway</span> และ <span class="en-term">Evolutionary Prototyping</span> พร้อมระบุข้อแลกเปลี่ยนด้านคุณภาพที่ไม่ใช่ฟังก์ชันและวงจรรับข้อเสนอแนะจากผู้ใช้</li>
+            <li><strong>ประยุกต์ใช้โมเดลสไปรัลของ Boehm</strong> ผ่านทั้ง 4 จตุภาค เพื่อจำแนก วิเคราะห์ และวางแผนจัดการความเสี่ยงด้านโครงการ ผลิตภัณฑ์ และธุรกิจ</li>
+            <li><strong>กำหนดกลยุทธ์รับมือความไม่แน่นอน</strong> โดยสมดุลระหว่างการคาดการณ์ล่วงหน้า (<span class="en-term">Change Anticipation</span>) กับการรองรับความเปลี่ยนแปลง (<span class="en-term">Change Tolerance</span>) การส่งมอบ <span class="en-term">MVP</span> และการปรับโครงสร้างโค้ด (<span class="en-term">Refactoring</span>)</li>
+            <li><strong>ตัดสินใจเลือกโมเดลกระบวนการ</strong>ที่เหมาะสมกับบริบทของระบบจริง (ระบบความปลอดภัยวิกฤต ระบบสารสนเทศองค์กร และระบบเว็บที่มีความผันผวนสูง)</li>
+          </ol>
+        </div>
+
+        <div class="figure-card-tight">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-xs);">
+            <span class="index-num">STUDY NAVIGATION &amp; PROGRESS</span>
+            <span id="overall-progress-label" class="dossier-meta">0% COMPLETED</span>
+          </div>
+          <div class="progress-track" style="margin-bottom:var(--space-md);">
+            <div id="overall-progress-bar" class="progress-fill" style="width:0%;"></div>
+          </div>
+          <nav aria-label="สารบัญเนื้อหาบทเรียน" class="toc-grid" style="grid-template-columns:1fr;">
+            <a href="#sec-1" class="toc-link">
+              <span class="index-num">01</span>
+              <span>
+                <span class="toc-title">การพัฒนาแบบทำซ้ำ vs. การเพิ่มเติมทีละส่วน</span>
+                <span class="toc-sub">นิยาม กลไกประสาน และการลดความเสี่ยง Big Bang</span>
+              </span>
+            </a>
+            <a href="#sec-2" class="toc-link">
+              <span class="index-num">02</span>
+              <span>
+                <span class="toc-title">โมเดลการสร้างต้นแบบ (Prototyping)</span>
+                <span class="toc-sub">Throwaway vs. Evolutionary และ Requirements Churn</span>
+              </span>
+            </a>
+            <a href="#sec-3" class="toc-link">
+              <span class="index-num">03</span>
+              <span>
+                <span class="toc-title">โมเดลสไปรัลของ Boehm และความเสี่ยง</span>
+                <span class="toc-sub">4 จตุภาค Risk Register และกลยุทธ์ลดความเสี่ยง</span>
+              </span>
+            </a>
+            <a href="#sec-4" class="toc-link">
+              <span class="index-num">04</span>
+              <span>
+                <span class="toc-title">การรับมือความไม่แน่นอน MVP และ Refactoring</span>
+                <span class="toc-sub">Change Anticipation vs. Tolerance และการคุมหนี้ทางเทคนิค</span>
+              </span>
+            </a>
+            <a href="#sec-5" class="toc-link">
+              <span class="index-num">05</span>
+              <span>
+                <span class="toc-title">กรณีศึกษา ตารางเปรียบเทียบ และเวิร์กช็อป</span>
+                <span class="toc-sub">5 ระบบตัวอย่าง ใบงานปฏิบัติการ และแบบทดสอบ</span>
+              </span>
+            </a>
+          </nav>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 1: ITERATIVE VS INCREMENTAL -->
+    <!-- ===================================================================== -->
+    <section id="sec-1" class="lecture-section">
+      <div class="dossier-bar">
+        <div class="dossier-bar-left">
+          <span class="dossier-pill">SECTION 01</span>
+          <span class="dossier-meta">CORE CONCEPTS &amp; BIG-BANG RISK MITIGATION</span>
+        </div>
+        <span class="dossier-meta">SOMMERVILLE CH. 2, 3 • DOOLEY &amp; KAZAKOVA CH. 2, 8</span>
+      </div>
+
+      <h2 class="section-title">1. แนวคิดการพัฒนาแบบทำซ้ำ (Iterative) กับการเพิ่มเติมทีละส่วน (Incremental)</h2>
+      <p class="standfirst">
+        เหตุใดความพยายามในการกำหนดข้อกำหนดทั้งหมดให้สมบูรณ์ตั้งแต่วันแรกจึงมักนำไปสู่ความล้มเหลว และเหตุใดการผสาน "การทำซ้ำเพื่อขัดเกลา" เข้ากับ "การทยอยส่งมอบทีละส่วน" จึงกลายเป็นกระดูกสันหลังของวิศวกรรมซอฟต์แวร์สมัยใหม่
+      </p>
+
+      <div class="two-col-equal card-wrapper">
+        <div class="figure-card">
+          <span class="chip chip-slate">CONCEPT A • การพัฒนาแบบทำซ้ำ</span>
+          <h3 class="subhead" style="margin-top:var(--space-sm);">Iterative Development (ทำซ้ำเพื่อขัดเกลา)</h3>
+          <p class="prose-wide">
+            อ้างอิงตาม <strong>Sommerville (2016, บทที่ 2.1.2 &amp; Glossary)</strong> การพัฒนาแบบทำซ้ำคือกระบวนการที่สอดประสานกิจกรรมหลัก 4 ประการ ได้แก่ <em>การกำหนดคุณลักษณะ (Specification)</em> <em>การออกแบบ (Design)</em> <em>การเขียนโปรแกรม (Programming)</em> และ<em>การทดสอบ (Testing)</em> เข้าด้วยกันในรูปแบบวงรอบ แทนที่จะทำทีละขั้นให้เสร็จขาดจากกัน
+          </p>
+          <p class="prose-wide">
+            หัวใจของการทำซ้ำคือการยอมรับธรรมชาติการแก้ปัญหาของมนุษย์ ดังที่ Sommerville ชี้ว่าวิศวกรแทบไม่เคยคิดคำตอบที่สมบูรณ์แบบได้ตั้งแต่แรก แต่จะเคลื่อนเข้าหาคำตอบทีละก้าวและพร้อม <strong>ย้อนกลับไปแก้ไข (Backtracking)</strong> เมื่อพบข้อผิดพลาด เช่นเดียวกับที่ <strong>Dooley &amp; Kazakova (2024, บทที่ 2)</strong> สรุปหลักการว่าเป็นการ <em>"วิเคราะห์บ้าง ออกแบบบ้าง เขียนโค้ดบ้าง และทดสอบบ้างในทุกวัน"</em> ผ่านการทดลองระยะสั้นที่ทำให้เราเรียนรู้เร็วและล้มเหลวด้วยต้นทุนต่ำ
+          </p>
+          <div class="callout-rule" style="margin-bottom:0;">
+            <div class="callout-title">เป้าหมายหลักของการทำซ้ำ</div>
+            ลดความไม่แน่นอนของความต้องการและการออกแบบผ่านวงรอบป้อนกลับ (<span class="en-term">Feedback Loop</span>) เพื่อเปลี่ยนระบบจากฉบับร่างที่คลุมเครือให้ตรงกับปัญหาที่แท้จริง
+          </div>
+        </div>
+
+        <div class="figure-card">
+          <span class="chip">CONCEPT B • การเพิ่มเติมทีละส่วน</span>
+          <h3 class="subhead" style="margin-top:var(--space-sm);">Incremental Development (เพิ่มทีละส่วน)</h3>
+          <p class="prose-wide">
+            <strong>Incremental Development</strong> มุ่งเน้นที่ <em>การแบ่งส่งมอบฟังก์ชันการทำงาน</em> โดยพัฒนาระบบฉบับเริ่มต้นที่มีความสามารถสำคัญที่สุดก่อน จากนั้นรับข้อเสนอแนะจากผู้ใช้ แล้วจึงวิวัฒนาการซอฟต์แวร์ผ่านรุ่นย่อยหลายรุ่น (<span class="en-term">Increments</span>) โดยแต่ละรุ่นจะเพิ่มเติมความสามารถใหม่เข้าไปบนพื้นฐานเดิม (Sommerville, 2016, รูปที่ 2.2)
+          </p>
+          <p class="prose-wide">
+            นอกจากนี้ Sommerville (บทที่ 2.3.2, รูปที่ 2.10) ยังแยกแยะอย่างชัดเจนระหว่าง <strong>Incremental Development</strong> (การพัฒนาเป็นส่วนย่อยภายในทีมเพื่อให้ผู้มีส่วนได้ส่วนเสียทดลองและติชม) กับ <strong>Incremental Delivery</strong> (การนำแต่ละส่วนที่สร้างเสร็จไปติดตั้งและใช้งานจริงในสภาพแวดล้อมการทำงานของลูกค้า) ซึ่งช่วยให้องค์กรได้รับคุณค่าทางธุรกิจตั้งแต่งวดแรกโดยไม่ต้องรอให้ระบบสมบูรณ์ 100%
+          </p>
+          <div class="callout-rule" style="margin-bottom:0;">
+            <div class="callout-title">เป้าหมายหลักของการเพิ่มทีละส่วน</div>
+            จัดลำดับความสำคัญของคุณค่าทางธุรกิจ ส่งมอบบริการที่จำเป็นที่สุดให้ผู้ใช้ได้ใช้งานจริงเร็วที่สุด และจำกัดขอบเขตความเสียหายหากต้องเปลี่ยนแปลง
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">1.1 วิกฤตของการส่งมอบแบบ Big Bang (Waterfall) ภายใต้ความไม่แน่นอน</h3>
+      <p class="prose">
+        ในโมเดลน้ำตก (<span class="en-term">Waterfall Model</span>) ซึ่งแยกขั้นตอนความต้องการ การออกแบบ การสร้าง การทดสอบ และการบำรุงรักษาออกจากกันอย่างชัดเจน การส่งมอบซอฟต์แวร์เกิดขึ้นเพียงครั้งเดียวในช่วงท้ายโครงการ ลักษณะเช่นนี้ถูกเรียกว่า <strong>Big Bang Delivery</strong> ซึ่งก่อให้เกิดความเสี่ยงเชิงโครงสร้าง 4 ประการตามหลักฐานจากตำราอ้างอิงทั้งสองเล่ม:
+      </p>
+      <ul class="academic-list">
+        <li><strong>การแช่แข็งข้อกำหนดก่อนเวลาอันควร (Premature Freezing of Specifications):</strong> Sommerville (2016, บทที่ 2.1.1) อธิบายว่าเมื่อค้นพบในขั้นพัฒนาว่าข้อกำหนดบางอย่างแพงเกินไปหรือคลุมเครือ การย้อนกลับไปแก้เอกสารความต้องการต้องผ่านการอนุมัติและทำให้โครงการล่าช้า ทั้งลูกค้าและทีมพัฒนามักตัดสินใจ "แช่แข็ง" เอกสารไว้แล้วไปแก้ไขเฉพาะหน้าในโค้ดแทน ส่งผลให้ระบบไม่ตรงความต้องการและโครงสร้างภายในบิดเบี้ยว</li>
+        <li><strong>ความเสี่ยงแบบฐานสองของผลลัพธ์ (Binary Deliverable Risk):</strong> Dooley &amp; Kazakova (2024, บทที่ 2) อ้างถึง Tom DeMarco (1983) ว่าในวันส่งมอบโครงการขนาดใหญ่ ผลลัพธ์มีเพียง "ส่งมอบระบบที่ผู้ใช้ยอมรับได้" หรือ "ล้มเหลวทั้งหมด" ไม่มีการแบ่งส่งมอบความสำเร็จเป็นส่วนย่อย</li>
+        <li><strong>อคติจากความไม่สามารถคาดการณ์อนาคตของลูกค้า:</strong> ลูกค้ามักไม่สามารถจินตนาการได้ว่าซอฟต์แวร์ใหม่จะเปลี่ยนวิธีทำงานประจำวันอย่างไรหรือจะเชื่อมโยงกับระบบอื่นอย่างไร จนกว่าจะได้สัมผัสซอฟต์แวร์ที่ทำงานได้จริง (Sommerville, บทที่ 3)</li>
+        <li><strong>ลักษณะปัญหาแบบ Wicked Problems:</strong> Conklin (2005, อ้างใน Dooley &amp; Kazakova, บทที่ 8) ชี้ว่าปัญหาการพัฒนาซอฟต์แวร์จำนวนมากไม่มีกฎการหยุดที่ตายตัวและไม่สามารถเข้าใจปัญหาได้สมบูรณ์จนกว่าจะเริ่มสร้างต้นแบบวิธีแก้ปัญหาออกมาทดสอบ</li>
+      </ul>
+
+      <!-- INTERACTIVE PROCESS ARCHETYPE EXPLORER + CHART -->
+      <div class="figure-card" aria-label="เครื่องมือสำรวจและเปรียบเทียบสถาปัตยกรรมกระบวนการ">
+        <div class="dossier-bar" style="margin-bottom:var(--space-md);">
+          <div class="dossier-bar-left">
+            <span class="index-num">INTERACTIVE MODEL 1.1</span>
+            <strong>จำลองกลไกการทำงาน: Big Bang vs. Iterative vs. Incremental</strong>
+          </div>
+          <span class="dossier-meta">CLICK TO COMPARE FLOW &amp; RISK CURVE</span>
+        </div>
+
+        <div class="btn-row" style="margin-bottom:var(--space-md);" role="group" aria-label="เลือกโมเดลกระบวนการ">
+          <button type="button" class="btn btn-secondary is-active" id="proc-btn-waterfall" onclick="selectProcessMode('waterfall')">1. Waterfall (Big Bang)</button>
+          <button type="button" class="btn btn-secondary" id="proc-btn-iterative" onclick="selectProcessMode('iterative')">2. Pure Iterative</button>
+          <button type="button" class="btn btn-secondary" id="proc-btn-incremental" onclick="selectProcessMode('incremental')">3. Pure Incremental</button>
+          <button type="button" class="btn btn-secondary" id="proc-btn-combined" onclick="selectProcessMode('combined')">4. Combined Iterative + Incremental</button>
+        </div>
+
+        <div class="two-col-asym">
+          <div>
+            <div class="svg-stage" style="margin-bottom:var(--space-md);">
+              <svg id="process-svg" viewBox="0 0 640 240" aria-label="แผนภาพโครงสร้างกระบวนการพัฒนาซอฟต์แวร์"></svg>
+            </div>
+            <div id="process-detail-panel" class="aside-box" style="margin-top:0;">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <div class="figure-card-tight">
+            <span class="index-num">VALUE &amp; RISK DYNAMICS OVER 6 MONTHS</span>
+            <h4 class="subhead" style="margin:var(--space-xs) 0 var(--space-xs) 0; font-size:1rem;">กราฟเปรียบเทียบมูลค่าที่ส่งมอบ (%) กับความเสี่ยงจากความต้องการที่ยังไม่ถูกพิสูจน์</h4>
+            <p style="font-size:0.84rem; color:var(--on-surface-variant); margin:0 0 var(--space-sm) 0;">
+              เส้นทึบสีน้ำเงินเข้ม = คุณค่าที่ผู้ใช้ใช้งานได้จริง | เส้นประสีแดงอิฐ = ความเสี่ยงที่ซ่อนอยู่
+            </p>
+            <div class="chart-box">
+              <canvas id="processChart" aria-label="กราฟแสดงความสัมพันธ์ระหว่างเวลา คุณค่าที่ส่งมอบ และความเสี่ยง"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">1.2 ข้อได้เปรียบ 3 ประการ และความท้าทายทางการจัดการ 5 ด้าน (Sommerville, 2016)</h3>
+      <p class="prose">
+        แม้แนวทาง Iterative &amp; Incremental จะลดความเสี่ยงของ Big Bang ได้อย่างมาก แต่ Sommerville (บทที่ 2.1.2 และ 2.3.2) เตือนว่าวิศวกรซอฟต์แวร์ต้องเข้าใจทั้งข้อได้เปรียบและข้อจำกัดเชิงองค์กรเพื่อบริหารจัดการอย่างมืออาชีพ:
+      </p>
+
+      <div class="two-col-equal">
+        <div class="figure-card">
+          <span class="chip chip-positive">3 MAJOR ADVANTAGES</span>
+          <h4 class="subhead" style="margin-top:var(--space-sm);">ข้อได้เปรียบเหนือโมเดลน้ำตก</h4>
+          <ol class="academic-list" style="margin-bottom:0;">
+            <li><strong>ต้นทุนการเปลี่ยนแปลงความต้องการต่ำลง:</strong> ปริมาณเอกสารการวิเคราะห์และออกแบบที่ต้องรื้อทำใหม่ลดลงอย่างมีนัยสำคัญ เพราะแก้ไขเฉพาะขอบเขตของรอบปัจจุบัน</li>
+            <li><strong>รับข้อเสนอแนะจากลูกค้าได้ง่ายและแม่นยำกว่า:</strong> ลูกค้าประเมินความคืบหน้าจากเอกสารออกแบบได้ยาก แต่สามารถวิจารณ์ซอฟต์แวร์ที่รันสาธิตให้เห็นได้ทันที</li>
+            <li><strong>ส่งมอบและใช้งานซอฟต์แวร์ได้เร็วขึ้น:</strong> แม้ยังไม่ครบทุกฟีเจอร์ ลูกค้าสามารถนำส่วนที่มีความสำคัญสูงสุดไปสร้างประโยชน์ทางธุรกิจได้ก่อนวันปิดโครงการ</li>
+          </ol>
+        </div>
+
+        <div class="figure-card">
+          <span class="chip chip-error">2 MANAGEMENT + 3 DELIVERY CHALLENGES</span>
+          <h4 class="subhead" style="margin-top:var(--space-sm);">ความท้าทายและข้อจำกัดในทางปฏิบัติ</h4>
+          <ol class="academic-list" style="margin-bottom:0;">
+            <li><strong>กระบวนการมองเห็นได้ยาก (Process Invisibility):</strong> ผู้บริหารต้องการเอกสารส่งมอบเพื่อติดตามงาน แต่การออกเอกสารทุกเวอร์ชันย่อยไม่คุ้มทุนในกระบวนการที่เร็ว</li>
+            <li><strong>โครงสร้างระบบเสื่อมสลาย (Structural Degradation):</strong> การเพิ่มฟีเจอร์ซ้ำๆ โดยไม่จัดระเบียบทำให้โค้ดยุ่งเหยิง (<span class="en-term">Messy Code</span>) จึงต้องอาศัยการปรับโครงสร้างโค้ด (<span class="en-term">Refactoring</span>) อย่างสม่ำเสมอ</li>
+            <li><strong>อุปสรรคเมื่อแทนที่ระบบเดิม (Legacy Replacement):</strong> ผู้ใช้ไม่ยอมทดลองใช้ระบบใหม่ที่ยังขาดฟีเจอร์สำคัญของระบบเก่า และใช้สองระบบคู่ขนานกันได้ยาก</li>
+            <li><strong>การระบุโครงสร้างพื้นฐานร่วม (Common Facilities):</strong> หากยังไม่วิเคราะห์ความต้องการทั้งหมด อาจออกแบบโมดูลกลางที่ใช้ร่วมกันทุกส่วนได้ยาก</li>
+            <li><strong>ความขัดแย้งกับสัญญาจัดซื้อจัดจ้าง:</strong> หน่วยงานภาครัฐหรือองค์กรขนาดใหญ่มักต้องการข้อกำหนดครบถ้วนในสัญญาตั้งแต่วันแรกก่อนประมูล</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 2: PROTOTYPING MODELS -->
+    <!-- ===================================================================== -->
+    <section id="sec-2" class="lecture-section">
+      <div class="dossier-bar">
+        <div class="dossier-bar-left">
+          <span class="dossier-pill">SECTION 02</span>
+          <span class="dossier-meta">PROTOTYPING MODELS &amp; REQUIREMENTS CHURN</span>
+        </div>
+        <span class="dossier-meta">SOMMERVILLE SEC. 2.3.1 • DOOLEY &amp; KAZAKOVA CH. 2, 8</span>
+      </div>
+
+      <h2 class="section-title">2. โมเดลการสร้างต้นแบบ: Throwaway vs. Evolutionary Prototyping</h2>
+      <p class="standfirst">
+        ต้นแบบ (Prototype) คือรุ่นเริ่มต้นของระบบที่สร้างขึ้นอย่างรวดเร็วเพื่อพิสูจน์แนวคิด ทดสอบทางเลือกการออกแบบ และค้นหาความต้องการที่แท้จริงก่อนทุ่มงบประมาณผลิตเต็มรูปแบบ
+      </p>
+
+      <p class="prose">
+        <strong>Sommerville (2016, บทที่ 2.3.1)</strong> นิยามว่าต้นแบบทำหน้าที่หลัก 2 บทบาทในกระบวนการพัฒนาซอฟต์แวร์: ประการแรก ในขั้นตอน <em>วิศวกรรมความต้องการ</em> ต้นแบบช่วยดึงความต้องการ (<span class="en-term">Elicitation</span>) และทวนสอบความถูกต้อง (<span class="en-term">Validation</span>) เพราะบ่อยครั้งที่ฟีเจอร์ซึ่งเขียนอธิบายบนกระดาษดูเหมือนชัดเจน แต่เมื่อผู้ใช้ลองใช้งานร่วมกับฟีเจอร์อื่นกลับพบว่าไม่ตรงกับงานจริง ประการที่สอง ในขั้นตอน <em>การออกแบบระบบ</em> ต้นแบบใช้วิจัยความเป็นไปได้ทางเทคนิค เช่น ทดสอบประสิทธิภาพการค้นคืนข้อมูลของฐานข้อมูล หรือออกแบบส่วนติดต่อผู้ใช้ (<span class="en-term">User Interface</span>) ซึ่งคำอธิบายเชิงข้อความไม่สามารถสื่อสารพฤติกรรมเชิงพลวัตได้ดีเท่าต้นแบบที่โต้ตอบได้
+      </p>
+
+      <!-- 4-Stage Prototyping Process (Sommerville Fig. 2.9) -->
+      <div class="figure-card">
+        <span class="index-num">SOMMERVILLE FIGURE 2.9 • PROCESS PIPELINE</span>
+        <h3 class="subhead" style="margin-top:var(--space-xs);">กระบวนการสร้างต้นแบบ 4 ขั้นตอนอย่างเป็นระบบ</h3>
+        <div class="card-grid" style="margin-top:var(--space-md);">
+          <div class="aside-box" style="border-top-color:var(--secondary);">
+            <span class="index-num">STAGE 01</span>
+            <h4 style="margin:var(--space-xs) 0;">กำหนดวัตถุประสงค์ให้ชัดเจน</h4>
+            <p style="font-size:0.9rem; margin:0;">
+              ระบุให้ชัดตั้งแต่ต้นว่าสร้างเพื่อออกแบบ UI เพื่อทดสอบความต้องการฟังก์ชัน หรือเพื่อทดสอบประสิทธิภาพสถาปัตยกรรม <strong>ต้นแบบเดียวไม่อาจตอบทุกเป้าหมายพร้อมกันได้</strong>
+            </p>
+            <div style="margin-top:var(--space-sm);"><span class="chip chip-slate">ผลผลิต: Prototyping Plan</span></div>
+          </div>
+          <div class="aside-box" style="border-top-color:var(--secondary);">
+            <span class="index-num">STAGE 02</span>
+            <h4 style="margin:var(--space-xs) 0;">นิยามขอบเขตสิ่งที่จะใส่และตัดออก</h4>
+            <p style="font-size:0.9rem; margin:0;">
+              ตัดสินใจว่าจะจำลองฟังก์ชันใดและ <em>ละเว้นสิ่งใด</em> เพื่อคุมต้นทุนและความเร็ว เช่น ผ่อนปรนเวลาตอบสนอง การจัดการข้อผิดพลาด หรือความทนทานของหน่วยความจำ
+            </p>
+            <div style="margin-top:var(--space-sm);"><span class="chip chip-slate">ผลผลิต: Outline Definition</span></div>
+          </div>
+          <div class="aside-box" style="border-top-color:var(--secondary);">
+            <span class="index-num">STAGE 03</span>
+            <h4 style="margin:var(--space-xs) 0;">พัฒนาต้นแบบที่ทำงานได้</h4>
+            <p style="font-size:0.9rem; margin:0;">
+              ใช้เครื่องมือพัฒนาเร็วหรือภาษาพลวัตสร้างต้นแบบที่คลิกหรือโต้ตอบได้จริง โดยมุ่งเน้นความเร็วในการเรียนรู้มากกว่าความสมบูรณ์ของโค้ดเบื้องหลัง
+            </p>
+            <div style="margin-top:var(--space-sm);"><span class="chip chip-slate">ผลผลิต: Executable Prototype</span></div>
+          </div>
+          <div class="aside-box" style="border-top-color:var(--secondary);">
+            <span class="index-num">STAGE 04</span>
+            <h4 style="margin:var(--space-xs) 0;">ประเมินผลโดยผู้ใช้ตัวจริง</h4>
+            <p style="font-size:0.9rem; margin:0;">
+              จัดอบรมสั้นๆ ให้ผู้ใช้ที่ตรงกลุ่มเป้าหมายทดลองใช้งานตามแผนที่ตั้งไว้ จากนั้นเก็บข้อผิดพลาด ความต้องการที่ตกหล่น และอคติจากความช้าของต้นแบบ
+            </p>
+            <div style="margin-top:var(--space-sm);"><span class="chip chip-slate">ผลผลิต: Evaluation Report</span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">2.1 การเปรียบเทียบเชิงลึก: Throwaway Prototyping vs. Evolutionary Prototyping</h3>
+      <div class="table-scroll">
+        <table class="briefing-table">
+          <thead>
+            <tr>
+              <th style="width:20%;">มิติการเปรียบเทียบ</th>
+              <th style="width:40%;">Throwaway (Rapid) Prototyping<br><span style="font-weight:400; color:var(--on-surface-variant);">ต้นแบบแบบใช้แล้วทิ้ง</span></th>
+              <th style="width:40%;">Evolutionary Prototyping<br><span style="font-weight:400; color:var(--on-surface-variant);">ต้นแบบเชิงวิวัฒนาการ</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>ปรัชญาและเป้าหมายหลัก</strong></td>
+              <td>มุ่งเน้น <strong>Change Anticipation</strong> สร้างขึ้นเร็วที่สุดเพื่อสำรวจความต้องการที่คลุมเครือหรือทดสอบความเป็นไปได้ทางเทคนิค แล้วทิ้งโค้ดต้นแบบทั้งหมดเพื่อสร้างระบบจริงอย่างมีระเบียบ</td>
+              <td>มุ่งเน้น <strong>Continuous Refinement</strong> เริ่มจากส่วนที่เข้าใจความต้องการดีที่สุด แล้วปรับแก้และขยายตัวตามข้อเสนอแนะของผู้ใช้จนกลายเป็นผลิตภัณฑ์จริง (<span class="en-term">Production System</span>)</td>
+            </tr>
+            <tr>
+              <td><strong>การจัดการ NFRs และคุณภาพโค้ด</strong></td>
+              <td>จงใจลดมาตรฐานความเชื่อถือได้ (<span class="en-term">Reliability</span>) ความปลอดภัย เวลาตอบสนอง และละเว้นการดักจับข้อผิดพลาด (<span class="en-term">Error Handling</span>) เพื่อความเร็วสูงสุด</td>
+              <td>ต้องรักษามาตรฐานคุณภาพ สถาปัตยกรรม ความปลอดภัย และเอกสารประกอบตั้งแต่ต้น รวมถึงต้องทำ <span class="en-term">Refactoring</span> ทุกครั้งที่ขยายระบบ</td>
+            </tr>
+            <tr>
+              <td><strong>ความเสี่ยงและกับดักสำคัญ</strong></td>
+              <td>ผู้บริหารหรือลูกค้าเห็นต้นแบบที่หน้าตาดีแล้วกดดันให้นำโค้ดต้นแบบไปใช้งานจริงทันที ทำให้ได้ระบบที่เปราะบางและบำรุงรักษาไม่ได้</td>
+              <td>หากความเข้าใจปัญหาผิดพลาดในแกนหลักตั้งแต่รอบแรก การแก้สถาปัตยกรรมภายหลังทำได้ยาก และโครงสร้างโค้ดมักเสื่อมสลายเมื่อแก้ซ้ำบ่อยๆ</td>
+            </tr>
+            <tr>
+              <td><strong>บริบทที่เหมาะสม</strong></td>
+              <td>ระบบที่มี UI ซับซ้อน ระบบความปลอดภัยวิกฤต (ใช้ทดสอบหน้าจอก่อนเขียนสเปกจริง) หรือการพิสูจน์เทคโนโลยีใหม่ (<span class="en-term">Technical Spike</span>)</td>
+              <td>เว็บแอปพลิเคชันระบบธุรกิจ ระบบเริ่มต้น (<span class="en-term">Startup/MVP</span>) หรือระบบสารสนเทศที่ลูกค้าสามารถมีส่วนร่วมประเมินผลได้ทุกสัปดาห์</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="subhead">2.2 การค้นพบความต้องการจริงและการจัดการ Requirements Churn</h3>
+      <p class="prose">
+        <strong>Dooley &amp; Kazakova (2024, บทที่ 2 &amp; 8)</strong> เน้นย้ำว่าความท้าทายอันดับหนึ่งที่ทำให้กำหนดการโครงการคลาดเคลื่อนคือ <strong>ความผันผวนของความต้องการ (Requirements Churn)</strong> นั่นคือเหตุการณ์ที่ทีมค้นพบความต้องการใหม่ ความต้องการเดิมที่ลูกค้าคิดว่าเป็นอันดับหนึ่งกลับมีความสำคัญน้อยลง หรือฟีเจอร์ที่เคยวางไว้สำหรับรุ่นถัดไปถูกเลื่อนขึ้นมาเป็นความต้องการเร่งด่วนอันดับแรก นอกจากนี้ การนำเครื่องมือหรือเฟรมเวิร์กใหม่มาใช้ยังมักเผยข้อจำกัดและผลข้างเคียงที่ไม่คาดคิด (เช่น เฟรมเวิร์กเว็บที่เลือกใช้บังคับให้ต้องใช้ระบบฐานข้อมูลและการตั้งค่าเซิร์ฟเวอร์เฉพาะทาง)
+      </p>
+      <div class="callout-warning">
+        <div class="callout-title">ข้อควรระวังในการประเมินต้นแบบ (Sommerville, 2016, บทที่ 2.3.1)</div>
+        ผู้ทดสอบต้นแบบอาจไม่ใช่อาสาสมัครที่สะท้อนผู้ใช้จริง และหากต้นแบบทำงานช้า ผู้ประเมินมักปรับพฤติกรรมโดยหลีกเลี่ยงฟีเจอร์ที่ช้านั้น ทำให้ทีมพัฒนาเข้าใจผิดว่าฟีเจอร์ดังกล่าวไม่สำคัญ เมื่อนำไปสร้างระบบจริงที่เร็วขึ้น ผู้ใช้จริงกลับใช้งานในรูปแบบที่แตกต่างออกไปโดยสิ้นเชิง
+      </div>
+
+      <!-- INTERACTIVE PROTOTYPE SCENARIO LAB -->
+      <div class="figure-card">
+        <div class="dossier-bar" style="margin-bottom:var(--space-md);">
+          <div class="dossier-bar-left">
+            <span class="index-num">INTERACTIVE LAB 2.1</span>
+            <strong>ห้องปฏิบัติการจำลองการตัดสินใจสร้างต้นแบบ (Prototyping Tradeoff Lab)</strong>
+          </div>
+          <span class="dossier-meta">SOMMERVILLE FIG. 2.9</span>
+        </div>
+
+        <div class="two-col-asym">
+          <div>
+            <div class="field-group" style="margin-bottom:var(--space-md);">
+              <label for="proto-scenario-select" class="field-label">เลือกสถานการณ์ระบบที่ต้องการวิเคราะห์:</label>
+              <select id="proto-scenario-select" class="field-select" onchange="updateProtoLab()">
+                <option value="youth_web">กรณี A: ระบบกิจกรรมเยาวชนออนไลน์ (Non-Profit Wicked Problem — Dooley &amp; Kazakova บทที่ 8)</option>
+                <option value="insulin_ui">กรณี B: หน้าจอควบคุมปั๊มอินซูลินพกพา (Safety-Critical Embedded — Sommerville บทที่ 1.3.1)</option>
+                <option value="mentcare_db">กรณี C: ทดสอบความเร็วซิงก์ข้อมูลผู้ป่วย Mentcare เมื่อเครือข่ายขาดหาย (Technical Feasibility — Sommerville บทที่ 1.3.2)</option>
+              </select>
+            </div>
+
+            <div id="proto-scenario-desc" class="aside-box" style="margin-bottom:var(--space-md);">
+              <!-- Populated by JS -->
+            </div>
+
+            <div class="field-group">
+              <span class="field-label">ลองเลือกแนวทางต้นแบบที่เหมาะสมที่สุดสำหรับสถานการณ์นี้:</span>
+              <div class="btn-row" style="margin-top:var(--space-xs);">
+                <button type="button" class="btn btn-secondary" id="proto-choice-throwaway" onclick="evaluateProtoChoice('throwaway')">เลือก Throwaway Prototype</button>
+                <button type="button" class="btn btn-secondary" id="proto-choice-evolutionary" onclick="evaluateProtoChoice('evolutionary')">เลือก Evolutionary Prototype</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="figure-card-tight" id="proto-feedback-box">
+            <span class="index-num">ENGINEERING EVALUATION</span>
+            <h4 class="subhead" style="margin:var(--space-xs) 0;">ผลการวิเคราะห์ Tradeoffs และคำแนะนำ</h4>
+            <p style="color:var(--on-surface-variant); margin:0;">
+              เลือกสถานการณ์ด้านซ้ายแล้วกดเลือกรูปแบบต้นแบบเพื่อดูการวิเคราะห์สิ่งที่ควรใส่/ตัดออกใน Stage 2 และความเสี่ยงที่ต้องเฝ้าระวัง
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 3: BOEHM'S SPIRAL MODEL -->
+    <!-- ===================================================================== -->
+    <section id="sec-3" class="lecture-section">
+      <div class="dossier-bar">
+        <div class="dossier-bar-left">
+          <span class="dossier-pill">SECTION 03</span>
+          <span class="dossier-meta">BOEHM'S SPIRAL MODEL &amp; RISK ENGINEERING</span>
+        </div>
+        <span class="dossier-meta">BOEHM (1988) • SOMMERVILLE CH. 2, 12, 22</span>
+      </div>
+
+      <h2 class="section-title">3. โมเดลสไปรัลของ Boehm: กระบวนการซอฟต์แวร์ที่ขับเคลื่อนด้วยความเสี่ยง</h2>
+      <p class="standfirst">
+        Barry Boehm (1988) เสนอ Spiral Model เพื่อผสานจุดแข็งของการหลีกเลี่ยงการเปลี่ยนแปลง (Change Avoidance) เข้ากับการรองรับการเปลี่ยนแปลง (Change Tolerance) โดยวาง "การประเมินและลดความเสี่ยง" เป็นหัวใจของการตัดสินใจในทุกรอบเกลียว
+      </p>
+
+      <p class="prose">
+        ใน <strong>Sommerville (2016, บทที่ 2 และบทที่ 22.1)</strong> โมเดลสไปรัลไม่ได้แสดงกระบวนการเป็นลำดับเส้นตรง แต่แสดงเป็นวงเกลียวก้นหอยที่หมุนวนออกไปเรื่อยๆ <strong>ระยะห่างเชิงรัศมีจากจุดศูนย์กลางแทนต้นทุนสะสมของโครงการ</strong> ส่วน<strong>มุมที่หมุนไปในแต่ละรอบแทนความก้าวหน้าผ่าน 4 จตุภาค</strong> ของรอบนั้นๆ โดยรอบชั้นในสุดมักเริ่มต้นจากการศึกษาความเป็นไปได้ของระบบ (<span class="en-term">System Feasibility</span>) รอบถัดมาเป็นการกำหนดความต้องการ (<span class="en-term">Requirements Definition</span>) รอบต่อมาเป็นการออกแบบระบบ (<span class="en-term">System Design</span>) และรอบนอกเป็นการพัฒนา ทดสอบ และส่งมอบ
+      </p>
+
+      <!-- INTERACTIVE BOEHM SPIRAL EXPLORER -->
+      <div class="figure-card">
+        <div class="dossier-bar" style="margin-bottom:var(--space-md);">
+          <div class="dossier-bar-left">
+            <span class="index-num">INTERACTIVE MODEL 3.1</span>
+            <strong>แผนภาพสไปรัล 4 จตุภาค 4 วงรอบ (Boehm's Spiral Explorer)</strong>
+          </div>
+          <span class="dossier-meta">CLICK A LOOP OR QUADRANT TO INSPECT</span>
+        </div>
+
+        <div class="btn-row" style="margin-bottom:var(--space-md);" role="group" aria-label="เลือกวงรอบของโมเดลสไปรัล">
+          <button type="button" class="btn btn-secondary is-active" id="spiral-loop-1" onclick="selectSpiralLoop(1)">Loop 1: Feasibility</button>
+          <button type="button" class="btn btn-secondary" id="spiral-loop-2" onclick="selectSpiralLoop(2)">Loop 2: Requirements</button>
+          <button type="button" class="btn btn-secondary" id="spiral-loop-3" onclick="selectSpiralLoop(3)">Loop 3: System Design</button>
+          <button type="button" class="btn btn-secondary" id="spiral-loop-4" onclick="selectSpiralLoop(4)">Loop 4: Implementation &amp; Release</button>
+        </div>
+
+        <div class="two-col-asym">
+          <div class="svg-stage">
+            <svg id="spiral-svg" viewBox="0 0 560 440" aria-label="แผนภาพโมเดลสไปรัล 4 จตุภาคของ Boehm">
+              <!-- Quadrant Backgrounds & Labels -->
+              <rect x="20" y="20" width="260" height="200" fill="var(--background)" stroke="var(--outline-variant)" stroke-width="1"></rect>
+              <rect x="280" y="20" width="260" height="200" fill="var(--background)" stroke="var(--outline-variant)" stroke-width="1"></rect>
+              <rect x="280" y="220" width="260" height="200" fill="var(--background)" stroke="var(--outline-variant)" stroke-width="1"></rect>
+              <rect x="20" y="220" width="260" height="200" fill="var(--background)" stroke="var(--outline-variant)" stroke-width="1"></rect>
+
+              <!-- Axes -->
+              <line x1="20" y1="220" x2="540" y2="220" stroke="var(--outline)" stroke-width="1.5"></line>
+              <line x1="280" y1="20" x2="280" y2="420" stroke="var(--outline)" stroke-width="1.5"></line>
+
+              <!-- Axis Labels -->
+              <text x="32" y="42" font-size="11" font-weight="700" fill="var(--secondary)">I. OBJECTIVE SETTING</text>
+              <text x="32" y="57" font-size="10.5" fill="var(--on-surface-variant)">กำหนดเป้าหมาย ทางเลือก และข้อจำกัด</text>
+
+              <text x="292" y="42" font-size="11" font-weight="700" fill="var(--data-4)">II. RISK ASSESSMENT &amp; REDUCTION</text>
+              <text x="292" y="57" font-size="10.5" fill="var(--on-surface-variant)">วิเคราะห์ความเสี่ยง สร้างต้นแบบ/จำลองผล</text>
+
+              <text x="292" y="405" font-size="11" font-weight="700" fill="var(--data-3)">III. DEVELOPMENT &amp; VALIDATION</text>
+              <text x="292" y="390" font-size="10.5" fill="var(--on-surface-variant)">เลือกโมเดลพัฒนาและทวนสอบผลผลิต</text>
+
+              <text x="32" y="405" font-size="11" font-weight="700" fill="var(--tertiary)">IV. PLAN NEXT PHASES &amp; REVIEW</text>
+              <text x="32" y="390" font-size="10.5" fill="var(--on-surface-variant)">ทบทวนร่วมกับลูกค้า ตัดสินใจเดินต่อ</text>
+
+              <!-- Concentric Spiral Arcs (4 loops) -->
+              <path id="spiral-arc-1" class="spiral-ring" d="M 250 220 A 30 30 0 0 1 280 190 A 36 36 0 0 1 316 220 A 42 42 0 0 1 280 262 A 48 48 0 0 1 232 220" stroke="var(--data-1)" stroke-width="4" onclick="selectSpiralLoop(1)"></path>
+              <path id="spiral-arc-2" class="spiral-ring" d="M 232 220 A 56 56 0 0 1 280 164 A 64 64 0 0 1 344 220 A 72 72 0 0 1 280 292 A 80 80 0 0 1 200 220" stroke="var(--data-2)" stroke-width="3" onclick="selectSpiralLoop(2)"></path>
+              <path id="spiral-arc-3" class="spiral-ring" d="M 200 220 A 88 88 0 0 1 280 132 A 96 96 0 0 1 376 220 A 104 104 0 0 1 280 324 A 112 112 0 0 1 168 220" stroke="var(--data-3)" stroke-width="3" onclick="selectSpiralLoop(3)"></path>
+              <path id="spiral-arc-4" class="spiral-ring" d="M 168 220 A 120 120 0 0 1 280 100 A 128 128 0 0 1 408 220 A 136 136 0 0 1 280 356 A 144 144 0 0 1 136 220" stroke="var(--data-4)" stroke-width="3" onclick="selectSpiralLoop(4)"></path>
+
+              <!-- Clickable Quadrant Hit Targets -->
+              <g class="spiral-node" onclick="selectSpiralQuadrant(1)">
+                <circle cx="215" cy="145" r="16" fill="var(--secondary)" stroke="var(--surface-container-low)" stroke-width="2"></circle>
+                <text x="215" y="149" text-anchor="middle" font-size="11" font-weight="700" fill="var(--on-primary)">Q1</text>
+              </g>
+              <g class="spiral-node" onclick="selectSpiralQuadrant(2)">
+                <circle cx="345" cy="145" r="16" fill="var(--data-4)" stroke="var(--surface-container-low)" stroke-width="2"></circle>
+                <text x="345" y="149" text-anchor="middle" font-size="11" font-weight="700" fill="var(--on-primary)">Q2</text>
+              </g>
+              <g class="spiral-node" onclick="selectSpiralQuadrant(3)">
+                <circle cx="345" cy="295" r="16" fill="var(--data-3)" stroke="var(--surface-container-low)" stroke-width="2"></circle>
+                <text x="345" y="299" text-anchor="middle" font-size="11" font-weight="700" fill="var(--on-primary)">Q3</text>
+              </g>
+              <g class="spiral-node" onclick="selectSpiralQuadrant(4)">
+                <circle cx="215" cy="295" r="16" fill="var(--tertiary)" stroke="var(--surface-container-low)" stroke-width="2"></circle>
+                <text x="215" y="299" text-anchor="middle" font-size="11" font-weight="700" fill="var(--on-primary)">Q4</text>
+              </g>
+
+              <!-- Radial Cost Label -->
+              <text x="280" y="234" text-anchor="middle" font-size="10" font-weight="700" fill="var(--on-surface)">ORIGIN (COST=0)</text>
+              <text x="480" y="213" text-anchor="middle" font-size="10" font-weight="600" fill="var(--on-surface-variant)">CUMULATIVE COST →</text>
+            </svg>
+          </div>
+
+          <div class="aside-box" id="spiral-inspector" style="margin:0;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">3.1 การประเมินความเสี่ยง 3 ประเภท และ 6 หมวดหมู่ (Sommerville บทที่ 22.1)</h3>
+      <p class="prose">
+        ความเสี่ยงในโครงการซอฟต์แวร์ไม่ได้เกิดขึ้นโดดๆ แต่อาจส่งผลกระทบซ้อนทับกันทั้ง 3 มิติ (Sommerville, 2016, บทที่ 22.1):
+        <strong>(1) Project Risks</strong> กระทบต่อกำหนดการและทรัพยากร (เช่น สูญเสียสถาปนิกซอฟต์แวร์หลัก)
+        <strong>(2) Product Risks</strong> กระทบต่อคุณภาพและสมรรถนะของซอฟต์แวร์ (เช่น คอมโพเนนต์ที่ซื้อมาทำงานช้ากว่าที่คาด)
+        และ <strong>(3) Business Risks</strong> กระทบต่อองค์กรผู้พัฒนาหรือผู้จัดซื้อ (เช่น คู่แข่งออกผลิตภัณฑ์ตัดหน้า) ความเสี่ยงเดียว เช่น การลาออกของวิศวกรอาวุโส สามารถเป็นทั้ง Project Risk (งานช้าลง), Product Risk (คนใหม่ขาดความชำนาญจนเกิดบั๊ก) และ Business Risk (เสียความน่าเชื่อถือในการประมูลงานใหม่)
+      </p>
+
+      <div class="three-col-grid">
+        <div class="figure-card-tight">
+          <span class="index-num">STRATEGY 01 • AVOIDANCE</span>
+          <h4 class="subhead" style="margin:var(--space-xs) 0; font-size:1.05rem;">กลยุทธ์การหลีกเลี่ยงความเสี่ยง</h4>
+          <p style="font-size:0.9rem; margin:0;">
+            ดำเนินการเชิงรุกเพื่อ <strong>ลดความน่าจะเป็น (Probability)</strong> ที่ความเสี่ยงจะเกิดขึ้น เช่น เปลี่ยนคอมโพเนนต์ที่สงสัยว่ามีบั๊กไปใช้คอมโพเนนต์มาตรฐานที่พิสูจน์แล้ว หรือทำ Pair Programming เพื่อกระจายความรู้โค้ด
+          </p>
+        </div>
+        <div class="figure-card-tight">
+          <span class="index-num">STRATEGY 02 • MINIMIZATION</span>
+          <h4 class="subhead" style="margin:var(--space-xs) 0; font-size:1.05rem;">กลยุทธ์การลดผลกระทบ</h4>
+          <p style="font-size:0.9rem; margin:0;">
+            หากหลีกเลี่ยงไม่ได้ ให้ <strong>ลดความรุนแรงของผลกระทบ (Impact)</strong> เช่น จัดทีมให้มีงานซ้อนทับกันเพื่อให้คนอื่นรับช่วงต่อได้ทันทีหากวิศวกรป่วย หรือใช้ <span class="en-term">Information Hiding</span> เพื่อจำกัดผลกระทบจากการแก้ความต้องการ
+          </p>
+        </div>
+        <div class="figure-card-tight">
+          <span class="index-num">STRATEGY 03 • CONTINGENCY</span>
+          <h4 class="subhead" style="margin:var(--space-xs) 0; font-size:1.05rem;">แผนฉุกเฉินและฟื้นฟู</h4>
+          <p style="font-size:0.9rem; margin:0;">
+            เตรียมแผนสำรองล่วงหน้าเมื่อ <strong>กรณีเลวร้ายที่สุดเกิดขึ้นจริง</strong> เช่น เตรียมเอกสารชี้แจงมูลค่าธุรกิจต่อผู้บริหารเพื่อป้องกันการถูกตัดงบ หรือตัดฟีเจอร์รองออกเพื่อรักษากำหนดส่งมอบหลัก
+          </p>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE RISK REGISTER & ALARP MATRIX -->
+      <div class="figure-card">
+        <div class="dossier-bar" style="margin-bottom:var(--space-md);">
+          <div class="dossier-bar-left">
+            <span class="index-num">INTERACTIVE TOOL 3.2</span>
+            <strong>แบบจำลองทะเบียนความเสี่ยงและแผนรับมือ (Sommerville Fig. 22.3–22.5)</strong>
+          </div>
+          <span class="dossier-meta">SELECT RISK &amp; TEST MITIGATION</span>
+        </div>
+
+        <div class="two-col-asym">
+          <div>
+            <div class="field-group" style="margin-bottom:var(--space-md);">
+              <label for="risk-item-select" class="field-label">เลือกความเสี่ยงตัวอย่างจากบัญชีความเสี่ยง 6 หมวดของ Sommerville:</label>
+              <select id="risk-item-select" class="field-select" onchange="loadRiskPreset()">
+                <option value="staff_skill">People Risk: ไม่สามารถสรรหาทีมงานที่มีทักษะเฉพาะทางได้ทันเวลา (Fig. 22.4 #6)</option>
+                <option value="req_rework">Requirements Risk: ลูกค้าเปลี่ยนความต้องการจนต้องรื้อโครงสร้างออกแบบใหม่ (Fig. 22.4 #9)</option>
+                <option value="db_perf">Technology Risk: ฐานข้อมูลรองรับธุรกรรมต่อวินาทีได้ต่ำกว่าเป้าหมาย (Fig. 22.4 #11)</option>
+                <option value="budget_cut">Organizational Risk: ปัญหาการเงินขององค์กรบีบให้ลดงบโครงการ 20% (Fig. 22.4 #5)</option>
+                <option value="est_time">Estimation Risk: ประเมินเวลาพัฒนาซอฟต์แวร์ต่ำกว่าความเป็นจริง (Fig. 22.4 #1)</option>
+                <option value="tool_gen">Tools Risk: โค้ดที่สร้างจากเครื่องมือ Code Generation ไม่มีประสิทธิภาพ (Fig. 22.4 #13)</option>
+              </select>
+            </div>
+
+            <div class="two-col-equal" style="gap:var(--space-md); margin-bottom:var(--space-md);">
+              <div class="field-group">
+                <label for="risk-prob-select" class="field-label">ความน่าจะเป็น (Probability):</label>
+                <select id="risk-prob-select" class="field-select" onchange="recomputeRiskMatrix()">
+                  <option value="1">1 - Insignificant (น้อยมาก)</option>
+                  <option value="2">2 - Low (ต่ำ)</option>
+                  <option value="3" selected>3 - Moderate (ปานกลาง)</option>
+                  <option value="4">4 - High (สูง)</option>
+                  <option value="5">5 - Very High (สูงมาก)</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label for="risk-effect-select" class="field-label">ความรุนแรงของผลกระทบ (Effects):</label>
+                <select id="risk-effect-select" class="field-select" onchange="recomputeRiskMatrix()">
+                  <option value="1">1 - Insignificant (ไม่มีนัยสำคัญ)</option>
+                  <option value="2">2 - Tolerable (อยู่ในช่วงเผื่อไว้)</option>
+                  <option value="3" selected>3 - Serious (ล่าช้าอย่างมีนัยสำคัญ)</option>
+                  <option value="4">4 - Catastrophic (คุกคามการอยู่รอด)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <span class="field-label">กลยุทธ์ที่นักศึกษาเลือกใช้ในรอบ Spiral Q2:</span>
+              <div class="btn-row" style="margin-top:var(--space-xs);">
+                <button type="button" class="btn btn-secondary is-active" id="mit-btn-avoid" onclick="selectMitigationType('avoid')">Avoidance</button>
+                <button type="button" class="btn btn-secondary" id="mit-btn-min" onclick="selectMitigationType('min')">Minimization</button>
+                <button type="button" class="btn btn-secondary" id="mit-btn-cont" onclick="selectMitigationType('cont')">Contingency</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="aside-box" id="risk-analysis-output" style="margin:0;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <details class="deep-dive">
+        <summary>เจาะลึกเพิ่มเติม: การเชื่อมโยงความเสี่ยงโครงการกับ Safety Risk Triangle (ALARP) ในระบบวิกฤต (Sommerville บทที่ 12.2.2)</summary>
+        <p class="prose-wide">
+          ในระบบที่มีความสำคัญต่อความปลอดภัย (<span class="en-term">Safety-Critical Systems</span>) เช่น ปั๊มอินซูลินหรือระบบควบคุมอากาศยาน กระบวนการใน Q2 ของโมเดลสไปรัลจะยกระดับจากการประเมินความเสี่ยงโครงการทั่วไปไปสู่ <strong>Hazard-Driven Specification</strong> โดยแบ่งระดับความเสี่ยงตามสามเหลี่ยมความเสี่ยง (<span class="en-term">Risk Triangle</span>, รูปที่ 12.3) ออกเป็น 3 เขต:
+        </p>
+        <ul class="academic-list" style="margin-bottom:0;">
+          <li><strong>Intolerable Region (ยอมรับไม่ได้):</strong> ความเสี่ยงที่คุกคามชีวิตมนุษย์ (เช่น ปั๊มอินซูลินฉีดยาเกินขนาด) ระบบต้องถูกออกแบบให้เหตุการณ์นี้เกิดขึ้นไม่ได้โดยเด็ดขาด หรือตรวจจับและหยุดก่อนเกิดอุบัติเหตุ</li>
+          <li><strong>ALARP Region (As Low As Reasonably Practicable):</strong> ความเสี่ยงที่ผลกระทบน้อยกว่าหรือโอกาสเกิดต่ำมาก ระบบต้องลดโอกาสเกิดให้ต่ำที่สุดเท่าที่ทำได้ในทางปฏิบัติภายใต้ข้อจำกัดด้านต้นทุนและเวลา</li>
+          <li><strong>Acceptable Region (ยอมรับได้):</strong> ความเสียหายเล็กน้อย ไม่คุ้มค่าที่จะเพิ่มต้นทุนมหาศาลเพื่อกำจัดทั้งหมด (เช่น อาการระคายเคืองผิวเล็กน้อยจากวัสดุมาตรฐาน)</li>
+        </ul>
+      </details>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 4: UNCERTAINTY, MVP, REFACTORING -->
+    <!-- ===================================================================== -->
+    <section id="sec-4" class="lecture-section">
+      <div class="dossier-bar">
+        <div class="dossier-bar-left">
+          <span class="dossier-pill">SECTION 04</span>
+          <span class="dossier-meta">CHANGE MANAGEMENT, MVP &amp; REFACTORING</span>
+        </div>
+        <span class="dossier-meta">SOMMERVILLE SEC. 2.3, 3.2.2, 9.2, 23.4 • DOOLEY &amp; KAZAKOVA CH. 2, 8</span>
+      </div>
+
+      <h2 class="section-title">4. การรับมือกับความต้องการที่ไม่แน่นอน: Change Anticipation, MVP และ Refactoring</h2>
+      <p class="standfirst">
+        เมื่อความเปลี่ยนแปลงเป็นค่าคงที่เพียงอย่างเดียวของวิศวกรรมซอฟต์แวร์ ทีมพัฒนาต้องเลือกใช้กลไกเชิงสถาปัตยกรรมและการจัดการขอบเขตเพื่อส่งมอบคุณค่าโดยไม่ปล่อยให้โครงสร้างระบบพังทลาย
+      </p>
+
+      <h3 class="subhead">4.1 Change Anticipation vs. Change Tolerance (Sommerville, 2016, บทที่ 2.3)</h3>
+      <p class="prose">
+        เพื่อลดต้นทุนการทำซ้ำ (<span class="en-term">Rework Cost</span>) Sommerville เสนอ 2 แนวทางที่เสริมกันอย่างลงตัว:
+      </p>
+      <div class="two-col-equal">
+        <div class="figure-card">
+          <span class="index-num">APPROACH 01</span>
+          <h4 class="subhead" style="margin-top:var(--space-xs);">Change Anticipation (คาดการณ์ล่วงหน้า)</h4>
+          <p style="margin-bottom:var(--space-sm);">
+            แทรกกิจกรรมที่ช่วยให้ทีมคาดเดาการเปลี่ยนแปลงที่อาจเกิดขึ้น <em>ก่อน</em> ลงมือผลิตจริงเต็มรูปแบบ ตัวอย่างสำคัญคือการทำ <strong>System Prototyping</strong> ให้ผู้ใช้ทดลองคลิกและปรับแก้ความเข้าใจความต้องการก่อนทุ่มงบเขียนระบบหลังบ้านเต็มรูป ช่วยลดคำขอเปลี่ยนแปลงหลังส่งมอบได้อย่างมาก
+          </p>
+          <span class="chip chip-slate">กลไกหลัก: Prototyping &amp; Risk Analysis</span>
+        </div>
+        <div class="figure-card">
+          <span class="index-num">APPROACH 02</span>
+          <h4 class="subhead" style="margin-top:var(--space-xs);">Change Tolerance (รองรับการเปลี่ยนแปลง)</h4>
+          <p style="margin-bottom:var(--space-sm);">
+            ออกแบบทั้งกระบวนการและสถาปัตยกรรมซอฟต์แวร์ให้ <strong>การเปลี่ยนแปลงมีต้นทุนต่ำเมื่อเกิดขึ้นจริง</strong> ผ่านการพัฒนาแบบ <span class="en-term">Incremental Delivery</span> (ย้ายการเปลี่ยนแปลงไปใส่ในรอบที่ยังไม่เริ่มสร้าง หรือแก้เพียงส่วนย่อยเดียว) และใช้หลัก <span class="en-term">Information Hiding</span> เพื่อกักกันผลกระทบ
+          </p>
+          <span class="chip">กลไกหลัก: Incremental Delivery &amp; Refactoring</span>
+        </div>
+      </div>
+
+      <p class="prose" style="margin-top:var(--space-sm);">
+        อย่างไรก็ตาม ในบทที่ 3.2.2 <strong>Sommerville</strong> ชี้ให้เห็นมุมมองที่น่าสนใจจาก <em>Extreme Programming (XP)</em> ซึ่งตั้งคำถามกับหลักการดั้งเดิมที่ว่า "จงออกแบบเผื่อการเปลี่ยนแปลงล่วงหน้า (Design for Change)" โดย XP แย้งว่าการเสียเวลาวางโครงสร้างทั่วไปเผื่ออนาคตมักเป็นความสูญเปล่า เพราะการเปลี่ยนแปลงที่คาดการณ์ไว้อาจไม่เคยเกิดขึ้นเลย ในขณะที่ความต้องการจริงกลับเปลี่ยนไปในทิศทางอื่น ดังนั้นวิธีที่ประหยัดกว่าคือ <strong>รักษาความเรียบง่ายในปัจจุบัน และปรับโครงสร้างโค้ด (Refactoring) เมื่อความเปลี่ยนแปลงเกิดขึ้นจริง</strong>
+      </p>
+
+      <h3 class="subhead">4.2 Minimum Viable Product (MVP) และการควบคุมขอบเขตแบบ Time-Boxed</h3>
+      <p class="prose">
+        <strong>Dooley &amp; Kazakova (2024, บทที่ 2)</strong> นิยามว่าแต่ละรอบการพัฒนาควรปฏิบัติเสมือน "โครงการขนาดเล็กที่จบในตัวเอง" ซึ่งส่งมอบ <strong>Minimum Viable Product (MVP)</strong> ที่ <em>ทำงานได้จริง ทดสอบครบถ้วน บูรณาการสมบูรณ์ และทนทาน</em> เพียงแต่มีชุดฟีเจอร์น้อยกว่าเป้าหมายปลายทาง หลักคิดนี้เชื่อมโยงโดยตรงกับโครงสร้างการวางแผน 2 ระดับในกระบวนการแบบ Agile และ Scrum (Sommerville, 2016, บทที่ 23.4):
+      </p>
+      <ul class="academic-list">
+        <li><strong>Release Planning:</strong> มองล่วงหน้าหลายเดือนเพื่อกำหนดกลุ่มฟีเจอร์หลักที่จะส่งมอบในแต่ละ Release ใหญ่</li>
+        <li><strong>Iteration / Sprint Planning:</strong> วางแผนระยะสั้นแบบกำหนดกรอบเวลาตายตัว (<span class="en-term">Time-boxed Sprint</span> นาน 1–4 สัปดาห์) โดยกำหนดวันที่ส่งมอบชัดเจนและไม่เลื่อนวันส่งมอบ</li>
+        <li><strong>กฎเหล็กเมื่อประเมินงานพลาด (Move Deadline or Remove Features):</strong> Dooley &amp; Kazakova ย้ำว่าเมื่อใกล้ถึงวันปิดรอบแล้วงานไม่ทัน มีทางเลือกที่สมเหตุสมผลเพียง 2 ทางคือ <em>เลื่อนกำหนดส่ง</em> หรือ <em>ตัดฟีเจอร์รองออก</em> ใน Scrum กำหนดส่งมักถูกตรึงไว้ตายตัว จึงต้องเลือกตัดขอบเขตเพื่อรักษาคุณภาพของ MVP</li>
+        <li><strong>การผลักอำนาจการตัดสินใจและ "ความกล้าหาญ" (Courage):</strong> แทนที่จะปล่อยให้คณะกรรมการควบคุมการเปลี่ยนแปลง (CCB) ที่ห่างไกลทีมพัฒนาแทรกงานใหม่กลางคัน Scrum จะนำความต้องการใหม่เข้า <strong>Product Backlog</strong> เพื่อรอจัดลำดับใน Sprint ถัดไป และใช้หลัก <em>Courage</em> ของ Kent Beck เพื่อสื่อสารกับลูกค้าอย่างตรงไปตรงมา เช่น <em>"หากต้องการฟีเจอร์ใหม่นี้ในรอบนี้ จะต้องตัดฟีเจอร์ A หรือ B ออก คุณเลือกสิ่งที่สำคัญที่สุด"</em></li>
+      </ul>
+
+      <h3 class="subhead">4.3 Refactoring เพื่อต่อต้านความเสื่อมสลายของโครงสร้าง (Structural Degradation)</h3>
+      <p class="prose">
+        การเพิ่มโค้ดใหม่ทีละรอบอย่างรวดเร็วโดยไม่จัดระเบียบย่อมนำไปสู่ปัญหาที่ Sommerville (บทที่ 2.1.2) เรียกว่า <strong>Structural Degradation</strong> โค้ดจะเริ่มพันกันยุ่งเหยิง จนการเพิ่มฟีเจอร์เล็กน้อยในรอบหลังๆ ใช้เวลานานขึ้นและเกิดบั๊กง่ายขึ้น แนวทางแก้ไขเชิงวิศวกรรมคือ <strong>การปรับโครงสร้างโค้ด (Refactoring)</strong> ซึ่งหมายถึงการปรับปรุงโครงสร้างภายในของโปรแกรมให้อ่านง่าย ลดความซ้ำซ้อน และลดการพึ่งพากัน <em>โดยไม่เปลี่ยนแปลงพฤติกรรมภายนอกของซอฟต์แวร์</em>
+      </p>
+      <p class="prose">
+        หัวใจสำคัญที่ทำให้ Refactoring ปลอดภัยในโมเดลทำซ้ำคือการมีชุดการทดสอบอัตโนมัติและแนวปฏิบัติ <strong>Test-Driven Development (TDD)</strong> (Sommerville บทที่ 8.2) เมื่อมีชุดทดสอบยืนยันความถูกต้องอยู่ตลอดเวลา วิศวกรสามารถปรับโครงสร้างโค้ดให้สะอาดได้ทุก Sprint โดยไม่ต้องกลัวว่าจะทำให้ฟีเจอร์เก่าพัง นอกจากนี้ Sommerville (บทที่ 25.2) ยังเน้นการใช้ <em>Frequent System Builds &amp; Continuous Integration</em> เพื่อให้พบข้อผิดพลาดจากการเชื่อมต่อระหว่างส่วนประกอบทันที
+      </p>
+
+      <!-- INTERACTIVE MVP SPRINT & TECHNICAL DEBT SIMULATOR -->
+      <div class="figure-card">
+        <div class="dossier-bar" style="margin-bottom:var(--space-md);">
+          <div class="dossier-bar-left">
+            <span class="index-num">INTERACTIVE SIMULATOR 4.1</span>
+            <strong>จำลองการบริหาร Sprint, Requirements Churn และ Technical Debt (4 Sprints)</strong>
+          </div>
+          <span class="dossier-meta">TEST SCOPE VS. REFACTORING STRATEGY</span>
+        </div>
+
+        <div class="two-col-asym">
+          <div>
+            <p style="font-size:0.92rem; margin-top:0;">
+              ปรับกลยุทธ์การบริหารทีมตลอด 4 Sprints (รอบละ 2 สัปดาห์) เพื่อดูผลกระทบต่อ <strong>มูลค่าทางธุรกิจสะสม (Business Value)</strong> และ <strong>ดัชนีความยั่งยืนของโครงสร้างโค้ด (Maintainability Index)</strong>
+            </p>
+
+            <div class="field-group" style="margin-bottom:var(--space-md);">
+              <label for="sim-refactor-slider" class="field-label">
+                สัดส่วนเวลาที่จัดสรรให้ Refactoring &amp; Automated Tests ต่อ Sprint:
+                <strong id="sim-refactor-val" class="en-term">20%</strong>
+              </label>
+              <input type="range" id="sim-refactor-slider" min="0" max="40" step="5" value="20" oninput="syncRefactorFromSlider(this.value)">
+              <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:var(--on-surface-variant);">
+                <span>0% (เร่งแต่ฟีเจอร์ — เสี่ยงโครงสร้างพัง)</span>
+                <span>20% (สมดุลยั่งยืน)</span>
+                <span>40% (เน้นปรับโครงสร้างหนัก)</span>
+              </div>
+            </div>
+
+            <div class="field-group" style="margin-bottom:var(--space-md);">
+              <label for="sim-churn-policy" class="field-label">นโยบายรับมือ Requirements Churn เมื่อลูกค้าแทรกงานใหม่กลาง Sprint:</label>
+              <select id="sim-churn-policy" class="field-select" onchange="runSprintSimulation()">
+                <option value="protect">Scrum Discipline: รับเข้า Product Backlog เพื่อจัดลำดับใน Sprint ถัดไป</option>
+                <option value="swap">Courage Trade-off: ยอมรับงานใหม่ แต่ตัดงานเดิมที่มีขนาดเท่ากันออก</option>
+                <option value="cram">Uncontrolled Churn (CCB): ยัดงานใหม่เพิ่มเข้าไปใน Sprint เดิมโดยไม่ตัดงานออก</option>
+              </select>
+            </div>
+
+            <div id="sim-verdict-box" class="aside-box" style="margin:0;">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <div class="figure-card-tight">
+            <span class="index-num">SPRINT TRAJECTORY (SPRINTS 1–4)</span>
+            <h4 class="subhead" style="margin:var(--space-xs) 0; font-size:1rem;">ผลลัพธ์เชิงปริมาณ: คุณค่าที่ส่งมอบ vs. สุขภาพสถาปัตยกรรม</h4>
+            <div class="chart-box">
+              <canvas id="sprintSimChart" aria-label="กราฟจำลองมูลค่าทางธุรกิจและสุขภาพโค้ดตลอด 4 Sprints"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <details class="deep-dive">
+        <summary>เชื่อมโยงสู่ระยะบำรุงรักษา: เมทริกซ์ตัดสินใจจัดการระบบดั้งเดิม (Legacy Systems — Sommerville บทที่ 9.2)</summary>
+        <p class="prose-wide">
+          เมื่อระบบที่พัฒนาแบบ Incremental หรือระบบเก่าถูกใช้งานต่อเนื่องเป็นเวลานาน มูลค่าการบำรุงรักษามักสูงกว่าต้นทุนพัฒนาตั้งต้น องค์กรจึงต้องประเมิน <strong>คุณภาพทางเทคนิค (System Quality)</strong> เทียบกับ <strong>คุณค่าทางธุรกิจ (Business Value)</strong> เพื่อเลือก 1 ใน 4 กลยุทธ์ (Sommerville บทที่ 9.2):
+        </p>
+        <div class="card-grid">
+          <div class="figure-card-tight">
+            <span class="chip chip-error">Low Quality • Low Value</span>
+            <p style="font-size:0.88rem; margin:var(--space-xs) 0 0 0;"><strong>Scrap:</strong> เลิกใช้งานและปลดระวางทันทีเพราะค่าดูแลสูงเกินผลตอบแทน</p>
+          </div>
+          <div class="figure-card-tight">
+            <span class="chip">Low Quality • High Value</span>
+            <p style="font-size:0.88rem; margin:var(--space-xs) 0 0 0;"><strong>Reengineer / Replace:</strong> ระบบทำเงินแต่โค้ดเสื่อม ต้องปรับโครงสร้างใหม่หรือทยอยเปลี่ยนทีละส่วน</p>
+          </div>
+          <div class="figure-card-tight">
+            <span class="chip chip-slate">High Quality • Low Value</span>
+            <p style="font-size:0.88rem; margin:var(--space-xs) 0 0 0;"><strong>Maintain Minimally:</strong> คงไว้ตามปกติต่อไปตราบใดที่ไม่ต้องแก้ไขราคาแพง</p>
+          </div>
+          <div class="figure-card-tight">
+            <span class="chip chip-positive">High Quality • High Value</span>
+            <p style="font-size:0.88rem; margin:var(--space-xs) 0 0 0;"><strong>Continue Normal Evolution:</strong> ระบบสุขภาพดีและสำคัญมาก พัฒนาต่อยอดตามปกติ</p>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 5: CASE STUDIES, COMPARATIVE TABLE & WORKSHOP -->
+    <!-- ===================================================================== -->
+    <section id="sec-5" class="lecture-section">
+      <div class="dossier-bar">
+        <div class="dossier-bar-left">
+          <span class="dossier-pill">SECTION 05</span>
+          <span class="dossier-meta">CASE STUDIES, COMPARISON MATRIX &amp; WORKSHOP</span>
+        </div>
+        <span class="dossier-meta">SYNTHESIS &amp; HANDS-ON LAB</span>
+      </div>
+
+      <h2 class="section-title">5. การประยุกต์ใช้เชิงปฏิบัติ: กรณีศึกษา ตารางเปรียบเทียบ และเวิร์กช็อป</h2>
+      <p class="standfirst">
+        "ไม่มีกระบวนการวิศวกรรมซอฟต์แวร์แบบใดแบบหนึ่งที่เหมาะสมกับระบบทุกประเภท" — การเลือกโมเดลต้องอ้างอิงจากความเสี่ยงด้านความปลอดภัย กฎหมาย ความไม่แน่นอนของความต้องการ และวัฒนธรรมองค์กร (Sommerville, 2016, บทที่ 1.1.2 &amp; 3.4)
+      </p>
+
+      <h3 class="subhead">5.1 วิเคราะห์กรณีศึกษา 5 ระบบจากตำราอ้างอิง</h3>
+      <div class="card-grid">
+        <div class="figure-card">
+          <span class="index-num">CASE 01 • EMBEDDED SAFETY-CRITICAL</span>
+          <h4 class="subhead" style="margin:var(--space-xs) 0; font-size:1.05rem;">ระบบควบคุมปั๊มอินซูลิน (Insulin Pump)</h4>
+          <p style="font-size:0.9rem; margin:0 0 var(--space-sm) 0;">
+            <strong>บริบท:</strong> ระบบฝังตัวคำนวณระดับน้ำตาลในเลือดและสั่งจ่ายอินซูลินอัตโนมัติ (Sommerville 1.3.1) ความผิดพลาดเพียงเล็กน้อยอาจทำให้ผู้ป่วยช็อกหรือเสียชีวิต
+          </p>
+          <p style="font-size:0.9rem; margin:0;">
+            <strong>โมเดลที่เหมาะสม:</strong> ใช้ <strong>Plan-Driven / Spiral Model</strong> พร้อมการวิเคราะห์อันตราย (<span class="en-term">Hazard Analysis</span>) และจัดทำเอกสารพิสูจน์ความปลอดภัย (<span class="en-term">Safety Case</span>) ล่วงหน้า ห้ามใช้วิธีส่งมอบ MVP แบบไม่ครบถ้วนกับตรรกะควบคุมยา แต่อาจใช้ <em>Throwaway Prototype</em> ทดสอบความชัดเจนของหน้าจอแจ้งเตือนผู้ป่วย
+          </p>
+        </div>
+
+        <div class="figure-card">
+          <span class="index-num">CASE 02 • CLINICAL INFORMATION SYSTEM</span>
+          <h4 class="subhead" style="margin:var(--space-xs) 0; font-size:1.05rem;">ระบบเวชระเบียนสุขภาพจิต (Mentcare)</h4>
+          <p style="font-size:0.9rem; margin:0 0 var(--space-sm) 0;">
+            <strong>บริบท:</strong> ระบบคลินิกที่ต้องรองรับการทำงานออฟไลน์บนแล็ปท็อปในพื้นที่ห่างไกล มีกฎหมายคุ้มครองข้อมูลส่วนบุคคลและการกักกันผู้ป่วยเสี่ยงสูง (Sommerville 1.3.2)
+          </p>
+          <p style="font-size:0.9rem; margin:0;">
+            <strong>โมเดลที่เหมาะสม:</strong> ใช้ <strong>Hybrid Spiral + Incremental</strong> วางสถาปัตยกรรมความปลอดภัยและความเป็นส่วนตัวของฐานข้อมูลให้มั่นคงล่วงหน้า (Q2/Q3) ร่วมกับการสร้างต้นแบบซิงก์ข้อมูลออฟไลน์ แล้วจึงทยอยส่งมอบฟีเจอร์รายงานและการเตือนแพทย์แบบ Incremental
+          </p>
+        </div>
+
+        <div class="figure-card">
+          <span class="index-num">CASE 03 • HOSTILE SENSOR SYSTEM</span>
+          <h4 class="subhead" style="margin:var(--space-xs) 0; font-size:1.05rem;">สถานีตรวจอากาศในป่าลึก (Wilderness Station)</h4>
+          <p style="font-size:0.9rem; margin:0 0 var(--space-sm) 0;">
+            <strong>บริบท:</strong> ใช้พลังงานแสงอาทิตย์และส่งข้อมูลผ่านดาวเทียมความเร็วต่ำ ต้องซ่อมบำรุงและอัปเดตเฟิร์มแวร์จากระยะไกลได้ (Sommerville 1.3.3)
+          </p>
+          <p style="font-size:0.9rem; margin:0;">
+            <strong>โมเดลที่เหมาะสม:</strong> <strong>Plan-Driven / Spiral Co-Design</strong> เนื่องจากฮาร์ดแวร์และซอฟต์แวร์พึ่งพากันสูงและเข้าถึงพื้นที่ซ่อมยาก จึงต้องทดสอบความทนทานและโปรโตคอลดาวเทียมในรอบจำลองให้สมบูรณ์ก่อนติดตั้งจริง
+          </p>
+        </div>
+
+        <div class="figure-card">
+          <span class="index-num">CASE 04 • SUPPORT ENVIRONMENT</span>
+          <h4 class="subhead" style="margin:var(--space-xs) 0; font-size:1.05rem;">ระบบนิเวศการเรียนรู้ดิจิทัล (iLearn)</h4>
+          <p style="font-size:0.9rem; margin:0 0 var(--space-sm) 0;">
+            <strong>บริบท:</strong> กลุ่มเครื่องมือสนับสนุนการเรียนการสอนที่ต้องประกอบขึ้นจากบริการและแอปพลิเคชันหลากหลายสำหรับโรงเรียน (Sommerville Part 1 Intro)
+          </p>
+          <p style="font-size:0.9rem; margin:0;">
+            <strong>โมเดลที่เหมาะสม:</strong> <strong>Integration &amp; Configuration + Incremental Delivery</strong> เน้นการนำคอมโพเนนต์และบริการที่มีอยู่แล้วมาปรับแต่งและทยอยเปิดใช้งานให้ครูและนักเรียนทดลองทีละภาคเรียน
+          </p>
+        </div>
+
+        <div class="figure-card">
+          <span class="index-num">CASE 05 • WICKED PROBLEM WEB APP</span>
+          <h4 class="subhead" style="margin:var(--space-xs) 0; font-size:1.05rem;">เว็บพอร์ทัลกิจกรรมเยาวชน (Non-Profit App)</h4>
+          <p style="font-size:0.9rem; margin:0 0 var(--space-sm) 0;">
+            <strong>บริบท:</strong> องค์กรไม่แสวงหากำไรต้องการย้ายข้อมูลจากแฟ้มกระดาษขึ้นเว็บ แต่ลูกค้าไม่ทราบว่าต้องการหน้าตาและระบบค้นหาแบบใด (Dooley &amp; Kazakova 8.2)
+          </p>
+          <p style="font-size:0.9rem; margin:0;">
+            <strong>โมเดลที่เหมาะสม:</strong> <strong>Throwaway UI Prototype + Iterative &amp; Incremental (Scrum)</strong> ใช้ต้นแบบหน้าจอคลิกได้เพื่อลดความคลุมเครือในสัปดาห์แรก จากนั้นส่งมอบ MVP ที่ค้นหากิจกรรมได้ก่อน แล้วค่อยเพิ่มระบบจัดการข้อมูลใน Sprint ถัดไป
+          </p>
+        </div>
+      </div>
+
+      <h3 class="subhead">5.2 ตารางเปรียบเทียบโมเดลกระบวนการพัฒนาซอฟต์แวร์เชิงวิศวกรรม</h3>
+      <div class="table-scroll">
+        <table class="briefing-table">
+          <thead>
+            <tr>
+              <th>โมเดลกระบวนการ</th>
+              <th>ความนิ่งของความต้องการ</th>
+              <th>การจัดการความเสี่ยง</th>
+              <th>การมีส่วนร่วมของลูกค้า</th>
+              <th>เอกสารและการควบคุม</th>
+              <th>ข้อควรระวัง / จุดอ่อน</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Waterfall (Plan-Driven)</strong></td>
+              <td>ต้องชัดเจนและนิ่งตั้งแต่ต้น</td>
+              <td>ต่ำ (ตรวจพบความเสี่ยงช่วงท้าย)</td>
+              <td>เฉพาะช่วงต้นและวันส่งมอบ</td>
+              <td>สูงมาก (สัญญาชัดเจน)</td>
+              <td>ความเสี่ยง Big Bang และแช่แข็งสเปกเร็วเกินไป</td>
+            </tr>
+            <tr>
+              <td><strong>Incremental Delivery</strong></td>
+              <td>ทราบภาพรวม แยกเป็นงวดได้</td>
+              <td>ปานกลาง (ลดความเสี่ยงทางธุรกิจ)</td>
+              <td>ประเมินทุกงวดที่ติดตั้งจริง</td>
+              <td>ปานกลาง</td>
+              <td>ยากเมื่อแทนที่ระบบเก่า หรือขาดการออกแบบโครงสร้างกลางร่วมกัน</td>
+            </tr>
+            <tr>
+              <td><strong>Throwaway Prototyping</strong></td>
+              <td>คลุมเครือมาก / ไม่แน่นอนสูง</td>
+              <td>สูงในขั้นสำรวจ (Change Anticipation)</td>
+              <td>สูงมากในขั้นประเมินต้นแบบ</td>
+              <td>ต่ำในต้นแบบ สูงในระบบจริง</td>
+              <td>อันตรายที่สุดหากผู้บริหารบังคับให้เอาโค้ดต้นแบบขึ้นระบบจริง</td>
+            </tr>
+            <tr>
+              <td><strong>Evolutionary Prototyping</strong></td>
+              <td>เปลี่ยนแปลงต่อเนื่อง</td>
+              <td>ปานกลาง</td>
+              <td>ต่อเนื่องตลอดโครงการ</td>
+              <td>ต่ำ</td>
+              <td>โครงสร้างโค้ดเสื่อมสลายได้ง่ายหากไม่ทำ Refactoring</td>
+            </tr>
+            <tr>
+              <td><strong>Boehm's Spiral Model</strong></td>
+              <td>ไม่แน่นอนและมีปัจจัยเทคนิคซับซ้อน</td>
+              <td><strong>สูงที่สุด</strong> (Risk-Driven ทุกวงรอบ)</td>
+              <td>ทบทวนร่วมกันทุกจตุภาคที่ 4</td>
+              <td>ปรับตามระดับความเสี่ยง</td>
+              <td>ซับซ้อน ต้องใช้ผู้เชี่ยวชาญประเมินความเสี่ยง ไม่คุ้มกับโครงการเล็ก</td>
+            </tr>
+            <tr>
+              <td><strong>Agile / Scrum (Iterative+Incremental)</strong></td>
+              <td>ผันผวนสูง (<span class="en-term">Churn</span>)</td>
+              <td>สูงต่อความเสี่ยงธุรกิจ/ความต้องการ</td>
+              <td>ใกล้ชิดรายวัน / Product Owner</td>
+              <td>น้อย เน้นโค้ดที่ทำงานได้</td>
+              <td>พึ่งพาบุคลากรสูง หากคนสำคัญลาออกอาจขาดความต่อเนื่อง และสเกลยากในทีมใหญ่</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- HANDS-ON WORKSHOP GUIDELINES -->
+      <div class="figure-card" id="workshop-panel">
+        <div class="dossier-bar" style="margin-bottom:var(--space-md);">
+          <div class="dossier-bar-left">
+            <span class="dossier-pill">WORKSHOP 90 MIN</span>
+            <span class="dossier-meta">HANDS-ON UNDERGRADUATE LAB • GROUP EXERCISE</span>
+          </div>
+          <span class="dossier-meta">STATE SAVED AUTOMATICALLY</span>
+        </div>
+
+        <h3 class="subhead" style="margin-top:0;">5.3 ใบงานปฏิบัติการกลุ่ม: ออกแบบกระบวนการให้ระบบ "Smart Campus Tele-Triage"</h3>
+        <div class="callout-rule">
+          <div class="callout-title">โจทย์สถานการณ์ปฏิบัติการ (Workshop Case Brief)</div>
+          มหาวิทยาลัยต้องการพัฒนาระบบคัดกรองอาการเจ็บป่วยเบื้องต้นออนไลน์และจองคิวคลินิกสำหรับนิสิต 30,000 คน โดยมีข้อเท็จจริงดังนี้: (1) พยาบาลและนิสิตยังไม่แน่ใจว่าหน้าจอแชทคัดกรองควรออกแบบอย่างไรให้ใช้งานง่ายภายใน 60 วินาที, (2) กฎหมายคุ้มครองข้อมูลสุขภาพกำหนดให้ข้อมูลประวัติการแพ้ยาและการวินิจฉัยต้องเข้ารหัสและห้ามรั่วไหล, (3) ต้องเชื่อมต่อกับระบบ Single Sign-On เก่าของมหาวิทยาลัยที่เอกสารไม่สมบูรณ์, และ (4) มีเวลาพัฒนา 12 สัปดาห์ก่อนเปิดภาคการศึกษาใหม่
+        </div>
+
+        <div class="two-col-asym" style="margin-top:var(--space-md);">
+          <div>
+            <h4 class="subhead" style="margin-top:0;">รายการตรวจสอบขั้นตอนปฏิบัติการ (Workshop Checklist)</h4>
+            <div style="display:flex; flex-direction:column; gap:var(--space-sm);" id="workshop-checklist">
+              <label class="check-item">
+                <input type="checkbox" id="chk-step-1" onchange="onWorkshopStateChange()">
+                <span><strong>ภารกิจ A (15 นาที):</strong> จำแนกส่วนประกอบของระบบออกเป็น "ส่วนที่ความต้องการนิ่ง/วิกฤตความปลอดภัย" และ "ส่วนที่ความต้องการผันผวนสูง" พร้อมเลือกโมเดลผสมผสาน (Hybrid Model)</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" id="chk-step-2" onchange="onWorkshopStateChange()">
+                <span><strong>ภารกิจ B (20 นาที):</strong> ออกแบบแผน Throwaway Prototype ตาม Sommerville Fig. 2.9 (ระบุวัตถุประสงค์ สิ่งที่ใส่/ตัดออก และเกณฑ์ประเมิน 60 วินาที)</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" id="chk-step-3" onchange="onWorkshopStateChange()">
+                <span><strong>ภารกิจ C (25 นาที):</strong> วิเคราะห์ความเสี่ยงสำคัญ 3 รายการในวงรอบ Spiral Q2 (เช่น SSO เก่าล้มเหลว, ข้อมูลสุขภาพรั่วไหล, UI สับสน) พร้อมระบุกลยุทธ์ Avoidance / Minimization / Contingency</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" id="chk-step-4" onchange="onWorkshopStateChange()">
+                <span><strong>ภารกิจ D (30 นาที):</strong> กำหนดขอบเขต MVP สำหรับ Sprint 1 (สัปดาห์ที่ 1–2) และกำหนดกติการับมือ Requirements Churn + แผน Refactoring</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="aside-box" style="margin:0;">
+            <span class="index-num">STUDENT WORKSPACE • บันทึกผลวิเคราะห์ของกลุ่ม</span>
+            <div class="field-group" style="margin-top:var(--space-sm); margin-bottom:var(--space-sm);">
+              <label for="ws-model-choice" class="field-label">โมเดลกระบวนการหลักที่กลุ่มเลือกใช้:</label>
+              <select id="ws-model-choice" class="field-select" onchange="onWorkshopStateChange()">
+                <option value="">-- เลือกแนวทางที่กลุ่มวิเคราะห์ได้ --</option>
+                <option value="Spiral + Throwaway UI + Incremental Sprints">Spiral (ด้าน Security/SSO) + Throwaway UI + Incremental Sprints</option>
+                <option value="Pure Waterfall">Pure Waterfall (ทำเอกสารครบก่อนสร้าง)</option>
+                <option value="Evolutionary Prototyping Only">Evolutionary Prototyping อย่างเดียว</option>
+              </select>
+            </div>
+            <div class="field-group" style="margin-bottom:var(--space-md);">
+              <label for="ws-notes" class="field-label">สรุปความเสี่ยงอันดับ 1 และขอบเขต MVP รอบแรกของกลุ่ม:</label>
+              <textarea id="ws-notes" class="field-textarea" placeholder="พิมพ์บันทึกการวิเคราะห์ความเสี่ยง กลยุทธ์รับมือ และฟีเจอร์ MVP ที่เลือกส่งมอบใน 2 สัปดาห์แรก..." oninput="onWorkshopStateChange()"></textarea>
+            </div>
+            <div class="btn-row">
+              <button type="button" class="btn btn-primary" onclick="exportWorkshopSummary()">ส่งออกบันทึกเวิร์กช็อป (.txt)</button>
+              <button type="button" class="btn btn-secondary" id="reset-state-btn" onclick="handleResetState(this)">ล้างข้อมูลที่บันทึก</button>
+            </div>
+            <div id="ws-status-toast" class="status-toast info" style="margin-top:var(--space-sm);" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE MASTERY QUIZ -->
+      <div class="figure-card" id="quiz-panel">
+        <div class="dossier-bar" style="margin-bottom:var(--space-md);">
+          <div class="dossier-bar-left">
+            <span class="index-num">MASTERY CHECK • 6 SCENARIO QUESTIONS</span>
+            <strong>แบบทดสอบความเข้าใจเชิงวิพากษ์ประจำบทที่ 3</strong>
+          </div>
+          <span id="quiz-score-badge" class="dossier-meta">SCORE: 0 / 6</span>
+        </div>
+
+        <div id="quiz-container" style="display:flex; flex-direction:column; gap:var(--space-lg);">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- ACADEMIC REFERENCES -->
+      <footer class="aside-box" aria-label="เอกสารอ้างอิงทางวิชาการ">
+        <span class="index-num">ACADEMIC REFERENCES &amp; GROUNDING</span>
+        <h3 class="subhead" style="margin:var(--space-xs) 0 var(--space-sm) 0; font-size:1.05rem;">เอกสารอ้างอิงหลักของบทเรียน</h3>
+        <ul class="academic-list" style="margin-bottom:0; max-width:none; font-size:0.92rem; color:var(--on-surface-variant);">
+          <li><strong>Sommerville, I. (2016).</strong> <em>Software Engineering</em> (10th ed., Global Edition). Pearson Education Limited. (เนื้อหาหลักจาก บทที่ 1 Introduction, บทที่ 2 Software Processes, บทที่ 3 Agile Software Development, บทที่ 4 Requirements Engineering, บทที่ 8 Software Testing, บทที่ 9 Software Evolution, บทที่ 12 Safety Engineering, บทที่ 22 Project Management และ บทที่ 23 Project Planning)</li>
+          <li><strong>Dooley, J. F., &amp; Kazakova, V. A. (2024).</strong> <em>Software Development, Design, and Coding: With Patterns, Debugging, Unit Testing, and Refactoring</em> (3rd ed.). Apress. (เนื้อหาหลักจาก บทที่ 2 Process Models, Agile, XP, Scrum, MVP และ Risk Mitigation และ บทที่ 8 Requirements Volatility, Wicked Problems และ Opportunity-Driven Development)</li>
+          <li><strong>Boehm, B. W. (1988).</strong> "A Spiral Model of Software Development and Enhancement." <em>IEEE Computer</em>, 21(5), 61–72. (อ้างอิงผ่าน Sommerville, 2016)</li>
+          <li><strong>DeMarco, T. (1983).</strong> <em>Controlling Software Projects</em> &amp; <strong>Conklin, J. (2005).</strong> <em>Dialogue Mapping</em>. (อ้างอิงผ่าน Dooley &amp; Kazakova, 2024)</li>
+        </ul>
+      </footer>
+    </section>
+
+  </div>
+
+  <api-shim></api-shim>
+
+  <script>
+    /* ================================================================
+       STATE & PERSISTENCE (notebookAppApi)
+       ================================================================ */
+    const APP_STATE = {
+      processMode: 'waterfall',
+      protoScenario: 'youth_web',
+      protoChoice: null,
+      spiralLoop: 1,
+      spiralQuadrant: null,
+      riskPreset: 'staff_skill',
+      riskProb: '4',
+      riskEffect: '4',
+      mitigationType: 'avoid',
+      refactorPct: 20,
+      churnPolicy: 'protect',
+      checklist: {
+        'chk-step-1': false,
+        'chk-step-2': false,
+        'chk-step-3': false,
+        'chk-step-4': false
+      },
+      wsModelChoice: '',
+      wsNotes: '',
+      quizAnswers: {}
+    };
+
+    let processChartInstance = null;
+    let sprintSimChartInstance = null;
+
+    function getThemeColor(tokenName) {
+      const val = getComputedStyle(document.documentElement).getPropertyValue(tokenName);
+      return val ? val.trim() : '#17181a';
+    }
+
+    async function persistState() {
+      if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === 'function') {
+        try {
+          await window.notebookAppApi.setAppState(APP_STATE);
+        } catch (e) {
+          // Graceful fallback if API rejects
+        }
+      }
+      updateOverallProgress();
+    }
+
+    function showToast(msg, variant) {
+      const el = document.getElementById('ws-status-toast');
+      if (!el) return;
+      el.className = `status-toast show ${variant === 'success' ? 'success' : 'info'}`;
+      el.textContent = msg;
+    }
+
+    /* ================================================================
+       SECTION 1: PROCESS ARCHETYPE EXPLORER & CHART
+       ================================================================ */
+    const PROCESS_DATA = {
+      waterfall: {
+        title: `Waterfall Model (Big Bang Delivery)`,
+        summary: `ดำเนินงานเป็นลำดับขั้นตายตัว (Specification → Design → Implementation → Testing) และส่งมอบซอฟต์แวร์เพียงครั้งเดียวเมื่อสิ้นสุดโครงการ`,
+        pros: `เอกสารครบถ้วน จัดการสัญญาจัดซื้อที่มีข้อกำหนดชัดเจนได้ดี (เช่น ระบบความปลอดภัยวิกฤตที่มีสเปกนิ่ง)`,
+        cons: `ความเสี่ยง Big Bang สูงมาก ลูกค้าไม่เห็นระบบจริงจนวันสุดท้าย หากความต้องการเปลี่ยนหรือแช่แข็งสเปกเร็วเกินไป ต้นทุนรื้อแก้จะพุ่งสูงมหาศาล`,
+        valueCurve: [0, 0, 0, 0, 0, 100],
+        riskCurve: [85, 88, 92, 95, 90, 20],
+        svgType: 'waterfall'
+      },
+      iterative: {
+        title: `Pure Iterative Development (ทำซ้ำเพื่อขัดเกลา)`,
+        summary: `วนรอบ Spec → Design → Build → Eval ซ้ำหลายรอบเพื่อขัดเกลาความเข้าใจและลดความคลุมเครือของระบบทั้งหมดก่อนเปิดใช้งานเต็มรูปแบบ`,
+        pros: `ค้นพบข้อผิดพลาดในการออกแบบเร็ว เปิดโอกาสให้ย้อนกลับแก้ไข (Backtracking) ได้ก่อนลงมือผลิตจริง`,
+        cons: `หากไม่แบ่งส่งมอบเป็นส่วนย่อยทางธุรกิจ ผู้ใช้อาจยังไม่ได้นำระบบไปใช้งานจริงระหว่างทางจนกว่ารอบสุดท้ายจะสมบูรณ์`,
+        valueCurve: [0, 10, 20, 35, 65, 100],
+        riskCurve: [85, 65, 45, 30, 18, 10],
+        svgType: 'iterative'
+      },
+      incremental: {
+        title: `Pure Incremental Delivery (ทยอยส่งมอบทีละส่วน)`,
+        summary: `แบ่งความต้องการที่ระบุไว้ล่วงหน้าออกเป็น Increment 1, 2, 3 ตามลำดับความสำคัญทางธุรกิจ แล้วสร้างและส่งมอบทีละส่วน`,
+        pros: `ลูกค้าได้รับคุณค่าทางธุรกิจเร็วตั้งแต่งวดแรก ลดความเสี่ยงแบบ Binary Deliverable (DeMarco, 1983)`,
+        cons: `หากไม่มีวงรอบทำซ้ำเพื่อรับข้อเสนอแนะและปรับแก้ความต้องการที่เพิ่งค้นพบ ระบบส่วนหลังอาจไม่สอดคล้องกับหน้างานจริง`,
+        valueCurve: [15, 35, 55, 75, 90, 100],
+        riskCurve: [80, 68, 56, 44, 30, 18],
+        svgType: 'incremental'
+      },
+      combined: {
+        title: `Combined Iterative & Incremental (Modern Agile / Spiral Cycles)`,
+        summary: `ผสานวงรอบทำซ้ำสั้นๆ เข้ากับการส่งมอบส่วนเพิ่มที่ทดสอบสมบูรณ์ (MVP) ทุกๆ 1–4 สัปดาห์ เพื่อเรียนรู้จากผู้ใช้จริงและปรับแผนทันที`,
+        pros: `ลดความเสี่ยง Big Bang สูงสุด: ได้ทั้งคุณค่าทางธุรกิจเร็วและการปรับแก้ความต้องการตามข้อเท็จจริงทุก Sprint (Sommerville 2.1.2; Dooley & Kazakova Ch. 2)`,
+        cons: `ต้องมีวินัยในการทำ Refactoring และ Test Automation เพื่อป้องกันโครงสร้างโค้ดเสื่อมสลายเมื่อแก้ซ้ำต่อเนื่อง`,
+        valueCurve: [20, 42, 62, 78, 90, 100],
+        riskCurve: [80, 50, 32, 20, 12, 8],
+        svgType: 'combined'
+      }
+    };
+
+    function renderProcessSVG(mode) {
+      const svg = document.getElementById('process-svg');
+      if (!svg) return;
+
+      const c1 = getThemeColor('--data-1');
+      const c2 = getThemeColor('--data-2');
+      const c3 = getThemeColor('--data-3');
+      const c4 = getThemeColor('--data-4');
+      const bg = getThemeColor('--surface-container');
+      const ink = getThemeColor('--on-surface');
+      const muted = getThemeColor('--on-surface-variant');
+      const white = getThemeColor('--surface-container-low');
+
+      if (mode === 'waterfall') {
+        svg.innerHTML = `
+          <rect x="20" y="30" width="120" height="44" rx="4" fill="${bg}" stroke="${c1}" stroke-width="2"/>
+          <text x="80" y="57" text-anchor="middle" font-size="12" font-weight="600" fill="${ink}">1. Specification</text>
+          <path d="M140 52 L165 52" stroke="${ink}" stroke-width="2"/>
+          <rect x="165" y="75" width="120" height="44" rx="4" fill="${bg}" stroke="${c1}" stroke-width="2"/>
+          <text x="225" y="102" text-anchor="middle" font-size="12" font-weight="600" fill="${ink}">2. Design</text>
+          <path d="M285 97 L310 97" stroke="${ink}" stroke-width="2"/>
+          <rect x="310" y="120" width="120" height="44" rx="4" fill="${bg}" stroke="${c1}" stroke-width="2"/>
+          <text x="370" y="147" text-anchor="middle" font-size="12" font-weight="600" fill="${ink}">3. Build &amp; Test</text>
+          <path d="M430 142 L455 142" stroke="${ink}" stroke-width="2"/>
+          <rect x="455" y="165" width="160" height="48" rx="4" fill="${c4}" stroke="${c4}" stroke-width="2"/>
+          <text x="535" y="187" text-anchor="middle" font-size="12" font-weight="700" fill="${white}">BIG BANG RELEASE</text>
+          <text x="535" y="203" text-anchor="middle" font-size="10" fill="${white}">ผู้ใช้เห็นระบบครั้งแรกเดือนที่ 6</text>
+          <text x="32" y="205" font-size="11" fill="${c4}" font-weight="600">ความเสี่ยง: หากสเปกผิดพลาด ต้นทุนย้อนแก้สูงมาก</text>
+        `;
+      } else if (mode === 'iterative') {
+        svg.innerHTML = `
+          <rect x="30" y="30" width="165" height="145" rx="6" fill="${bg}" stroke="${c1}" stroke-width="2"/>
+          <text x="112" y="54" text-anchor="middle" font-size="12" font-weight="700" fill="${c1}">Iteration 1 (Draft)</text>
+          <text x="112" y="82" text-anchor="middle" font-size="11" fill="${ink}">Spec → Design → Code → Test</text>
+          <text x="112" y="104" text-anchor="middle" font-size="11" fill="${muted}">Feedback: ยังเข้าใจผิด 40%</text>
+          <rect x="225" y="30" width="165" height="145" rx="6" fill="${bg}" stroke="${c2}" stroke-width="2"/>
+          <text x="307" y="54" text-anchor="middle" font-size="12" font-weight="700" fill="${ink}">Iteration 2 (Refine)</text>
+          <text x="307" y="82" text-anchor="middle" font-size="11" fill="${ink}">Revise Spec → Rebuild → Eval</text>
+          <text x="307" y="104" text-anchor="middle" font-size="11" fill="${muted}">Feedback: ใกล้ความจริง 80%</text>
+          <rect x="420" y="30" width="190" height="145" rx="6" fill="${c3}" stroke="${c3}" stroke-width="2"/>
+          <text x="515" y="54" text-anchor="middle" font-size="12" font-weight="700" fill="${white}">Iteration 3 (Final Polish)</text>
+          <text x="515" y="88" text-anchor="middle" font-size="11" fill="${white}">ระบบสมบูรณ์พร้อมส่งมอบจริง</text>
+          <path d="M195 102 L225 102" stroke="${ink}" stroke-width="2"/>
+          <path d="M390 102 L420 102" stroke="${ink}" stroke-width="2"/>
+          <text x="30" y="210" font-size="11" font-weight="600" fill="${c1}">เน้นการ "ทำซ้ำ" เพื่อขัดเกลาให้ถูกต้อง แต่ผู้ใช้ต้องรอใช้งานเต็มระบบในรอบท้าย</text>
+        `;
+      } else if (mode === 'incremental') {
+        svg.innerHTML = `
+          <rect x="25" y="30" width="150" height="44" rx="4" fill="${bg}" stroke="${ink}" stroke-width="1.5"/>
+          <text x="100" y="57" text-anchor="middle" font-size="11.5" font-weight="600" fill="${ink}">Outline Architecture</text>
+          <path d="M175 52 L220 52" stroke="${ink}" stroke-width="2"/>
+          <rect x="220" y="25" width="385" height="44" rx="4" fill="${c1}"/>
+          <text x="412" y="51" text-anchor="middle" font-size="12" font-weight="700" fill="${white}">Increment 1: Core Priority Features → Deploy Month 2</text>
+          <rect x="220" y="85" width="385" height="44" rx="4" fill="${c3}"/>
+          <text x="412" y="111" text-anchor="middle" font-size="12" font-weight="700" fill="${white}">Increment 2: Secondary Services → Deploy Month 4</text>
+          <rect x="220" y="145" width="385" height="44" rx="4" fill="${c2}"/>
+          <text x="412" y="171" text-anchor="middle" font-size="12" font-weight="700" fill="${ink}">Increment 3: Reporting &amp; Polish → Deploy Month 6</text>
+          <text x="25" y="215" font-size="11" font-weight="600" fill="${c3}">ได้คุณค่าทางธุรกิจเร็วทีละส่วน แต่อาจเจอปัญหาหากความต้องการเดิมเปลี่ยน</text>
+        `;
+      } else {
+        svg.innerHTML = `
+          <rect x="25" y="26" width="135" height="150" rx="6" fill="${c1}"/>
+          <text x="92" y="54" text-anchor="middle" font-size="12" font-weight="700" fill="${white}">Sprint 1: MVP 1</text>
+          <text x="92" y="82" text-anchor="middle" font-size="10.5" fill="${white}">Spec + Design</text>
+          <text x="92" y="100" text-anchor="middle" font-size="10.5" fill="${white}">Code + Test + Refactor</text>
+          <text x="92" y="135" text-anchor="middle" font-size="10.5" font-weight="700" fill="${white}">Deploy &amp; Feedback</text>
+
+          <path d="M160 100 L182 100" stroke="${ink}" stroke-width="2"/>
+
+          <rect x="182" y="26" width="135" height="150" rx="6" fill="${c3}"/>
+          <text x="249" y="54" text-anchor="middle" font-size="12" font-weight="700" fill="${white}">Sprint 2: MVP 2</text>
+          <text x="249" y="82" text-anchor="middle" font-size="10.5" fill="${white}">Refine + New Scope</text>
+          <text x="249" y="100" text-anchor="middle" font-size="10.5" fill="${white}">Code + Test + Refactor</text>
+          <text x="249" y="135" text-anchor="middle" font-size="10.5" font-weight="700" fill="${white}">Deploy &amp; Feedback</text>
+
+          <path d="M317 100 L339 100" stroke="${ink}" stroke-width="2"/>
+
+          <rect x="339" y="26" width="135" height="150" rx="6" fill="${c2}"/>
+          <text x="406" y="54" text-anchor="middle" font-size="12" font-weight="700" fill="${ink}">Sprint 3: MVP 3</text>
+          <text x="406" y="82" text-anchor="middle" font-size="10.5" fill="${ink}">Adapt to Churn</text>
+          <text x="406" y="100" text-anchor="middle" font-size="10.5" fill="${ink}">Code + Test + Refactor</text>
+          <text x="406" y="135" text-anchor="middle" font-size="10.5" font-weight="700" fill="${ink}">Deploy &amp; Feedback</text>
+
+          <path d="M474 100 L496 100" stroke="${ink}" stroke-width="2"/>
+
+          <rect x="496" y="26" width="120" height="150" rx="6" fill="${bg}" stroke="${c1}" stroke-width="2"/>
+          <text x="556" y="65" text-anchor="middle" font-size="12" font-weight="700" fill="${c1}">Sprint N</text>
+          <text x="556" y="95" text-anchor="middle" font-size="10.5" fill="${ink}">Continuous</text>
+          <text x="556" y="115" text-anchor="middle" font-size="10.5" fill="${ink}">Value &amp; Evolution</text>
+          <text x="25" y="210" font-size="11" font-weight="700" fill="${c3}">พลังประสาน: ส่งมอบ MVP ที่ใช้งานได้จริงทุกรอบ + ขัดเกลาความต้องการจากผู้ใช้จริง</text>
+        `;
+      }
+    }
+
+    function updateProcessChart(data) {
+      const ctxEl = document.getElementById('processChart');
+      if (!ctxEl || typeof Chart === 'undefined') return;
+
+      const c1 = getThemeColor('--data-1');
+      const c4 = getThemeColor('--data-4');
+      const gridColor = getThemeColor('--outline-variant');
+      const labels = ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6'];
+
+      if (processChartInstance) {
+        processChartInstance.data.datasets[0].data = data.valueCurve;
+        processChartInstance.data.datasets[1].data = data.riskCurve;
+        processChartInstance.update();
+        return;
+      }
+
+      processChartInstance = new Chart(ctxEl, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'คุณค่าทางธุรกิจที่ส่งมอบ (%)',
+              data: data.valueCurve,
+              borderColor: c1,
+              backgroundColor: c1,
+              borderWidth: 3,
+              tension: 0.25,
+              pointRadius: 4
+            },
+            {
+              label: 'ความเสี่ยงที่ยังไม่ถูกพิสูจน์ (%)',
+              data: data.riskCurve,
+              borderColor: c4,
+              backgroundColor: c4,
+              borderWidth: 2.5,
+              borderDash: [6, 4],
+              tension: 0.25,
+              pointRadius: 4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              min: 0,
+              max: 105,
+              grid: { color: gridColor },
+              ticks: { callback: function(v) { return v + '%'; } }
+            },
+            x: {
+              grid: { display: false }
+            }
+          },
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+    }
+
+    function selectProcessMode(mode) {
+      APP_STATE.processMode = mode;
+      const modes = ['waterfall', 'iterative', 'incremental', 'combined'];
+      for (let i = 0; i < modes.length; i++) {
+        const m = modes[i];
+        const btn = document.getElementById(`proc-btn-${m}`);
+        if (btn) {
+          if (m === mode) btn.classList.add('is-active');
+          else btn.classList.remove('is-active');
+        }
+      }
+
+      const data = PROCESS_DATA[mode] || PROCESS_DATA.waterfall;
+      const panel = document.getElementById('process-detail-panel');
+      if (panel) {
+        panel.innerHTML = `
+          <span class="index-num">MODEL ANALYSIS</span>
+          <h4 class="subhead" style="margin:var(--space-xs) 0;">${data.title}</h4>
+          <p style="font-size:0.92rem; margin:0 0 var(--space-sm) 0;">${data.summary}</p>
+          <p style="font-size:0.88rem; margin:0 0 var(--space-xs) 0;"><strong style="color:var(--positive);">จุดแข็ง:</strong> ${data.pros}</p>
+          <p style="font-size:0.88rem; margin:0;"><strong style="color:var(--error);">ความเสี่ยง/ข้อจำกัด:</strong> ${data.cons}</p>
+        `;
+      }
+      renderProcessSVG(mode);
+      updateProcessChart(data);
+      persistState();
+    }
+
+    /* ================================================================
+       SECTION 2: PROTOTYPING LAB
+       ================================================================ */
+    const PROTO_SCENARIOS = {
+      youth_web: {
+        title: `ระบบกิจกรรมเยาวชนออนไลน์ (Non-Profit Web Portal — Dooley & Kazakova บทที่ 8)`,
+        context: `องค์กรต้องการย้ายข้อมูลจากแฟ้มกระดาษและตารางคำนวณขึ้นเว็บ แต่ผู้ประสานงานไม่เคยออกแบบระบบเว็บมาก่อน จึงตอบไม่ได้ว่าหน้าจอค้นหาและฟอร์มแก้ไขควรมีหน้าตาหรือขั้นตอนอย่างไร`,
+        best: 'throwaway',
+        include: `หน้าจอค้นหากิจกรรม ฟอร์มอัปเดตข้อมูลจำลอง และลำดับการคลิกของบรรณารักษ์`,
+        exclude: `ระบบยืนยันตัวตนเต็มรูปแบบ การสำรองข้อมูลอัตโนมัติ และการรองรับผู้ใช้งานพร้อมกันหลักหมื่นคน`,
+        explanation: `ในกรณีนี้ ปัญหามีลักษณะเป็น Wicked Problem ลูกค้าจะรู้ว่าตัวเองต้องการอะไรก็ต่อเมื่อได้เห็นหน้าจอตัวอย่าง การสร้าง <strong>Throwaway UI Prototype</strong> อย่างรวดเร็วช่วยให้สำรวจและตกลงรูปแบบการใช้งานจริงได้ก่อน จากนั้นจึงโยนโค้ดต้นแบบทิ้งแล้วเริ่มสร้างระบบจริงด้วยสปรินต์ขนาดเล็ก`
+      },
+      insulin_ui: {
+        title: `หน้าจอแสดงผลและแจ้งเตือนของปั๊มอินซูลินพกพา (Sommerville บทที่ 1.3.1)`,
+        context: `ปั๊มอินซูลินเป็นระบบความปลอดภัยวิกฤต (Safety-Critical) ที่ฝังในตัวอุปกรณ์การแพทย์ ทีมวิศวกรต้องการทดสอบว่าผู้ป่วยเบาหวานสามารถอ่านค่า Display 1/Display 2 และรับรู้สัญญาณ Alarm ในภาวะน้ำตาลต่ำได้ชัดเจนหรือไม่`,
+        best: 'throwaway',
+        include: `การจำลองหน้าจอขนาดเล็ก ลำดับข้อความเตือน และปุ่มกดยืนยัน dose อินซูลิน`,
+        exclude: `ตรรกะการควบคุมมอเตอร์ฉีดยาจริง (Pump commands) ซึ่งต้องพัฒนาด้วยกระบวนการเข้มงวดและ Formal Verification`,
+        explanation: `สำหรับระบบความปลอดภัยวิกฤต <strong>ห้ามใช้ Evolutionary Prototype มาพัฒนาเป็นซอฟต์แวร์ฝังตัวควบคุมยาเด็ดขาด</strong> เพราะโค้ดที่ต่อเติมบ่อยจะไม่ผ่านเกณฑ์ความปลอดภัย (Safety Case) จึงควรใช้ <strong>Throwaway Prototype</strong> เฉพาะกับส่วนติดต่อผู้ใช้ (UI) แล้วทิ้งทั้งหมดก่อนเขียนซอฟต์แวร์จริงตามสเปกที่พิสูจน์แล้ว`
+      },
+      mentcare_db: {
+        title: `ทดสอบสมรรถนะการซิงก์ข้อมูลผู้ป่วย Mentcare แบบออฟไลน์ (Sommerville บทที่ 1.3.2)`,
+        context: `คลินิกสุขภาพจิตบางแห่งตั้งอยู่ในศูนย์ชุมชนที่ไม่มีเครือข่ายปลอดภัย แพทย์ต้องดาวน์โหลดข้อมูลผู้ป่วยลงแล็ปท็อปแล้วซิงก์กลับเมื่อต่อเครือข่ายได้ ทีมต้องการพิสูจน์ว่ากลไกจัดการข้อขัดแย้งของฐานข้อมูลท้องถิ่นทำได้เร็วพอหรือไม่`,
+        best: 'evolutionary',
+        include: `โมดูลซิงก์ข้อมูลตัวอย่าง ดัชนีค้นหาผู้ป่วย และการเข้ารหัสฐานข้อมูลท้องถิ่น`,
+        exclude: `โมดูลออกรายงานผู้บริหารรายเดือนและการเชื่อมต่อกับระบบโรงพยาบาลอื่น (ค่อยเพิ่มใน Increment ถัดไป)`,
+        explanation: `หากทีมวางสถาปัตยกรรมความปลอดภัยและการเข้ารหัสไว้อย่างมีระเบียบตั้งแต่ต้น สามารถใช้ <strong>Evolutionary Prototyping</strong> สำหรับระบบย่อยการจัดการข้อมูล (หรือสร้าง Technical Spike แล้วพัฒนาต่อยอดแบบ Incremental) โดยต้องทดสอบความเป็นส่วนตัวและความถูกต้องของการซิงก์อย่างเข้มงวดในทุกรอบ`
+      }
+    };
+
+    function updateProtoLab() {
+      const sel = document.getElementById('proto-scenario-select');
+      if (!sel) return;
+      APP_STATE.protoScenario = sel.value;
+      const sc = PROTO_SCENARIOS[sel.value] || PROTO_SCENARIOS.youth_web;
+      const descEl = document.getElementById('proto-scenario-desc');
+      if (descEl) {
+        descEl.innerHTML = `
+          <span class="index-num">SCENARIO CONTEXT</span>
+          <h4 style="margin:var(--space-xs) 0;">${sc.title}</h4>
+          <p style="font-size:0.9rem; margin:0;">${sc.context}</p>
+        `;
+      }
+      if (APP_STATE.protoChoice) {
+        evaluateProtoChoice(APP_STATE.protoChoice, true);
+      } else {
+        const fb = document.getElementById('proto-feedback-box');
+        if (fb) {
+          fb.innerHTML = `
+            <span class="index-num">ENGINEERING EVALUATION</span>
+            <h4 class="subhead" style="margin:var(--space-xs) 0;">ผลการวิเคราะห์ Tradeoffs และคำแนะนำ</h4>
+            <p style="color:var(--on-surface-variant); margin:0;">เลือกปุ่ม "Throwaway Prototype" หรือ "Evolutionary Prototype" ด้านซ้ายเพื่อประเมินความเหมาะสม</p>
+          `;
+        }
+      }
+      persistState();
+    }
+
+    function evaluateProtoChoice(choice, silent) {
+      APP_STATE.protoChoice = choice;
+      const btnT = document.getElementById('proto-choice-throwaway');
+      const btnE = document.getElementById('proto-choice-evolutionary');
+      if (btnT) btnT.classList.toggle('is-active', choice === 'throwaway');
+      if (btnE) btnE.classList.toggle('is-active', choice === 'evolutionary');
+
+      const sc = PROTO_SCENARIOS[APP_STATE.protoScenario] || PROTO_SCENARIOS.youth_web;
+      const isOptimal = (choice === sc.best);
+      const fb = document.getElementById('proto-feedback-box');
+      if (fb) {
+        fb.innerHTML = `
+          <span class="chip ${isOptimal ? 'chip-positive' : 'chip-error'}">
+            ${isOptimal ? 'เหมาะสมตามหลักวิศวกรรม (OPTIMAL CHOICE)' : 'ควรทบทวน Tradeoff (SUB-OPTIMAL CHOICE)'}
+          </span>
+          <h4 class="subhead" style="margin:var(--space-sm) 0 var(--space-xs) 0;">
+            ${isOptimal ? 'คำตัดสินสอดคล้องกับ Sommerville (2016)' : `แนวทางที่เหมาะสมกว่าคือ ${sc.best === 'throwaway' ? 'Throwaway Prototype' : 'Evolutionary Prototype'}`}
+          </h4>
+          <p style="font-size:0.9rem; margin:0 0 var(--space-sm) 0;">${sc.explanation}</p>
+          <div class="callout-rule" style="margin:0;">
+            <div style="font-size:0.86rem;"><strong>สิ่งที่ควรใส่ใน Stage 2:</strong> ${sc.include}</div>
+            <div style="font-size:0.86rem; margin-top:var(--space-xs);"><strong>สิ่งที่ควรตัดออกเพื่อความเร็ว/ปลอดภัย:</strong> ${sc.exclude}</div>
+          </div>
+        `;
+      }
+      if (!silent) persistState();
+    }
+
+    /* ================================================================
+       SECTION 3: BOEHM'S SPIRAL & RISK MATRIX
+       ================================================================ */
+    const SPIRAL_LOOPS = {
+      1: {
+        name: `Loop 1: System Feasibility & Concept`,
+        q1: `กำหนดวัตถุประสงค์ทางธุรกิจ ทางเลือกสถาปัตยกรรมเบื้องต้น และข้อจำกัดด้านงบประมาณ/กฎหมาย`,
+        q2: `ประเมินความเสี่ยงความเป็นไปได้ทางเทคนิคและความคุ้มทุน; สร้างต้นแบบพิสูจน์แนวคิด (Proof-of-Concept)`,
+        q3: `จัดทำร่างแนวคิดการปฏิบัติงาน (Concept of Operations) และผลทดสอบต้นแบบเบื้องต้น`,
+        q4: `ทบทวนร่วมกับผู้บริหารและลูกค้า เพื่อตัดสินใจว่าจะอนุมัติงบเดินหน้าสู่รอบกำหนดความต้องการหรือไม่`
+      },
+      2: {
+        name: `Loop 2: Requirements Definition`,
+        q1: `กำหนดเป้าหมายด้านฟังก์ชัน คุณสมบัติด้านความปลอดภัย/ความเชื่อถือได้ และข้อจำกัดด้านเวลา`,
+        q2: `ระบุความเสี่ยงจาก Requirements Churn และช่องโหว่ความต้องการ; สร้าง UI Prototype ให้ผู้ใช้ทดลอง`,
+        q3: `จัดทำเอกสารความต้องการพื้นฐาน (Requirements Specification / Prioritized Backlog) และทวนสอบความสอดคล้อง`,
+        q4: `วางแผนรอบการออกแบบสถาปัตยกรรมและการจัดสรรทีมพัฒนาสำหรับรอบถัดไป`
+      },
+      3: {
+        name: `Loop 3: System & Architectural Design`,
+        q1: `กำหนดทางเลือกสถาปัตยกรรม (เช่น Client-Server, RESTful Services, ฐานข้อมูล) และเป้าหมายสมรรถนะ`,
+        q2: `ประเมินความเสี่ยงด้านคอขวดฐานข้อมูล คอมโพเนนต์ภายนอก และความปลอดภัย; ทำ Benchmark & Simulation`,
+        q3: `ออกแบบสถาปัตยกรรมระบบ โมเดล UML และทวนสอบอินเทอร์เฟซระหว่างโมดูลย่อย`,
+        q4: `ยืนยันการเลือกกระบวนการพัฒนาสำหรับแต่ละส่วนย่อย (Plan-driven สำหรับส่วนวิกฤต / Agile สำหรับส่วน UI)`
+      },
+      4: {
+        name: `Loop 4: Implementation, Integration & Release`,
+        q1: `กำหนดขอบเขตฟีเจอร์ของรอบส่งมอบ เป้าหมายการทดสอบ และการฝึกอบรมผู้ใช้`,
+        q2: `ประเมินความเสี่ยงการรวมระบบ (Integration Risks) ปัญหาเครื่องมือ และผลกระทบต่อระบบเดิม`,
+        q3: `เขียนโค้ด ทดสอบระดับหน่วย/ระบบ (Unit, Release & User Acceptance Testing) และปรับโครงสร้างโค้ด`,
+        q4: `ส่งมอบระบบสู่การใช้งานจริง วางแผนรอบวิวัฒนาการและการบำรุงรักษาหลังส่งมอบ`
+      }
+    };
+
+    const SPIRAL_QUADRANTS = {
+      1: {
+        title: `Q1: Determine Objectives, Alternatives & Constraints`,
+        desc: `กำหนดเป้าหมายเฉพาะของรอบนั้น (เช่น สมรรถนะ ฟังก์ชัน ต้นทุน) ระบุทางเลือกในการแก้ปัญหา (เช่น ซื้อซอฟต์แวร์สำเร็จรูป vs. พัฒนาเอง) และข้อจำกัดที่มีผลบังคับ`
+      },
+      2: {
+        title: `Q2: Evaluate Alternatives, Identify & Resolve Risks`,
+        desc: `หัวใจสำคัญที่ทำให้ Spiral แตกต่างจากโมเดลอื่น: ประเมินทางเลือกเทียบกับเป้าหมาย ระบุพื้นที่ที่มีความไม่แน่นอนสูงสุด แล้วลงมือ "ลดความเสี่ยง" ด้วย Prototyping, Simulation หรือ Benchmarking`
+      },
+      3: {
+        title: `Q3: Develop & Verify Next-Level Product`,
+        desc: `หลังจากจัดการความเสี่ยงหลักแล้ว ทีมจึงเลือกโมเดลพัฒนาที่เหมาะสมที่สุดกับระดับความเสี่ยงที่เหลืออยู่ (เช่น Waterfall/Formal ถ้าความเสี่ยงสูงและสเปกนิ่ง หรือ Incremental/Agile ถ้ายืดหยุ่นได้)`
+      },
+      4: {
+        title: `Q4: Plan Next Phases & Stakeholder Review`,
+        desc: `ทบทวนผลผลิตของรอบปัจจุบันกับผู้มีส่วนได้ส่วนเสีย ตรวจสอบว่าความเสี่ยงยังอยู่ในระดับที่ยอมรับได้หรือไม่ จากนั้นวางแผนและขอความเห็นชอบสำหรับรอบสไปรัลถัดไป`
+      }
+    };
+
+    function renderSpiralInspector() {
+      const loopData = SPIRAL_LOOPS[APP_STATE.spiralLoop] || SPIRAL_LOOPS[1];
+      const qData = APP_STATE.spiralQuadrant ? SPIRAL_QUADRANTS[APP_STATE.spiralQuadrant] : null;
+      const el = document.getElementById('spiral-inspector');
+      if (!el) return;
+
+      for (let i = 1; i <= 4; i++) {
+        const btn = document.getElementById(`spiral-loop-${i}`);
+        if (btn) btn.classList.toggle('is-active', i === APP_STATE.spiralLoop);
+        const arc = document.getElementById(`spiral-arc-${i}`);
+        if (arc) {
+          arc.setAttribute('stroke-width', i === APP_STATE.spiralLoop ? '6' : '2.5');
+          arc.setAttribute('opacity', i === APP_STATE.spiralLoop ? '1' : '0.42');
+        }
+      }
+
+      let html = `
+        <span class="index-num">ACTIVE SPIRAL CYCLE</span>
+        <h4 class="subhead" style="margin:var(--space-xs) 0;">${loopData.name}</h4>
+        <ul class="academic-list" style="font-size:0.9rem; margin-bottom:${qData ? 'var(--space-md)' : '0'};">
+          <li><strong>Q1 (เป้าหมาย):</strong> ${loopData.q1}</li>
+          <li><strong>Q2 (ความเสี่ยง):</strong> ${loopData.q2}</li>
+          <li><strong>Q3 (พัฒนา/ทวนสอบ):</strong> ${loopData.q3}</li>
+          <li><strong>Q4 (ทบทวน/วางแผน):</strong> ${loopData.q4}</li>
+        </ul>
+      `;
+
+      if (qData) {
+        html += `
+          <div class="callout-rule" style="margin:0;">
+            <div class="callout-title">${qData.title}</div>
+            <p style="font-size:0.88rem; margin:0;">${qData.desc}</p>
+          </div>
+        `;
+      } else {
+        html += `<p style="font-size:0.84rem; color:var(--on-surface-variant); margin:var(--space-sm) 0 0 0;">คำแนะนำ: คลิกที่วงกลม Q1–Q4 ในแผนภาพด้านซ้ายเพื่ออ่านคำอธิบายบทบาทของแต่ละจตุภาค</p>`;
+      }
+      el.innerHTML = html;
+    }
+
+    function selectSpiralLoop(n) {
+      APP_STATE.spiralLoop = n;
+      renderSpiralInspector();
+      persistState();
+    }
+
+    function selectSpiralQuadrant(q) {
+      APP_STATE.spiralQuadrant = q;
+      renderSpiralInspector();
+      persistState();
+    }
+
+    /* Risk Register Simulator (Sommerville Fig. 22.3 - 22.5) */
+    const RISK_PRESETS = {
+      staff_skill: {
+        category: `People Risk (ความเสี่ยงด้านบุคลากร)`,
+        defaultProb: '4',
+        defaultEffect: '4',
+        indicators: `หาผู้สมัครที่มีประสบการณ์ตรงไม่ได้ภายในระยะเวลาที่กำหนด หรือผู้เชี่ยวชาญลาออก`,
+        avoid: `สำรวจตลาดแรงงานและเริ่มสรรหาล่วงหน้า หรือเลือกใช้เทคโนโลยีมาตรฐานที่ทีมเดิมมีทักษะอยู่แล้ว`,
+        min: `จัดหาผู้เชี่ยวชาญภายนอกเป็นที่ปรึกษาร่วมสอนงาน (Mentoring) ให้ทีมปัจจุบันเพื่อลดช่องว่างทักษะ`,
+        cont: `แจ้งลูกค้าถึงโอกาสล่าช้าและพิจารณาซื้อคอมโพเนนต์สำเร็จรูป (COTS/Reuse) มาใช้แทนการพัฒนาเอง (Sommerville Fig. 22.5)`
+      },
+      req_rework: {
+        category: `Requirements Risk (ความเสี่ยงด้านความต้องการ)`,
+        defaultProb: '3',
+        defaultEffect: '3',
+        indicators: `จำนวนคำขอเปลี่ยนแปลง (Change Requests) พุ่งสูงขึ้น หรือผู้มีส่วนได้ส่วนเสียมีความเห็นขัดแย้งกัน`,
+        avoid: `สร้าง Throwaway Prototype ให้ลูกค้าทดลองและยืนยันขั้นตอนงานก่อนเริ่มออกแบบสถาปัตยกรรมจริง`,
+        min: `สร้างตารางสืบย้อนความต้องการ (Traceability) เพื่อประเมินผลกระทบและใช้ Information Hiding ในการออกแบบ (Sommerville Fig. 22.5)`,
+        cont: `เจรจาเลื่อนฟีเจอร์ที่มีความสำคัญรองออกไปใน Release ถัดไปเพื่อรักษางบและกำหนดการหลัก`
+      },
+      db_perf: {
+        category: `Technology Risk (ความเสี่ยงด้านเทคโนโลยี)`,
+        defaultProb: '3',
+        defaultEffect: '3',
+        indicators: `ผลทดสอบโหลดเบื้องต้น (Load Testing) แสดงค่า Response Time เกินเกณฑ์เมื่อธุรกรรมเพิ่มขึ้น`,
+        avoid: `ทำ Database Prototyping และ Stress Benchmark ตั้งแต่ Loop 2–3 ของโมเดลสไปรัลก่อนเขียนระบบจริง`,
+        min: `ออกแบบ Data Caching Layer หรือแยกส่วนอ่านและส่วนเขียนข้อมูลออกจากกันเพื่อลดภาระฐานข้อมูลหลัก`,
+        cont: `ศึกษาทางเลือกในการอัปเกรดหรือจัดซื้อระบบจัดการฐานข้อมูลที่มีสมรรถนะสูงกว่า (Sommerville Fig. 22.5)`
+      },
+      budget_cut: {
+        category: `Organizational Risk (ความเสี่ยงด้านองค์กร)`,
+        defaultProb: '2',
+        defaultEffect: '4',
+        indicators: `ข่าวลือในองค์กร การปรับโครงสร้างผู้บริหาร หรือความล่าช้าในการอนุมัติงบประมาณ`,
+        avoid: `เชื่อมโยงเป้าหมายโครงการเข้ากับตัวชี้วัดกลยุทธ์หลักขององค์กรตั้งแต่วันแรกและรายงานความคืบหน้าสม่ำเสมอ`,
+        min: `ส่งมอบระบบแบบ Incremental ที่สร้างผลตอบแทนทางธุรกิจได้เร็ว เพื่อให้องค์กรเห็นความคุ้มค่าในระยะสั้น`,
+        cont: `จัดทำเอกสารชี้แจงต่อผู้บริหารระดับสูงแสดงให้เห็นว่าโครงการสร้างคุณค่าหลักต่อธุรกิจและการตัดงบไม่คุ้มค่า (Sommerville Fig. 22.5)`
+      },
+      est_time: {
+        category: `Estimation Risk (ความเสี่ยงด้านการประมาณการ)`,
+        defaultProb: '4',
+        defaultEffect: '3',
+        indicators: `ทีมทำตามกำหนดการย่อยไม่ทันซ้ำๆ หรืออัตราการแก้ไขข้อบกพร่องช้ากว่าที่วางแผนไว้ (Fig. 22.6)`,
+        avoid: `ใช้ข้อมูลสถิติความเร็วของทีมในอดีต (Velocity) ร่วมกับหลายเทคนิคการประมาณการแทนการเดาจากความหวัง`,
+        min: `แบ่งงานเป็น Sprint สั้นๆ พร้อมทำ Code Generation หรือนำเครื่องมืออัตโนมัติมาช่วยลดงานซ้ำซ้อน`,
+        cont: `นำคอมโพเนนต์สำเร็จรูปมาประกอบแทนการเขียนเองทั้งหมด หรือตัดฟีเจอร์รองตามหลัก Time-boxed MVP`
+      },
+      tool_gen: {
+        category: `Tools Risk (ความเสี่ยงด้านเครื่องมือพัฒนา)`,
+        defaultProb: '3',
+        defaultEffect: '1',
+        indicators: `เครื่องมือสร้างโค้ดอัตโนมัติผลิตโค้ดขนาดใหญ่เกินจำเป็นหรือปรับแต่งยาก`,
+        avoid: `ทดสอบเครื่องมือกับโมดูลขนาดเล็ก (Spike) ก่อนประกาศใช้เป็นมาตรฐานทั้งทีม`,
+        min: `จำกัดการใช้ Code Generator เฉพาะส่วน CRUD พื้นฐานและเขียนส่วนที่ต้องการประสิทธิภาพสูงด้วยมือ`,
+        cont: `ยอมรับผลกระทบเล็กน้อยด้านขนาดไฟล์ หรือปรับแต่งโค้ดเฉพาะจุดที่เป็นคอขวดจริง`
+      }
+    };
+
+    function loadRiskPreset() {
+      const sel = document.getElementById('risk-item-select');
+      if (!sel) return;
+      APP_STATE.riskPreset = sel.value;
+      const preset = RISK_PRESETS[sel.value] || RISK_PRESETS.staff_skill;
+      APP_STATE.riskProb = preset.defaultProb;
+      APP_STATE.riskEffect = preset.defaultEffect;
+
+      const probEl = document.getElementById('risk-prob-select');
+      const effEl = document.getElementById('risk-effect-select');
+      if (probEl) probEl.value = APP_STATE.riskProb;
+      if (effEl) effEl.value = APP_STATE.riskEffect;
+      recomputeRiskMatrix();
+    }
+
+    function selectMitigationType(type) {
+      APP_STATE.mitigationType = type;
+      const types = ['avoid', 'min', 'cont'];
+      for (let i = 0; i < types.length; i++) {
+        const t = types[i];
+        const btn = document.getElementById(`mit-btn-${t}`);
+        if (btn) btn.classList.toggle('is-active', t === type);
+      }
+      recomputeRiskMatrix();
+    }
+
+    function recomputeRiskMatrix() {
+      const probEl = document.getElementById('risk-prob-select');
+      const effEl = document.getElementById('risk-effect-select');
+      if (probEl) APP_STATE.riskProb = probEl.value;
+      if (effEl) APP_STATE.riskEffect = effEl.value;
+
+      const p = parseInt(APP_STATE.riskProb, 10) || 3;
+      const e = parseInt(APP_STATE.riskEffect, 10) || 3;
+      const score = p * e;
+
+      let tierLabel = 'Tolerable / Monitor Normally';
+      let tierClass = 'chip-slate';
+      let actionRule = `ความเสี่ยงระดับปานกลาง-ต่ำ ติดตามในรอบประชุมทบทวนปกติ`;
+      if (e === 4 || score >= 12) {
+        tierLabel = 'CRITICAL TOP-RISK (ต้องบรรจุในแผนจัดการทันที)';
+        tierClass = 'chip-error';
+        actionRule = `ตามเกณฑ์ Sommerville (22.1.2): ความเสี่ยงระดับ Catastrophic ทุกตัวและระดับ Serious ที่โอกาสเกิดปานกลางขึ้นไป ต้องอยู่ใน Top Risk List ที่ติดตามทุกรอบ`;
+      } else if (score >= 6) {
+        tierLabel = 'MODERATE / SERIOUS (เฝ้าระวังใกล้ชิด)';
+        tierClass = 'chip';
+        actionRule = `ควรเตรียมแผน Minimization หรือ Contingency ไว้รองรับก่อนเข้าสู่รอบก่อสร้างระบบ`;
+      }
+
+      const preset = RISK_PRESETS[APP_STATE.riskPreset] || RISK_PRESETS.staff_skill;
+      const stratText = APP_STATE.mitigationType === 'avoid' ? preset.avoid
+        : (APP_STATE.mitigationType === 'min' ? preset.min : preset.cont);
+      const stratTitle = APP_STATE.mitigationType === 'avoid' ? 'Avoidance Strategy (ลดโอกาสเกิด)'
+        : (APP_STATE.mitigationType === 'min' ? 'Minimization Strategy (ลดผลกระทบ)' : 'Contingency Plan (แผนสำรองฉุกเฉิน)');
+
+      const out = document.getElementById('risk-analysis-output');
+      if (out) {
+        out.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:var(--space-xs); margin-bottom:var(--space-sm);">
+            <span class="chip ${tierClass}">${tierLabel}</span>
+            <span class="en-term">Score: ${score} / 20</span>
+          </div>
+          <p style="font-size:0.88rem; margin:0 0 var(--space-sm) 0;"><strong>หมวดหมู่:</strong> ${preset.category}</p>
+          <p style="font-size:0.86rem; color:var(--on-surface-variant); margin:0 0 var(--space-sm) 0;">${actionRule}</p>
+          <div class="callout-rule" style="margin:0 0 var(--space-sm) 0;">
+            <div class="callout-title">${stratTitle}</div>
+            <p style="font-size:0.88rem; margin:0;">${stratText}</p>
+          </div>
+          <p style="font-size:0.84rem; margin:0;"><strong>ตัวชี้วัดการเฝ้าระวัง (Monitoring Indicator):</strong> ${preset.indicators}</p>
+        `;
+      }
+      persistState();
+    }
+
+    /* ================================================================
+       SECTION 4: MVP SPRINT & TECHNICAL DEBT SIMULATOR
+       ================================================================ */
+    function syncRefactorFromSlider(val) {
+      APP_STATE.refactorPct = parseInt(val, 10) || 0;
+      const lbl = document.getElementById('sim-refactor-val');
+      if (lbl) lbl.textContent = `${APP_STATE.refactorPct}%`;
+      runSprintSimulation();
+    }
+
+    function runSprintSimulation() {
+      const policyEl = document.getElementById('sim-churn-policy');
+      if (policyEl) APP_STATE.churnPolicy = policyEl.value;
+      const refPct = APP_STATE.refactorPct;
+      const policy = APP_STATE.churnPolicy;
+
+      const sprintLabels = ['Sprint 1', 'Sprint 2', 'Sprint 3', 'Sprint 4'];
+      const valueSeries = [];
+      const healthSeries = [];
+
+      let cumValue = 0;
+      let health = 100;
+
+      for (let s = 1; s <= 4; s++) {
+        // Technical debt penalty based on refactoring allocation and churn policy
+        const churnPenalty = policy === 'cram' ? 18 : (policy === 'swap' ? 6 : 3);
+        const debtDelta = (refPct - 18) * 0.7 - churnPenalty;
+        health = Math.max(15, Math.min(100, Math.round(health + debtDelta)));
+
+        // Feature delivery capacity shrinks as maintainability drops
+        const featureShare = (100 - refPct) / 100;
+        const speedMultiplier = health / 100;
+        const policyBonus = policy === 'swap' ? 1.05 : (policy === 'protect' ? 1.0 : 0.85);
+        const sprintValue = Math.round(35 * featureShare * speedMultiplier * policyBonus);
+
+        cumValue += sprintValue;
+        valueSeries.push(cumValue);
+        healthSeries.push(health);
+      }
+
+      const finalVal = valueSeries[3];
+      const finalHealth = healthSeries[3];
+
+      let verdictClass = 'callout-rule';
+      let verdictTitle = 'สมดุลระหว่างความเร็วและสถาปัตยกรรม (Sustainable MVP)';
+      let verdictMsg = `การจัดสรรเวลา ${refPct}% ให้ Refactoring ร่วมกับการปกป้อง Sprint Backlog ช่วยรักษาระดับ Maintainability Index ที่ ${finalHealth}/100 และส่งมอบคุณค่าสะสม ${finalVal} หน่วย`;
+
+      if (finalHealth < 55) {
+        verdictClass = 'callout-danger';
+        verdictTitle = 'เตือน: โครงสร้างโค้ดเสื่อมสลาย (Structural Degradation!)';
+        verdictMsg = `Maintainability Index ตกลงเหลือ ${finalHealth}/100 เพราะจัดสรรเวลา Refactoring น้อยเกินไปหรือยอมรับงานแทรกกลาง Sprint โดยไม่ตัดขอบเขตเดิม ทำให้ความเร็วทีมชะงักใน Sprint 3–4 (Sommerville 2.1.2)`;
+      } else if (refPct >= 35) {
+        verdictClass = 'callout-warning';
+        verdictTitle = 'สังเกต: ปรับโครงสร้างมากเกินจำเป็นต่อคุณค่าธุรกิจ';
+        verdictMsg = `แม้สุขภาพโค้ดจะสูงมาก (${finalHealth}/100) แต่มูลค่าฟีเจอร์ที่ลูกค้าใช้งานได้ (${finalVal} หน่วย) ช้าลง ควรปรับ Refactoring มาอยู่ราว 15–25% เพื่อให้ MVP ออกสู่ตลาดได้เร็ว`;
+      }
+
+      const vBox = document.getElementById('sim-verdict-box');
+      if (vBox) {
+        vBox.className = verdictClass;
+        vBox.innerHTML = `
+          <div class="callout-title">${verdictTitle}</div>
+          <p style="font-size:0.88rem; margin:0;">${verdictMsg}</p>
+        `;
+      }
+
+      const ctxEl = document.getElementById('sprintSimChart');
+      if (ctxEl && typeof Chart !== 'undefined') {
+        const c1 = getThemeColor('--data-1');
+        const c3 = getThemeColor('--data-3');
+        const gridColor = getThemeColor('--outline-variant');
+
+        if (sprintSimChartInstance) {
+          sprintSimChartInstance.data.datasets[0].data = valueSeries;
+          sprintSimChartInstance.data.datasets[1].data = healthSeries;
+          sprintSimChartInstance.update();
+        } else {
+          sprintSimChartInstance = new Chart(ctxEl, {
+            type: 'bar',
+            data: {
+              labels: sprintLabels,
+              datasets: [
+                {
+                  type: 'bar',
+                  label: 'คุณค่าธุรกิจสะสม (Value Points)',
+                  data: valueSeries,
+                  backgroundColor: c1,
+                  yAxisID: 'y'
+                },
+                {
+                  type: 'line',
+                  label: 'สุขภาพโครงสร้างโค้ด (Maintainability / 100)',
+                  data: healthSeries,
+                  borderColor: c3,
+                  backgroundColor: c3,
+                  borderWidth: 3,
+                  tension: 0.2,
+                  pointRadius: 5,
+                  yAxisID: 'y1'
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  type: 'linear',
+                  position: 'left',
+                  min: 0,
+                  max: 140,
+                  grid: { color: gridColor },
+                  title: { display: true, text: 'Cumulative Value' }
+                },
+                y1: {
+                  type: 'linear',
+                  position: 'right',
+                  min: 0,
+                  max: 105,
+                  grid: { drawOnChartArea: false },
+                  title: { display: true, text: 'Maintainability' }
+                }
+              },
+              plugins: {
+                legend: { position: 'bottom' }
+              }
+            }
+          });
+        }
+      }
+      persistState();
+    }
+
+    /* ================================================================
+       SECTION 5: WORKSHOP STATE, EXPORT & MASTERY QUIZ
+       ================================================================ */
+    const QUIZ_QUESTIONS = [
+      {
+        id: 'q1',
+        stem: `1. ข้อใดอธิบายความแตกต่างระหว่าง Iterative Development และ Incremental Development ได้ถูกต้องที่สุดตาม Sommerville (2016)?`,
+        options: [
+          `Iterative คือการพัฒนาให้เสร็จทีเดียวทั้งหมด ส่วน Incremental คือการเขียนเอกสารก่อนเขียนโค้ด`,
+          `Iterative เน้นการวนซ้ำเพื่อขัดเกลาความเข้าใจและแก้ไขข้อผิดพลาด (Backtracking) ส่วน Incremental เน้นการทยอยส่งมอบฟังก์ชันการทำงานที่มีคุณค่าทีละส่วน`,
+          `Incremental ไม่จำเป็นต้องมีการทดสอบ ส่วน Iterative ต้องทำ Formal Verification เสมอ`,
+          `ทั้งสองคำมีความหมายเหมือนกันทุกประการและไม่สามารถใช้ร่วมกันได้`
+        ],
+        correct: 1,
+        explanation: `ถูกต้อง: Iterative มุ่งเน้นการขัดเกลาความเข้าใจและการออกแบบผ่านการสอดประสาน Spec–Design–Code–Test ส่วน Incremental มุ่งเน้นการส่งมอบฟังก์ชันสำคัญทีละส่วน เมื่อนำมาผสานกันจึงช่วยลดความเสี่ยง Big Bang ได้ดีที่สุด (Sommerville 2.1.2)`
+      },
+      {
+        id: 'q2',
+        stem: `2. ความเสี่ยงใดร้ายแรงที่สุดเมื่อทีมพัฒนาสร้าง Throwaway Prototype หน้าตาสวยงามให้กับฝ่ายบริหารชม โดยไม่ได้ระบุวัตถุประสงค์ไว้ตั้งแต่ Stage 1 (Sommerville Fig. 2.9)?`,
+        options: [
+          `ต้นแบบจะใช้พื้นที่ฮาร์ดดิสก์มากเกินไป`,
+          `ฝ่ายบริหารอาจเข้าใจผิดว่าเป็นระบบเกือบสมบูรณ์และกดดันให้นำโค้ดต้นแบบที่ขาด NFRs และ Error Handling ไปใช้งานจริง`,
+          `ทีมพัฒนาจะไม่สามารถใช้ภาษาโปรแกรมเชิงวัตถุในการสร้างระบบจริงได้`,
+          `ผู้ประเมินจะขอเพิ่มเอกสาร UML Sequence Diagram มากเกินความจำเป็น`
+        ],
+        correct: 1,
+        explanation: `ถูกต้อง: Sommerville (2.3.1) เตือนว่า Throwaway Prototype จงใจละเว้นความเชื่อถือได้ การจัดการข้อผิดพลาด และประสิทธิภาพเพื่อความเร็ว หากไม่ประกาศจุดประสงค์ให้ชัดเจนตั้งแต่ต้น ผู้บริหารมักเข้าใจผิดและบังคับนำโค้ดต้นแบบขึ้นระบบจริง`
+      },
+      {
+        id: 'q3',
+        stem: `3. ในโมเดลสไปรัลของ Barry Boehm (1988) กิจกรรมใดเป็นตัวขับเคลื่อนหลักใน Quadrant II ก่อนที่จะเลือกโมเดลพัฒนาใน Quadrant III?`,
+        options: [
+          `การเขียนคู่มือผู้ใช้ฉบับสมบูรณ์`,
+          `การประเมินทางเลือก ระบุความเสี่ยงสูงสุด และลงมือลดความเสี่ยงด้วยต้นแบบหรือการจำลองผล`,
+          `การจัดซื้อลิขสิทธิ์ซอฟต์แวร์บัญชีขององค์กร`,
+          `การปรับโครงสร้างโค้ดที่ส่งมอบไปแล้วเมื่อ 2 ปีก่อน`
+        ],
+        correct: 1,
+        explanation: `ถูกต้อง: หัวใจของ Spiral Model คือ Risk-Driven Process ในจตุภาคที่ 2 ทีมต้องระบุความเสี่ยงหลักและลดความเสี่ยงนั้นให้กระจ่างก่อน จึงค่อยตัดสินใจในจตุภาคที่ 3 ว่าจะพัฒนาส่วนนั้นด้วยวิธีใด`
+      },
+      {
+        id: 'q4',
+        stem: `4. ตามแนวทางของ Dooley & Kazakova (2024) เมื่อเหลือเวลาอีก 3 วันก่อนครบกำหนด Sprint แบบ Time-boxed แต่ทีมพัฒนาไม่สามารถทำฟีเจอร์ที่วางแผนไว้ได้ครบ ทางเลือกใดสอดคล้องกับวินัยทางวิศวกรรม?`,
+        options: [
+          `ยกเลิกการเขียน Unit Test ทั้งหมดเพื่อให้โค้ดเสร็จทันเวลา`,
+          `ยืดวันส่งมอบ Sprint ออกไปเรื่อยๆ ทุกสัปดาห์จนกว่าจะครบ`,
+          `คงคุณภาพของ MVP ที่ทดสอบสมบูรณ์ไว้ แต่ตัดฟีเจอร์ที่สำคัญน้อยกว่ากลับไปรอใน Product Backlog (Remove Features)`,
+          `ปล่อยให้ระบบมีบั๊กร้ายแรงแล้วค่อยไปแก้ในวันเปิดตัวจริง`
+        ],
+        correct: 2,
+        explanation: `ถูกต้อง: Dooley & Kazakova (บทที่ 2) ระบุว่าเมื่อประเมินผิดพลาดและกำหนดส่งถูกตรึงไว้ตายตัว (Time-boxed Sprint) ต้องตัดขอบเขตฟีเจอร์รองออกเพื่อรักษาคุณภาพและความเสถียรของ MVP ที่ส่งมอบ`
+      },
+      {
+        id: 'q5',
+        stem: `5. เหตุใด Extreme Programming (XP) จึงเน้นการทำ Refactoring อย่างต่อเนื่องมากกว่าการออกแบบเผื่ออนาคตล่วงหน้าอย่างซับซ้อน (Design for Change)?`,
+        options: [
+          `เพราะการออกแบบล่วงหน้าทำให้ไม่สามารถใช้ฐานข้อมูลเชิงสัมพันธ์ได้`,
+          `เพราะการคาดเดาความเปลี่ยนแปลงล่วงหน้ามักสูญเปล่า (Anticipated changes often never materialize) การรักษาโค้ดให้เรียบง่ายแล้ว Refactor เมื่อความต้องการเปลี่ยนจริงจึงคุ้มค่ากว่า`,
+          `เพราะ Refactoring ไม่จำเป็นต้องใช้ชุดการทดสอบอัตโนมัติ`,
+          `เพราะระบบขนาดใหญ่ไม่มีทางเกิด Structural Degradation`
+        ],
+        correct: 1,
+        explanation: `ถูกต้อง: Sommerville (3.2.2) อธิบายหลักการของ XP ว่าการทุ่มเวลาสร้างโครงสร้างทั่วไปเผื่ออนาคตมักเป็นการลงทุนที่เสียเปล่า การทำ Refactoring อย่างสม่ำเสมอช่วยป้องกันโค้ดเสื่อมสลายได้ตรงจุดกว่า`
+      },
+      {
+        id: 'q6',
+        stem: `6. สำหรับระบบควบคุมปั๊มอินซูลินพกพา (Sommerville 1.3.1) แนวทางกระบวนการพัฒนาใดเหมาะสมที่สุด?`,
+        options: [
+          `Evolutionary Prototyping เต็มรูปแบบโดยไม่ต้องมีเอกสารข้อกำหนด`,
+          `Code and Fix เพื่อให้ส่งมอบได้เร็วที่สุดภายใน 2 สัปดาห์`,
+          `Plan-Driven / Spiral Model ที่มีข้อกำหนดความปลอดภัยวิเคราะห์ได้ครบถ้วนและการทวนสอบอย่างเข้มงวด โดยอาจใช้ Throwaway Prototype เฉพาะกับหน้าจอ UI`,
+          `Incremental Delivery โดยปล่อยให้ผู้ป่วยทดลองฉีดยาด้วยระบบที่ยังขาดฟีเจอร์เตือนน้ำตาลต่ำ`
+        ],
+        correct: 2,
+        explanation: `ถูกต้อง: ปั๊มอินซูลินเป็นระบบ Safety-Critical ที่ความผิดพลาดคุกคามชีวิต จึงต้องใช้กระบวนการที่วิเคราะห์สเปกและอันตรายได้อย่างสมบูรณ์ก่อนผลิต (Sommerville รูปที่ 1.1 & บทที่ 12)`
+      }
+    ];
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      if (!container) return;
+      let html = '';
+
+      for (let i = 0; i < QUIZ_QUESTIONS.length; i++) {
+        const q = QUIZ_QUESTIONS[i];
+        const chosen = APP_STATE.quizAnswers[q.id];
+        const hasAnswered = (typeof chosen === 'number');
+
+        let optionsHtml = '';
+        for (let j = 0; j < q.options.length; j++) {
+          let cls = 'quiz-option';
+          if (hasAnswered) {
+            if (j === q.correct) cls += ' selected-correct';
+            else if (j === chosen && chosen !== q.correct) cls += ' selected-wrong';
+          }
+          optionsHtml += `
+            <button type="button" class="${cls}" onclick="answerQuiz('${q.id}', ${j})">
+              <span class="index-num" style="min-width:24px;">${String.fromCharCode(65 + j)}.</span>
+              <span>${q.options[j]}</span>
+            </button>
+          `;
+        }
+
+        const feedbackHtml = hasAnswered ? `
+          <div class="${chosen === q.correct ? 'callout-rule' : 'callout-danger'}" style="margin:var(--space-sm) 0 0 0;">
+            <div class="callout-title">${chosen === q.correct ? 'คำตอบถูกต้อง' : 'ยังไม่ถูกต้อง — คำอธิบายเฉลย'}</div>
+            <p style="font-size:0.88rem; margin:0;">${q.explanation}</p>
+          </div>
+        ` : '';
+
+        html += `
+          <div class="aside-box" style="margin:0;">
+            <p style="font-weight:700; margin:0 0 var(--space-sm) 0;">${q.stem}</p>
+            <div style="display:flex; flex-direction:column; gap:var(--space-xs);">
+              ${optionsHtml}
+            </div>
+            ${feedbackHtml}
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+      updateQuizScoreBadge();
+    }
+
+    function answerQuiz(qid, optIdx) {
+      APP_STATE.quizAnswers[qid] = optIdx;
+      renderQuiz();
+      persistState();
+    }
+
+    function updateQuizScoreBadge() {
+      let correctCount = 0;
+      for (let i = 0; i < QUIZ_QUESTIONS.length; i++) {
+        const q = QUIZ_QUESTIONS[i];
+        if (APP_STATE.quizAnswers[q.id] === q.correct) correctCount++;
+      }
+      const badge = document.getElementById('quiz-score-badge');
+      if (badge) badge.textContent = `SCORE: ${correctCount} / ${QUIZ_QUESTIONS.length}`;
+    }
+
+    function onWorkshopStateChange() {
+      const checkIds = ['chk-step-1', 'chk-step-2', 'chk-step-3', 'chk-step-4'];
+      for (let i = 0; i < checkIds.length; i++) {
+        const id = checkIds[i];
+        const el = document.getElementById(id);
+        if (el) APP_STATE.checklist[id] = !!el.checked;
+      }
+      const sel = document.getElementById('ws-model-choice');
+      if (sel) APP_STATE.wsModelChoice = sel.value;
+      const notes = document.getElementById('ws-notes');
+      if (notes) APP_STATE.wsNotes = notes.value;
+
+      showToast('บันทึกความคืบหน้าเวิร์กช็อปเรียบร้อยแล้ว', 'success');
+      persistState();
+    }
+
+    function updateOverallProgress() {
+      let total = 10; // 4 workshop checkboxes + 6 quiz questions
+      let done = 0;
+      const checkIds = ['chk-step-1', 'chk-step-2', 'chk-step-3', 'chk-step-4'];
+      for (let i = 0; i < checkIds.length; i++) {
+        if (APP_STATE.checklist[checkIds[i]]) done++;
+      }
+      for (let i = 0; i < QUIZ_QUESTIONS.length; i++) {
+        if (typeof APP_STATE.quizAnswers[QUIZ_QUESTIONS[i].id] === 'number') done++;
+      }
+      const pct = Math.round((done / total) * 100);
+      const bar = document.getElementById('overall-progress-bar');
+      const lbl = document.getElementById('overall-progress-label');
+      if (bar) bar.style.width = `${pct}%`;
+      if (lbl) lbl.textContent = `${pct}% COMPLETED (${done}/${total})`;
+    }
+
+    function exportWorkshopSummary() {
+      const lines = [
+        `MODULE 3 WORKSHOP SUMMARY — SMART CAMPUS TELE-TRIAGE`,
+        `====================================================`,
+        `Selected Process Architecture: ${APP_STATE.wsModelChoice || '(Not selected yet)'}`,
+        ``,
+        `Workshop Checklist:`,
+        `[${APP_STATE.checklist['chk-step-1'] ? 'X' : ' '}] Task A: System Partitioning & Hybrid Model`,
+        `[${APP_STATE.checklist['chk-step-2'] ? 'X' : ' '}] Task B: Throwaway Prototype Plan (Sommerville Fig. 2.9)`,
+        `[${APP_STATE.checklist['chk-step-3'] ? 'X' : ' '}] Task C: Spiral Q2 Risk Register & Mitigation`,
+        `[${APP_STATE.checklist['chk-step-4'] ? 'X' : ' '}] Task D: Sprint 1 MVP & Churn/Refactoring Rules`,
+        ``,
+        `Group Notes & MVP Scope:`,
+        APP_STATE.wsNotes || '(No notes entered)',
+        ``,
+        `Quiz Progress: ${Object.keys(APP_STATE.quizAnswers).length} / ${QUIZ_QUESTIONS.length} answered`
+      ];
+      const content = lines.join('\n');
+
+      if (window.notebookAppApi && typeof window.notebookAppApi.triggerFileDownload === 'function') {
+        window.notebookAppApi.triggerFileDownload({
+          content: content,
+          contentType: 'text/plain',
+          encoding: 'UTF-8',
+          filename: 'module3-workshop-summary.txt'
+        });
+        showToast('ส่งออกไฟล์ module3-workshop-summary.txt สำเร็จ', 'success');
+      } else {
+        showToast('คัดลอกผลสรุปในระบบพร้อมใช้งานแล้ว', 'info');
+      }
+    }
+
+    function handleResetState(btn) {
+      if (!btn) return;
+      if (btn.dataset.armed !== 'true') {
+        btn.dataset.armed = 'true';
+        btn.textContent = 'คลิกอีกครั้งเพื่อยืนยันการล้างข้อมูล';
+        showToast('คำเตือน: กดปุ่มเดิมอีกครั้งเพื่อล้างคำตอบและบันทึกเวิร์กช็อปทั้งหมด', 'info');
+        return;
+      }
+      btn.dataset.armed = 'false';
+      btn.textContent = 'ล้างข้อมูลที่บันทึก';
+
+      APP_STATE.protoChoice = null;
+      APP_STATE.checklist = {
+        'chk-step-1': false,
+        'chk-step-2': false,
+        'chk-step-3': false,
+        'chk-step-4': false
+      };
+      APP_STATE.wsModelChoice = '';
+      APP_STATE.wsNotes = '';
+      APP_STATE.quizAnswers = {};
+
+      restoreDOMFromState();
+      persistState();
+      showToast('ล้างข้อมูลทั้งหมดเรียบร้อยแล้ว', 'success');
+    }
+
+    function restoreDOMFromState() {
+      const checkIds = ['chk-step-1', 'chk-step-2', 'chk-step-3', 'chk-step-4'];
+      for (let i = 0; i < checkIds.length; i++) {
+        const el = document.getElementById(checkIds[i]);
+        if (el) el.checked = !!APP_STATE.checklist[checkIds[i]];
+      }
+      const wsChoice = document.getElementById('ws-model-choice');
+      if (wsChoice) wsChoice.value = APP_STATE.wsModelChoice || '';
+      const wsNotes = document.getElementById('ws-notes');
+      if (wsNotes) wsNotes.value = APP_STATE.wsNotes || '';
+
+      const protoSel = document.getElementById('proto-scenario-select');
+      if (protoSel) protoSel.value = APP_STATE.protoScenario || 'youth_web';
+
+      const riskSel = document.getElementById('risk-item-select');
+      if (riskSel) riskSel.value = APP_STATE.riskPreset || 'staff_skill';
+      const probSel = document.getElementById('risk-prob-select');
+      if (probSel) probSel.value = APP_STATE.riskProb || '4';
+      const effSel = document.getElementById('risk-effect-select');
+      if (effSel) effSel.value = APP_STATE.riskEffect || '4';
+
+      const refSlider = document.getElementById('sim-refactor-slider');
+      if (refSlider) refSlider.value = String(APP_STATE.refactorPct);
+      const refVal = document.getElementById('sim-refactor-val');
+      if (refVal) refVal.textContent = `${APP_STATE.refactorPct}%`;
+      const churnSel = document.getElementById('sim-churn-policy');
+      if (churnSel) churnSel.value = APP_STATE.churnPolicy || 'protect';
+
+      selectProcessMode(APP_STATE.processMode || 'waterfall');
+      updateProtoLab();
+      renderSpiralInspector();
+      selectMitigationType(APP_STATE.mitigationType || 'avoid');
+      runSprintSimulation();
+      renderQuiz();
+      updateOverallProgress();
+    }
+
+    async function initApp() {
+      if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === 'function') {
+        try {
+          const saved = await window.notebookAppApi.getAppState();
+          if (saved && typeof saved === 'object') {
+            Object.assign(APP_STATE, saved);
+            if (!APP_STATE.checklist) {
+              APP_STATE.checklist = {
+                'chk-step-1': false,
+                'chk-step-2': false,
+                'chk-step-3': false,
+                'chk-step-4': false
+              };
+            }
+            if (!APP_STATE.quizAnswers) APP_STATE.quizAnswers = {};
+          }
+        } catch (e) {
+          // Proceed with default state
+        }
+      }
+
+      restoreDOMFromState();
+
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+      if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === 'function') {
+        window.notebookAppApi.notifyAppReady();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
