@@ -1,0 +1,2885 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="narrative">
+  <meta name="design-style" content="carbon">
+  <title>Module 4: Agile Process Frameworks — Scrum &amp; Kanban | วิศวกรรมซอฟต์แวร์</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* Page and surfaces (Carbon light) */
+      --background: #ffffff;
+      --surface-container-low: #f4f4f4;
+      --surface-container: #f4f4f4;
+      --surface-container-high: #e0e0e0;
+      --surface-hover: #ebebeb;
+
+      /* Ink */
+      --on-surface: #161616;
+      --on-surface-variant: #525252;
+
+      /* Rules */
+      --outline: #8d8d8d;
+      --outline-variant: #e0e0e0;
+
+      /* Accents */
+      --primary: #0f62fe;
+      --primary-hover: #0353e9;
+      --on-primary: #ffffff;
+      --primary-container: #d0e2ff;
+      --on-primary-container: #161616;
+      --secondary: #6f6f6f;
+      --tertiary: #198038;
+      --tertiary-container: #defbe6;
+      --on-tertiary-container: #0e6027;
+      --error: #da1e28;
+      --error-container: #fff1f1;
+      --on-error: #ffffff;
+
+      /* Semantic */
+      --positive: #198038;
+      --warning: #8e6a00;
+      --warning-container: #fcf4d6;
+      --on-warning-container: #5c4500;
+      --info-container: #edf5ff;
+
+      /* Data series */
+      --data-1: #0f62fe;
+      --data-2: #6929c4;
+      --data-3: #005d5d;
+      --data-4: #9f1853;
+      --data-context: #8d8d8d;
+
+      /* Fonts */
+      --font-headline: 'Noto Sans Thai', 'IBM Plex Sans', sans-serif;
+      --font-body: 'Noto Sans Thai', 'IBM Plex Sans', sans-serif;
+      --font-label: 'IBM Plex Mono', 'Noto Sans Thai', monospace;
+
+      /* Shape */
+      --rounded: 0.125rem;
+      --rounded-lg: 0.25rem;
+      --rounded-full: 0.75rem;
+
+      /* Style effects */
+      --shadow-1: 0 2px 6px rgb(0 0 0 / 0.1);
+      --shadow-2: 0 4px 12px rgb(0 0 0 / 0.12);
+      --rule: 1px solid var(--outline-variant);
+      --rule-strong: 1px solid var(--on-surface);
+      --field-rule: 1px solid var(--outline);
+      --indicator: 2px solid var(--primary);
+      --callout-bar: 3px solid var(--primary);
+      --callout-bar-success: 3px solid var(--tertiary);
+      --callout-bar-warn: 3px solid var(--warning);
+      --callout-bar-error: 3px solid var(--error);
+
+      /* Focus */
+      --focus: #0f62fe;
+
+      /* Type scale (Narrative with Thai readability tuning) */
+      --display-size: clamp(2rem, 1.35rem + 2.4vw, 3.125rem);
+      --headline-size: clamp(1.5rem, 1.2rem + 1.1vw, 2rem);
+      --subhead-size: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem);
+      --body-size: clamp(1rem, 0.96rem + 0.15vw, 1.0625rem);
+      --label-size: 0.75rem;
+
+      /* Spacing scale (4pt base) */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      scroll-behavior: smooth;
+    }
+
+    header { position: static !important; }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .page-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-xl);
+      padding: var(--space-lg);
+      max-width: 1200px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Top Course Bar & Masthead */
+    .course-topbar {
+      border-bottom: var(--rule);
+      padding-bottom: var(--space-md);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .mono-tag {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .mono-inline {
+      font-family: var(--font-label);
+      font-size: 0.875em;
+      background: var(--surface-container-low);
+      padding: 0.125rem 0.375rem;
+      border-radius: var(--rounded);
+      color: var(--on-surface);
+    }
+
+    .hero-block {
+      padding: var(--space-lg) 0 var(--space-xl);
+      border-bottom: var(--rule-strong);
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
+    .hero-title {
+      font-family: var(--font-headline);
+      font-size: var(--display-size);
+      font-weight: 300;
+      line-height: 1.25;
+      margin: var(--space-sm) 0 var(--space-md);
+      letter-spacing: 0;
+    }
+    .hero-title strong {
+      font-weight: 700;
+    }
+
+    .hero-lede {
+      font-size: var(--subhead-size);
+      color: var(--on-surface-variant);
+      line-height: 1.65;
+      max-width: 62ch;
+      margin: 0 0 var(--space-lg);
+    }
+
+    .hero-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+
+    .metric-tile {
+      background: var(--surface-container);
+      padding: var(--space-md);
+      border-radius: 0;
+      border-bottom: 2px solid var(--outline-variant);
+    }
+    .metric-tile.is-key {
+      border-bottom: var(--indicator);
+    }
+    .metric-tile .metric-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-xs);
+    }
+    .metric-tile .metric-value {
+      font-family: var(--font-label);
+      font-size: 1.625rem;
+      font-weight: 400;
+      color: var(--on-surface);
+      line-height: 1.2;
+    }
+    .metric-tile .metric-sub {
+      font-size: 0.8125rem;
+      color: var(--on-surface-variant);
+      margin-top: var(--space-xs);
+      line-height: 1.45;
+    }
+
+    /* Table of Contents / Navigation Strip */
+    .toc-panel {
+      background: var(--surface-container);
+      padding: var(--space-lg);
+      display: grid;
+      gap: var(--space-md);
+    }
+    .toc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: var(--rule);
+      padding-bottom: var(--space-sm);
+    }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+      gap: var(--space-sm);
+    }
+    .toc-link {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--background);
+      color: var(--on-surface);
+      text-decoration: none;
+      border-left: 2px solid transparent;
+      transition: background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+      min-height: 44px;
+    }
+    .toc-link:hover {
+      background: var(--surface-hover);
+      border-left-color: var(--primary);
+    }
+    .toc-num {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--primary);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .toc-text {
+      font-size: 0.9375rem;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    /* Sections & Typography */
+    .module-section {
+      padding-top: var(--space-xl);
+      display: grid;
+      gap: var(--space-lg);
+    }
+
+    .section-head {
+      border-bottom: var(--rule);
+      padding-bottom: var(--space-md);
+    }
+    .section-index {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--primary);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: var(--space-xs);
+    }
+    .section-title {
+      font-family: var(--font-headline);
+      font-size: var(--headline-size);
+      font-weight: 300;
+      line-height: 1.3;
+      margin: 0 0 var(--space-xs);
+    }
+    .section-title strong {
+      font-weight: 600;
+    }
+    .section-subtitle {
+      font-size: 1rem;
+      color: var(--on-surface-variant);
+      margin: 0;
+      max-width: 70ch;
+    }
+
+    .subsection-title {
+      font-family: var(--font-headline);
+      font-size: var(--subhead-size);
+      font-weight: 600;
+      margin: var(--space-md) 0 var(--space-sm);
+      color: var(--on-surface);
+      line-height: 1.4;
+    }
+
+    p {
+      margin: 0 0 var(--space-md);
+      max-width: 72ch;
+    }
+    p:last-child { margin-bottom: 0; }
+
+    ul, ol {
+      margin: 0 0 var(--space-md);
+      padding-left: var(--space-lg);
+      max-width: 72ch;
+    }
+    li { margin-bottom: var(--space-xs); }
+    li:last-child { margin-bottom: 0; }
+
+    /* Carbon Layers & Asymmetric Layouts */
+    .split-8-4 {
+      display: grid;
+      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+    .split-6-6 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-lg);
+      align-items: start;
+    }
+
+    .layer {
+      background: var(--surface-container);
+      padding: var(--space-lg);
+      border-radius: 0;
+    }
+    .layer .layer {
+      background: var(--surface-container-high);
+      padding: var(--space-md);
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(270px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+    .card-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+
+    .carbon-card {
+      background: var(--surface-container);
+      padding: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    .carbon-card.bordered {
+      background: var(--background);
+      border: var(--rule);
+    }
+    .carbon-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+      border-bottom: var(--rule);
+      padding-bottom: var(--space-sm);
+    }
+    .carbon-card-title {
+      font-weight: 600;
+      font-size: 1.0625rem;
+      margin: 0;
+    }
+
+    /* Callout / Notification Strips */
+    .callout {
+      background: var(--surface-container);
+      border-left: var(--callout-bar);
+      padding: var(--space-md) var(--space-lg);
+      display: grid;
+      gap: var(--space-xs);
+    }
+    .callout.is-success {
+      border-left: var(--callout-bar-success);
+      background: var(--tertiary-container);
+    }
+    .callout.is-warning {
+      border-left: var(--callout-bar-warn);
+      background: var(--warning-container);
+    }
+    .callout.is-error {
+      border-left: var(--callout-bar-error);
+      background: var(--error-container);
+    }
+    .callout.is-info {
+      border-left: var(--callout-bar);
+      background: var(--info-container);
+    }
+    .callout-title {
+      font-weight: 600;
+      font-size: 0.9375rem;
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      color: var(--on-surface);
+    }
+    .callout-body {
+      font-size: 0.9375rem;
+      color: var(--on-surface);
+      max-width: none;
+    }
+
+    /* Visual Idea Box */
+    .visual-box {
+      background: var(--background);
+      border: 1px solid var(--outline-variant);
+      border-top: 2px solid var(--primary);
+      padding: var(--space-lg);
+      display: grid;
+      gap: var(--space-md);
+    }
+    .visual-box-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+      border-bottom: var(--rule);
+      padding-bottom: var(--space-sm);
+    }
+    .visual-box-title {
+      font-weight: 600;
+      font-size: 1rem;
+      margin: 0;
+    }
+    .visual-caption {
+      font-size: 0.875rem;
+      color: var(--on-surface-variant);
+      border-top: var(--rule);
+      padding-top: var(--space-sm);
+    }
+
+    /* Tags & Pills (Carbon: only tags use --rounded-full) */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 var(--space-sm);
+      border-radius: var(--rounded-full);
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      white-space: nowrap;
+    }
+    .tag.is-green {
+      background: var(--tertiary-container);
+      color: var(--on-tertiary-container);
+    }
+    .tag.is-warn {
+      background: var(--warning-container);
+      color: var(--on-warning-container);
+    }
+    .tag.is-red {
+      background: var(--error-container);
+      color: var(--error);
+    }
+    .tag.is-gray {
+      background: var(--surface-container-high);
+      color: var(--on-surface);
+    }
+
+    /* Buttons (Carbon square corners, 40px/44px min touch target) */
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--rounded);
+      border: 1px solid transparent;
+      font-weight: 500;
+      font-size: 0.9375rem;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+    .btn-secondary {
+      background: var(--background);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+    .btn-secondary:hover {
+      background: var(--info-container);
+    }
+    .btn-ghost {
+      background: var(--surface-container);
+      color: var(--on-surface);
+      border-color: var(--outline-variant);
+    }
+    .btn-ghost:hover {
+      background: var(--surface-container-high);
+    }
+    .btn-ghost.is-active {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+    .btn-sm {
+      min-height: 36px;
+      padding: var(--space-xs) var(--space-md);
+      font-size: 0.8125rem;
+    }
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    /* Tabs (Carbon bottom indicator) */
+    .tab-bar {
+      display: flex;
+      flex-wrap: wrap;
+      border-bottom: var(--rule);
+      gap: var(--space-xs);
+    }
+    .tab-btn {
+      background: transparent;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      padding: var(--space-sm) var(--space-md);
+      min-height: 44px;
+      color: var(--on-surface-variant);
+      font-weight: 400;
+      cursor: pointer;
+      transition: color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+    .tab-btn:hover {
+      color: var(--on-surface);
+      background: var(--surface-container);
+    }
+    .tab-btn.is-active {
+      color: var(--on-surface);
+      font-weight: 600;
+      border-bottom: var(--indicator);
+    }
+
+    /* Tables (Carbon zebra striping, no vertical rules) */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border-top: var(--rule-strong);
+      border-bottom: var(--rule);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9375rem;
+    }
+    thead tr {
+      background: var(--surface-container-high);
+    }
+    th {
+      font-family: var(--font-label);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--on-surface);
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: var(--rule);
+      vertical-align: bottom;
+    }
+    td {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: var(--rule);
+      vertical-align: top;
+      line-height: 1.55;
+    }
+    tbody tr:nth-child(even) {
+      background: var(--surface-container-low);
+    }
+    .num-cell {
+      font-family: var(--font-label);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    /* Form Controls */
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      align-items: end;
+    }
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      min-width: 180px;
+      flex: 1;
+    }
+    .field-label {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--on-surface-variant);
+    }
+    .field-input, .field-select {
+      height: 40px;
+      background: var(--surface-container);
+      border: 0;
+      border-bottom: var(--field-rule);
+      padding: 0 var(--space-md);
+      color: var(--on-surface);
+      border-radius: 0;
+    }
+    .field-select {
+      padding-right: var(--space-xl);
+    }
+
+    /* Agile 4 Values Matrix */
+    .manifesto-values {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+    .value-pair {
+      background: var(--surface-container);
+      padding: var(--space-md);
+      border-left: 3px solid var(--primary);
+      display: grid;
+      gap: var(--space-xs);
+    }
+    .value-left {
+      font-weight: 700;
+      color: var(--on-surface);
+      font-size: 1rem;
+    }
+    .value-over {
+      font-family: var(--font-label);
+      font-size: 0.75rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .value-right {
+      font-size: 0.9375rem;
+      color: var(--on-surface-variant);
+    }
+
+    /* 12 Principles Compact List */
+    .principles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+      gap: var(--space-sm);
+    }
+    .principle-item {
+      display: flex;
+      gap: var(--space-sm);
+      align-items: flex-start;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--background);
+      border-bottom: var(--rule);
+    }
+    .p-num {
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: 0.8125rem;
+      color: var(--primary);
+      min-width: 24px;
+    }
+
+    /* Scrum Event Strip */
+    .scrum-step-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
+      gap: var(--space-xs);
+    }
+    .scrum-step-btn {
+      text-align: left;
+      padding: var(--space-md);
+      background: var(--surface-container);
+      border: 0;
+      border-bottom: 2px solid var(--outline-variant);
+      cursor: pointer;
+      display: grid;
+      gap: var(--space-xs);
+      min-height: 44px;
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+    .scrum-step-btn:hover {
+      background: var(--surface-container-high);
+    }
+    .scrum-step-btn.is-active {
+      background: var(--info-container);
+      border-bottom: var(--indicator);
+    }
+
+    /* Chart Container */
+    .chart-box {
+      position: relative;
+      width: 100%;
+      min-height: 320px;
+      background: var(--background);
+      padding: var(--space-md);
+      border: var(--rule);
+    }
+
+    /* Kanban Simulator */
+    .kanban-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      justify-content: space-between;
+      align-items: end;
+      background: var(--surface-container);
+      padding: var(--space-md);
+    }
+    .kanban-metrics-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+      gap: var(--space-sm);
+    }
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+    .kanban-col {
+      background: var(--surface-container);
+      padding: var(--space-sm);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      min-height: 300px;
+    }
+    .kanban-col.is-at-limit {
+      background: var(--warning-container);
+    }
+    .kanban-col-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: var(--space-xs);
+      border-bottom: 2px solid var(--outline);
+    }
+    .kanban-col.is-at-limit .kanban-col-head {
+      border-bottom-color: var(--error);
+    }
+    .kanban-col-title {
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .kanban-wip-badge {
+      font-family: var(--font-label);
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      background: var(--background);
+      border: var(--rule);
+    }
+    .kanban-col.is-at-limit .kanban-wip-badge {
+      background: var(--error);
+      color: var(--on-error);
+      border-color: var(--error);
+    }
+    .kanban-card {
+      background: var(--background);
+      border: var(--rule);
+      border-left: 3px solid var(--primary);
+      padding: var(--space-sm);
+      display: grid;
+      gap: var(--space-xs);
+    }
+    .kanban-card.lane-bug {
+      border-left-color: var(--error);
+    }
+    .kanban-card-id {
+      font-family: var(--font-label);
+      font-size: 0.75rem;
+      color: var(--on-surface-variant);
+      display: flex;
+      justify-content: space-between;
+    }
+    .kanban-card-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .kanban-card-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: var(--space-xs);
+    }
+
+    /* Code / Issue Template Block */
+    .code-panel {
+      background: var(--surface-container);
+      border-left: 3px solid var(--on-surface);
+      padding: var(--space-md);
+      font-family: var(--font-label);
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    /* Checklist & Workshop */
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      padding: var(--space-sm);
+      background: var(--background);
+      border-bottom: var(--rule);
+      cursor: pointer;
+    }
+    .check-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: var(--primary);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    /* Collapsible details */
+    details.carbon-details {
+      background: var(--surface-container);
+      border-left: 2px solid var(--outline);
+      padding: var(--space-md);
+    }
+    details.carbon-details summary {
+      font-weight: 600;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    details.carbon-details[open] summary {
+      border-bottom: var(--rule);
+      padding-bottom: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    /* Footer */
+    .page-footer {
+      border-top: var(--rule-strong);
+      padding: var(--space-xl) 0 var(--space-2xl);
+      display: grid;
+      gap: var(--space-md);
+      color: var(--on-surface-variant);
+      font-size: 0.875rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 900px) {
+      .hero-block,
+      .split-8-4,
+      .split-6-6 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .kanban-board {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-grid {
+        padding: var(--space-md);
+        gap: var(--space-lg);
+      }
+      .hero-meta-grid,
+      .kanban-board {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .btn {
+        width: 100%;
+      }
+      .kanban-card-actions .btn {
+        width: auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    @media print {
+      body { font-size: 10.5pt; line-height: 1.5; }
+      .page-grid { max-width: 100%; padding: 0; }
+      .btn, .kanban-controls, .tab-bar { display: none; }
+      .module-section { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-grid">
+    <!-- Top Course Header -->
+    <header>
+      <div class="course-topbar">
+        <span class="mono-tag">CS / SE LECTURE &amp; STUDY HANDBOOK // MODULE 04</span>
+        <span class="mono-tag">SOFTWARE ENGINEERING &amp; SENIOR PROJECT PREP</span>
+      </div>
+
+      <div class="hero-block">
+        <div>
+          <span class="tag">Core Module — Agile Process Frameworks</span>
+          <h1 class="hero-title">
+            กรอบการทำงานอไจล์: <strong>Scrum และ Kanban</strong> สำหรับวิศวกรรมซอฟต์แวร์ยุคใหม่
+          </h1>
+          <p class="hero-lede">
+            คู่มือการบรรยายและการเรียนรู้เชิงลึกสำหรับนักศึกษาปริญญาตรี สาขาวิทยาการคอมพิวเตอร์และวิศวกรรมซอฟต์แวร์ เพื่อทำความเข้าใจปรัชญาอไจล์ ความเชื่อมโยงกับ Lean Software Development กลไกของ Scrum และ Kanban ตลอดจนการประยุกต์ใช้เครื่องมือระดับอุตสาหกรรม (User Stories, GitHub Projects, Git Flow) สำหรับโครงงาน Senior Project
+          </p>
+          <div class="btn-row">
+            <a href="#sec-1" class="btn btn-primary">เริ่มศึกษาบทที่ 1: ปรัชญาอไจล์</a>
+            <a href="#sec-6" class="btn btn-secondary">ข้ามไป Workshop 4: ปฏิบัติการกลุ่ม</a>
+          </div>
+        </div>
+
+        <div class="hero-meta-grid">
+          <div class="metric-tile is-key">
+            <div class="metric-label">Agile Manifesto</div>
+            <div class="metric-value">4 / 12</div>
+            <div class="metric-sub">4 ค่านิยมหลัก และ 12 หลักการปฏิบัติ</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-label">Lean Principles</div>
+            <div class="metric-value">7 Wastes</div>
+            <div class="metric-sub">หลักการขจัดความสูญเปล่าและสร้างคุณภาพ</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-label">Scrum Timebox</div>
+            <div class="metric-value">2–4 Wks</div>
+            <div class="metric-sub">วงรอบ Sprint สั้นเพื่อส่งมอบ MVP</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-label">Kanban Control</div>
+            <div class="metric-value">WIP Limit</div>
+            <div class="metric-sub">จำกัดงานค้างเพื่อลดคอขวดและ Cycle Time</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table of Contents -->
+      <nav class="toc-panel" aria-label="สารบัญเนื้อหาประจำโมดูล">
+        <div class="toc-header">
+          <span style="font-weight: 600;">โครงสร้างบทเรียน (Module 4 Outline)</span>
+          <span class="mono-tag">6 CHAPTERS + INTERACTIVE LABS</span>
+        </div>
+        <div class="toc-grid">
+          <a href="#sec-1" class="toc-link">
+            <span class="toc-num">01</span>
+            <span class="toc-text">ปรัชญาอไจล์, Lean และ Plan-Driven vs. Agile</span>
+          </a>
+          <a href="#sec-2" class="toc-link">
+            <span class="toc-num">02</span>
+            <span class="toc-text">กรอบการทำงาน Scrum เจาะลึก Roles, Artifacts &amp; Events</span>
+          </a>
+          <a href="#sec-3" class="toc-link">
+            <span class="toc-num">03</span>
+            <span class="toc-text">ระเบียบวิธี Kanban, Pull System, WIP &amp; Flow Metrics</span>
+          </a>
+          <a href="#sec-4" class="toc-link">
+            <span class="toc-num">04</span>
+            <span class="toc-text">การเปรียบเทียบ Scrum vs. Kanban และแนวคิดลูกผสม Scrumban</span>
+          </a>
+          <a href="#sec-5" class="toc-link">
+            <span class="toc-num">05</span>
+            <span class="toc-text">การเขียน INVEST User Stories, SMART Tasks &amp; Git Flow</span>
+          </a>
+          <a href="#sec-6" class="toc-link">
+            <span class="toc-num">06</span>
+            <span class="toc-text">Workshop 4: Lego Scrum &amp; GitHub Kanban Simulation</span>
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 1: AGILE PHILOSOPHY & MANIFESTO                             -->
+    <!-- =================================================================== -->
+    <section id="sec-1" class="module-section">
+      <div class="section-head">
+        <span class="section-index">01 // AGILE PHILOSOPHY &amp; LEAN THINKING</span>
+        <h2 class="section-title">ปรัชญาและแนวคิดของอไจล์: <strong>ตอบสนองต่อความเปลี่ยนแปลงได้ไวกว่าการยึดติดแผน</strong></h2>
+        <p class="section-subtitle">
+          เหตุใดโลกวิศวกรรมซอฟต์แวร์จึงเปลี่ยนผ่านจากกระบวนการวางแผนแบบดั้งเดิม (Plan-Driven) สู่แนวคิดอไจล์ (Agile) และเชื่อมโยงกับหลักการผลิตแบบ Lean อย่างไร (อ้างอิง Sommerville บทที่ 3 และ Dooley &amp; Kazakova บทที่ 2)
+        </p>
+      </div>
+
+      <div class="split-8-4">
+        <div>
+          <h3 class="subsection-title">1.1 ที่มาและคำประกาศอไจล์ (The Agile Manifesto, 2001)</h3>
+          <p>
+            ในช่วงทศวรรษ 1980 ถึงต้นทศวรรษ 1990 อุตสาหกรรมซอฟต์แวร์เชื่อมั่นในแนวทางแบบ <strong>Plan-Driven Development</strong> (เช่น Waterfall) ซึ่งออกแบบมาเพื่อระบบขนาดใหญ่และอายุยืนยาว เช่น ระบบการบินและระบบภาครัฐ กระบวนการเหล่านี้ต้องใช้เวลาวางแผน เขียนข้อกำหนด (Specification) และตรวจสอบเอกสารจำนวนมหาศาลล่วงหน้า แต่เมื่อนำแนวทางที่มีภาระเอกสารสูง (Heavyweight) มาใช้กับระบบธุรกิจขนาดกลางหรือซอฟต์แวร์เชิงพาณิชย์ที่ความต้องการของตลาดเปลี่ยนแปลงรวดเร็ว ทีมพัฒนากลับใช้เวลาไปกับเอกสารและขั้นตอนมากกว่าการเขียนโค้ดจริง ส่งผลให้ซอฟต์แวร์ส่งมอบล่าช้าและไม่ตรงความต้องการเมื่อถึงมือผู้ใช้
+          </p>
+          <p>
+            ในปี ค.ศ. 2001 กลุ่มนักพัฒนาซอฟต์แวร์ผู้มีประสบการณ์ 17 คนได้ประชุมร่วมกันที่เมือง Snowbird รัฐยูทาห์ และออก <strong>Agile Manifesto</strong> (คำประกาศอไจล์) เพื่อกำหนดกรอบคิดแบบ "Lightweight Methodology" ที่มุ่งเน้นการส่งมอบซอฟต์แวร์ที่ใช้งานได้จริงอย่างต่อเนื่อง โดยประกอบด้วย <strong>4 ค่านิยมหลัก (4 Values)</strong> และ <strong>12 หลักการปฏิบัติ (12 Principles)</strong>
+          </p>
+        </div>
+
+        <aside class="callout is-info">
+          <div class="callout-title">
+            <i data-lucide="alert-circle" width="18" height="18" aria-hidden="true"></i>
+            <span>แก้ความเข้าใจผิดเรื่อง Agile (Myths)</span>
+          </div>
+          <div class="callout-body">
+            Dooley &amp; Kazakova (2024) ชี้ให้เห็นความเข้าใจผิดสำคัญ 2 ประการ:
+            <ul style="margin-top: var(--space-xs); padding-left: var(--space-md);">
+              <li><strong>Myth 1: ใช้ได้เฉพาะโปรเจกต์เล็ก</strong> — ไม่จริง กระบวนการอไจล์ถูกใช้สำเร็จในระบบขนาดใหญ่ถึง 500,000+ บรรทัด โดยแบ่งระบบใหญ่เป็นทีมย่อยหลายทีมทำงานประสานกัน</li>
+              <li><strong>Myth 2: อไจล์แปลว่าไร้ระเบียบวินัย</strong> — ไม่จริง อไจล์ต้องการวินัยทางวิศวกรรมสูงมาก ทั้งการวางแผนรอบสั้น Test-Driven Development (TDD) การทำ Refactoring และ Continuous Integration</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+
+      <!-- 4 Core Values -->
+      <div>
+        <h3 class="subsection-title">4 ค่านิยมหลักของ Agile Manifesto (Values)</h3>
+        <p style="color: var(--on-surface-variant); margin-bottom: var(--space-md);">
+          หมายเหตุสำคัญจากคำประกาศ: <em>"แม้สิ่งทางด้านขวาจะมีคุณค่า แต่เราให้คุณค่าแก่สิ่งทางด้านซ้ายมากกว่า"</em> — อไจล์ไม่ได้ห้ามมีเอกสารหรือแผนงาน แต่ไม่ยอมให้เอกสารหรือแผนงานมาขัดขวางการส่งมอบคุณค่า
+        </p>
+        <div class="manifesto-values">
+          <div class="value-pair">
+            <div class="value-left">1. บุคคลและการมีปฏิสัมพันธ์</div>
+            <div class="value-over">OVER (เหนือกว่า)</div>
+            <div class="value-right">กระบวนการและเครื่องมือ (Processes and tools) — การสื่อสารโดยตรงระหว่างทีมและผู้ใช้แก้ปัญหาได้ไวกว่าการรอขั้นตอนตามระบบ</div>
+          </div>
+          <div class="value-pair">
+            <div class="value-left">2. ซอฟต์แวร์ที่ใช้งานได้จริง</div>
+            <div class="value-over">OVER (เหนือกว่า)</div>
+            <div class="value-right">เอกสารที่ครบถ้วนสมบูรณ์ (Comprehensive documentation) — โค้ดที่รันและทดสอบได้คือตัวชี้วัดความก้าวหน้าแท้จริง</div>
+          </div>
+          <div class="value-pair">
+            <div class="value-left">3. การร่วมมือกับลูกค้า</div>
+            <div class="value-over">OVER (เหนือกว่า)</div>
+            <div class="value-right">การต่อรองตามสัญญา (Contract negotiation) — ดึงลูกค้ามาร่วมตรวจสอบทุก Iteration ดีกว่าเขียนสัญญาปิดตายตั้งแต่ต้น</div>
+          </div>
+          <div class="value-pair">
+            <div class="value-left">4. การตอบสนองต่อการเปลี่ยนแปลง</div>
+            <div class="value-over">OVER (เหนือกว่า)</div>
+            <div class="value-right">การทำตามแผนที่วางไว้ (Following a plan) — ความต้องการเปลี่ยนเสมอ ระบบต้องออกแบบให้ปรับตัวตามข้อมูลใหม่ได้</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 12 Agile Principles -->
+      <div class="layer">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: var(--space-sm); margin-bottom: var(--space-md);">
+          <h3 class="subsection-title" style="margin: 0;">12 หลักการของ Agile Manifesto (Principles)</h3>
+          <span class="mono-tag">SOURCE: AGILEMANIFESTO.ORG / DOOLEY &amp; KAZAKOVA (2024)</span>
+        </div>
+        <div class="principles-grid">
+          <div class="principle-item"><span class="p-num">01</span><span>ความสำคัญสูงสุดคือสร้างความพึงพอใจแก่ลูกค้าด้วยการส่งมอบซอฟต์แวร์ที่มีคุณค่าอย่างรวดเร็วและต่อเนื่อง</span></div>
+          <div class="principle-item"><span class="p-num">02</span><span>ยินดีรับความต้องการที่เปลี่ยนแปลง แม้ในช่วงท้ายของการพัฒนา เพื่อสร้างความได้เปรียบเชิงแข่งขันให้ลูกค้า</span></div>
+          <div class="principle-item"><span class="p-num">03</span><span>ส่งมอบซอฟต์แวร์ที่ใช้งานได้บ่อยครั้ง (ทุก 2 สัปดาห์ ถึง 2 เดือน) โดยเน้นรอบเวลาที่สั้นกว่า</span></div>
+          <div class="principle-item"><span class="p-num">04</span><span>ฝ่ายธุรกิจ (ลูกค้า) และนักพัฒนาต้องทำงานร่วมกันทุกวันตลอดโครงการ</span></div>
+          <div class="principle-item"><span class="p-num">05</span><span>สร้างโครงการบนพื้นฐานของบุคคลที่มีแรงจูงใจ มอบสภาพแวดล้อมและการสนับสนุน และไว้วางใจให้ทำงานจนสำเร็จ</span></div>
+          <div class="principle-item"><span class="p-num">06</span><span>วิธีสื่อสารที่มีประสิทธิภาพและประสิทธิผลสูงสุดภายในทีมคือการสนทนาแบบเผชิญหน้า (Face-to-Face)</span></div>
+          <div class="principle-item"><span class="p-num">07</span><span>ซอฟต์แวร์ที่ใช้งานได้จริงคือตัววัดความก้าวหน้าหลัก (Primary measure of progress)</span></div>
+          <div class="principle-item"><span class="p-num">08</span><span>กระบวนการอไจล์ส่งเสริมการพัฒนาอย่างยั่งยืน (Sustainable pace) — ไม่โหมทำงานล่วงเวลาจนคุณภาพโค้ดตก</span></div>
+          <div class="principle-item"><span class="p-num">09</span><span>ความใส่ใจในความเป็นเลิศทางเทคนิคและการออกแบบที่ดีอย่างต่อเนื่องช่วยเพิ่มความคล่องตัว (Agility)</span></div>
+          <div class="principle-item"><span class="p-num">10</span><span>ความเรียบง่าย (Simplicity) — ศิลปะของการลดปริมาณงานที่ไม่จำเป็นต้องทำให้น้อยที่สุดเป็นสิ่งสำคัญยิ่ง</span></div>
+          <div class="principle-item"><span class="p-num">11</span><span>สถาปัตยกรรม ข้อกำหนด และการออกแบบที่ดีที่สุดเกิดขึ้นจากทีมที่บริหารจัดการตนเอง (Self-organizing teams)</span></div>
+          <div class="principle-item"><span class="p-num">12</span><span>ทีมทบทวนตนเองอย่างสม่ำเสมอเพื่อหาวิธีเพิ่มประสิทธิภาพ แล้วปรับปรุงพฤติกรรมและกระบวนการทำงานทันที</span></div>
+        </div>
+      </div>
+
+      <!-- 1.2 Lean Software Development -->
+      <div>
+        <h3 class="subsection-title">1.2 ความเชื่อมโยงระหว่าง Agile และ Lean Software Development</h3>
+        <p>
+          แนวคิด <strong>Lean Software Development</strong> มีรากฐานมาจากระบบการผลิตแบบทันเวลาพอดีของโตโยต้า (Toyota Production System: TPS) และถูกนำมาประยุกต์ใช้กับวิศวกรรมซอฟต์แวร์โดย Mary และ Tom Poppendieck (2003) ดังที่ Dooley &amp; Kazakova (2024) เน้นย้ำว่า <strong>"ไม่ใช่ Lean ปะทะ Agile แต่คือ Lean ร่วมกับ Agile (Lean AND Agile)"</strong> โดย Lean มุ่งเน้นการ<em>ปรับปรุงกระบวนการด้วยการขจัดความสูญเปล่า (Waste)</em> ส่วน Agile มุ่งเน้นการ<em>ปรับปรุงผลิตภัณฑ์ด้วยการตอบสนองต่อข้อมูลใหม่</em>
+        </p>
+
+        <div class="card-grid" style="margin-top: var(--space-md);">
+          <div class="carbon-card bordered">
+            <div class="carbon-card-head">
+              <h4 class="carbon-card-title">1. Eliminate Waste (ขจัดความสูญเปล่า)</h4>
+              <span class="tag is-red">7 Wastes</span>
+            </div>
+            <p style="font-size: 0.9375rem;">
+              สิ่งใดที่ไม่เพิ่มคุณค่าให้ผู้ใช้คือ "ขยะ" ในซอฟต์แวร์มี 7 ประเภท: (1) งานที่ทำค้างไว้ไม่เสร็จ (Partially done work) (2) ขั้นตอน/เอกสารเกินจำเป็น (Extra processing) (3) ฟีเจอร์ที่ไม่มีใครใช้ (Extra features) (4) การสลับงานไปมา (Task switching) (5) การรอคอยอนุมัติ (Waiting) (6) การส่งต่อข้อมูลไม่เป็นระบบ (Motion) และ (7) ข้อบกพร่อง (Defects) ที่พบช้า
+            </p>
+          </div>
+
+          <div class="carbon-card bordered">
+            <div class="carbon-card-head">
+              <h4 class="carbon-card-title">2. Build Quality In (สร้างคุณภาพตั้งแต่ต้น)</h4>
+              <span class="tag is-green">TDD &amp; Pair</span>
+            </div>
+            <p style="font-size: 0.9375rem;">
+              แทนที่จะเขียนโค้ดให้เสร็จแล้วค่อยส่งไปหาบั๊กทีหลัง ให้สร้างคุณภาพลงไปขณะพัฒนาด้วย <strong>Test-Driven Development (TDD)</strong>, <strong>Pair Programming</strong>, Continuous Integration และการแก้ Defect ทันทีที่พบ (Fix it NOW) เพื่อลดต้นทุนการย้อนกลับมาแก้ซ้ำ
+            </p>
+          </div>
+
+          <div class="carbon-card bordered">
+            <div class="carbon-card-head">
+              <h4 class="carbon-card-title">3. Create Knowledge (สร้างองค์ความรู้)</h4>
+              <span class="tag">Learning</span>
+            </div>
+            <p style="font-size: 0.9375rem;">
+              การพัฒนาซอฟต์แวร์คือกระบวนการเรียนรู้ ทีมเรียนรู้โดเมนธุรกิจและข้อจำกัดทางเทคนิคผ่านการลงมือทำ Prototype ทดสอบ และรับ Feedback ทำให้องค์ความรู้ถูกบันทึกไว้ในโค้ดและชุดทดสอบอัตโนมัติ
+            </p>
+          </div>
+
+          <div class="carbon-card bordered">
+            <div class="carbon-card-head">
+              <h4 class="carbon-card-title">4. Defer Commitment (ชะลอการผูกมัด)</h4>
+              <span class="tag">Modularity</span>
+            </div>
+            <p style="font-size: 0.9375rem;">
+              ชะลอการตัดสินใจที่ย้อนกลับได้ยาก (Irreversible decisions) ออกไปให้นานที่สุดจนกว่าจะมีข้อมูลเพียงพอ ใช้การออกแบบแบบ Modular, Loose Coupling และกำหนด API/Interface ที่ยืดหยุ่นเพื่อไม่ให้การตัดสินใจเร็วเกินไปปิดทางเลือกในอนาคต
+            </p>
+          </div>
+
+          <div class="carbon-card bordered">
+            <div class="carbon-card-head">
+              <h4 class="carbon-card-title">5. Deliver Fast (ส่งมอบอย่างรวดเร็ว)</h4>
+              <span class="tag">MVP</span>
+            </div>
+            <p style="font-size: 0.9375rem;">
+              ยิ่งส่งมอบไวเท่าไร ยิ่งได้รับ Feedback จากผู้ใช้จริงเร็วเท่านั้น ลดโอกาสที่ความต้องการตลาดจะเปลี่ยนไประหว่างทาง ใช้หลัก <em>Satisfice</em> (ดีพอสำหรับโจทย์ปัจจุบันและไม่ Over-engineer) แทนการรอจนสมบูรณ์แบบไร้ที่ติ
+            </p>
+          </div>
+
+          <div class="carbon-card bordered">
+            <div class="carbon-card-head">
+              <h4 class="carbon-card-title">6. Respect People &amp; 7. Optimize the Whole</h4>
+              <span class="tag is-gray">Systemic</span>
+            </div>
+            <p style="font-size: 0.9375rem;">
+              <strong>Respect People:</strong> ให้อำนาจนักพัฒนาผู้ลงมือทำตัดสินใจวิธีการทำงาน (ไม่สั่งการแบบ Micromanage) <strong>Optimize the Whole:</strong> ปรับปรุงทั้งสายธารคุณค่า (Value Stream) ตั้งแต่วิเคราะห์จนถึง Deploy ไม่ใช่เร่งแค่ฝั่งเขียนโค้ดแล้วไปค้างที่ฝั่งทดสอบ
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1.3 Plan-Driven vs Agile Interactive Comparison -->
+      <div>
+        <h3 class="subsection-title">1.3 เปรียบเทียบแนวคิด: Plan-Driven Development vs. Agile Development</h3>
+        <p>
+          จากกรอบแนวคิดของ Sommerville (2016) บทที่ 3 (รูปที่ 3.1) ความแตกต่างเชิงโครงสร้างที่สำคัญที่สุดคือ <strong>Plan-Driven วนซ้ำภายในแต่ละกิจกรรม (Iteration within activities)</strong> และใช้เอกสารเป็นตัวส่งต่อระหว่างเฟสแบบลำดับขั้น (Sequential) ในขณะที่ <strong>Agile วนซ้ำข้ามกิจกรรม (Iteration across activities)</strong> ทำให้วิศวกรรมความต้องการ (Requirements) การออกแบบ และการเขียนโค้ดดำเนินไปพร้อมกันแบบสอดประสาน (Interleaved)
+        </p>
+
+        <div class="visual-box">
+          <div class="visual-box-header">
+            <div>
+              <span class="mono-tag">INTERACTIVE DIAGRAM 01 // SOMMERVILLE FIG 3.1 &amp; SEC 3.4.2</span>
+              <h4 class="visual-box-title">กลไกการไหลของกิจกรรม: Plan-Driven vs. Agile vs. Hybrid</h4>
+            </div>
+            <div class="btn-row" role="group" aria-label="เลือกรูปแบบกระบวนการ">
+              <button type="button" class="btn btn-sm btn-ghost is-active" id="mode-btn-plan" onclick="setProcessMode('plan')">Plan-Driven (Sequential)</button>
+              <button type="button" class="btn btn-sm btn-ghost" id="mode-btn-agile" onclick="setProcessMode('agile')">Agile (Interleaved)</button>
+              <button type="button" class="btn btn-sm btn-ghost" id="mode-btn-hybrid" onclick="setProcessMode('hybrid')">Hybrid (Industry Mix)</button>
+            </div>
+          </div>
+
+          <div id="process-svg-container" style="width: 100%; overflow-x: auto;">
+            <!-- Rendered by JS -->
+          </div>
+
+          <div id="process-mode-desc" class="callout is-info" style="margin-top: var(--space-xs);">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-top: var(--space-lg);">
+          <table>
+            <thead>
+              <tr>
+                <th>มิติการเปรียบเทียบ</th>
+                <th>Plan-Driven Development</th>
+                <th>Agile Development</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>ลักษณะการไหลของกิจกรรม</strong></td>
+                <td>เป็นลำดับขั้น (Sequential) มี Stage-Gate ชัดเจน การวนซ้ำเกิดขึ้น<em>ภายใน</em>แต่ละกิจกรรม</td>
+                <td>ทำสอดประสานกัน (Interleaved) การวนซ้ำเกิดขึ้น<em>ข้าม</em>กิจกรรม Requirements และ Code พัฒนาคู่กัน</td>
+              </tr>
+              <tr>
+                <td><strong>การจัดการความต้องการ (Requirements)</strong></td>
+                <td>ระบุและลงนาม (Sign-off) ในเอกสาร Functional Specification ล่วงหน้าให้ครบก่อนออกแบบ</td>
+                <td>เริ่มต้นด้วยภาพรวมใน Product Backlog (User Stories) แล้วปรับเปลี่ยนและขยายรายละเอียดตามลำดับความสำคัญ</td>
+              </tr>
+              <tr>
+                <td><strong>การมีส่วนร่วมของลูกค้า</strong></td>
+                <td>สูงในช่วงเริ่มต้น (เก็บความต้องการ) และช่วงท้าย (ตรวจรับ) ระหว่างพัฒนาสื่อสารผ่าน Change Control Board</td>
+                <td>สูงมากตลอดโครงการ ลูกค้าหรือ Product Owner ร่วมจัดลำดับงานและประเมินผลงานทุก Iteration (2–4 สัปดาห์)</td>
+              </tr>
+              <tr>
+                <td><strong>เอกสารและการควบคุม</strong></td>
+                <td>เอกสารครบถ้วนทุกขั้นตอน (SRS, Design Doc, Test Plan) เพื่อประสานงานข้ามองค์กรหรือตรวจสอบสัญญา</td>
+                <td>ลดเอกสารที่ไม่จำเป็น ใช้ซอฟต์แวร์ที่รันได้ โค้ดที่อ่านง่าย และชุดทดสอบอัตโนมัติเป็นตัวสื่อสารหลัก</td>
+              </tr>
+              <tr>
+                <td><strong>ความเหมาะสมของระบบ (Sommerville)</strong></td>
+                <td>ระบบวิกฤตความปลอดภัย (Safety-critical เช่น ควบคุมเครื่องบิน ปั๊มอินซูลิน) ทีมใหญ่กระจายหลายบริษัท</td>
+                <td>ระบบธุรกิจขนาดกลาง/เล็ก แอปพลิเคชันเว็บและมือถือที่ความต้องการเปลี่ยนเร็ว ต้องการออกสู่ตลาดไว</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 2: SCRUM FRAMEWORK DEEP-DIVE                                -->
+    <!-- =================================================================== -->
+    <section id="sec-2" class="module-section">
+      <div class="section-head">
+        <span class="section-index">02 // SCRUM FRAMEWORK DEEP-DIVE</span>
+        <h2 class="section-title">กรอบการทำงานสครัม (Scrum): <strong>จัดระเบียบทีมขนาดเล็กด้วย Timebox ที่ชัดเจน</strong></h2>
+        <p class="section-subtitle">
+          Scrum เป็นกรอบการบริหารโครงการแบบอไจล์ที่ได้รับความนิยมสูงสุดในอุตสาหกรรม โดยไม่บังคับเทคนิคการเขียนโค้ดเฉพาะเจาะจง แต่สร้างโครงสร้างการบริหารผ่าน 3 บทบาท, 3 ผลลัพธ์, และ 5 พิธีการ (อ้างอิง Sommerville Sec. 3.3 และ Dooley &amp; Kazakova Ch. 2)
+        </p>
+      </div>
+
+      <!-- 2.1 Scrum Roles -->
+      <div>
+        <h3 class="subsection-title">2.1 บทบาทหน้าที่ 3 ประการ (Scrum Roles)</h3>
+        <div class="card-grid-3">
+          <div class="carbon-card">
+            <div class="carbon-card-head">
+              <h4 class="carbon-card-title">Product Owner (PO)</h4>
+              <span class="tag">Business &amp; Value</span>
+            </div>
+            <p style="font-size: 0.9375rem;">
+              ตัวแทนผู้ใช้งาน/ลูกค้า หรือผู้จัดการผลิตภัณฑ์ มีหน้าที่กำหนดวิสัยทัศน์ (Product Goal) รวบรวมและจัดลำดับความสำคัญของ <strong>Product Backlog</strong> (ในรูป User Stories) พร้อมอธิบายเหตุผลทางธุรกิจให้ทีมเข้าใจ และเป็นผู้ตัดสินใจว่าผลงาน Increment ผ่านเกณฑ์เพื่อส่งมอบหรือไม่
+            </p>
+            <div class="callout is-warning" style="padding: var(--space-sm) var(--space-md); margin-top: auto;">
+              <div class="callout-body" style="font-size: 0.875rem;"><strong>ข้อควรระวัง:</strong> PO เป็นผู้กำหนด "What &amp; Why" (ทำอะไรและทำไม) แต่ไม่สั่งว่านักพัฒนาต้องเขียนโค้ดอย่างไร ("How")</div>
+            </div>
+          </div>
+
+          <div class="carbon-card">
+            <div class="carbon-card-head">
+              <h4 class="carbon-card-title">Scrum Master (SM)</h4>
+              <span class="tag is-green">Servant Leader</span>
+            </div>
+            <p style="font-size: 0.9375rem;">
+              ผู้เชี่ยวชาญกระบวนการ Scrum ทำหน้าที่เป็นโค้ชช่วยให้ทีมเข้าใจและปฏิบัติตามกติกา Scrum ส่งเสริมการบริหารจัดการตนเอง (Self-organization) ช่วยขจัดอุปสรรคที่ขวางทางทีม (Blockers/Impediments) และปกป้องทีมจากการแทรกแซงภายนอกระหว่าง Sprint
+            </p>
+            <div class="callout is-error" style="padding: var(--space-sm) var(--space-md); margin-top: auto;">
+              <div class="callout-body" style="font-size: 0.875rem;"><strong>ไม่ใช่ Project Manager:</strong> Dooley &amp; Kazakova เตือนเรื่อง "Dark Scrum" — SM ห้ามทำตัวเป็นหัวหน้างานที่สั่งการหรือจับผิดใน Daily Scrum</div>
+            </div>
+          </div>
+
+          <div class="carbon-card">
+            <div class="carbon-card-head">
+              <h4 class="carbon-card-title">Development Team</h4>
+              <span class="tag is-gray">Self-Organizing (≤ 7)</span>
+            </div>
+            <p style="font-size: 0.9375rem;">
+              สมาชิกทุกคนที่ร่วมสร้างผลิตภัณฑ์ (Developers, Designers, Testers, Technical Writers) ขนาดทีมที่เหมาะสมไม่เกิน 7 คน (Sommerville Fig 3.8) เป็นทีมที่เท่าเทียมกัน ร่วมกันแตก User Story เป็น Tasks ประเมิน Effort เลือกงานเข้า Sprint และ<strong>ร่วมกันเป็นเจ้าของโค้ดทั้งหมด (Collective Ownership)</strong>
+            </p>
+            <div class="callout is-info" style="padding: var(--space-sm) var(--space-md); margin-top: auto;">
+              <div class="callout-body" style="font-size: 0.875rem;"><strong>อุปมาขับรถ (Dooley):</strong> PO เลือกจุดหมายปลายทาง แต่ Development Team คือ "คนขับ" ที่เลือกเส้นทางและความเร็วที่ปลอดภัย</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.2 Scrum Artifacts & DoD -->
+      <div>
+        <h3 class="subsection-title">2.2 ผลลัพธ์ในสครัม (Scrum Artifacts) และข้อตกลง Definition of Done (DoD)</h3>
+        <div class="split-8-4">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Artifact</th>
+                  <th>ผู้รับผิดชอบหลัก</th>
+                  <th>รายละเอียดและกฎเหล็ก</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Product Backlog</strong><br><span class="mono-tag">COMMITMENT: PRODUCT GOAL</span></td>
+                  <td>Product Owner</td>
+                  <td>รายการความต้องการทั้งหมดของระบบที่เรียงลำดับตามคุณค่าทางธุรกิจ มีชีวิตและปรับเปลี่ยนได้ตลอด (เช่น User Stories, Bug Fixes, Technical Refactoring)</td>
+                </tr>
+                <tr>
+                  <td><strong>Sprint Backlog</strong><br><span class="mono-tag">COMMITMENT: SPRINT GOAL</span></td>
+                  <td>Development Team</td>
+                  <td>ชุด User Stories ที่คัดเลือกมาจากส่วนบนสุดของ Product Backlog เพื่อทำใน Sprint นี้ พร้อมรายการ Tasks ที่แตกย่อยแล้ว <strong>บุคคลภายนอกห้ามแทรกงานใหม่เข้า Sprint Backlog ระหว่าง Sprint กำลังเดิน</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Product Increment</strong><br><span class="mono-tag">COMMITMENT: DEFINITION OF DONE</span></td>
+                  <td>Development Team &amp; PO</td>
+                  <td>ชิ้นส่วนซอฟต์แวร์ที่พัฒนา ทดสอบ และรวมเข้ากับระบบหลักเรียบร้อยแล้วในสภาพ <strong>Potentially Shippable (พร้อมส่งมอบได้จริง)</strong> หรือเป็น MVP ประจำรอบนั้น</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="carbon-card" style="border-left: 3px solid var(--tertiary);">
+            <div class="carbon-card-head">
+              <h4 class="carbon-card-title">Definition of Done (DoD)</h4>
+              <span class="tag is-green">Quality Gate</span>
+            </div>
+            <p style="font-size: 0.9375rem;">
+              ข้อตกลงร่วมกันของทีมว่างานชิ้นหนึ่งจะถูกย้ายไปช่อง <strong>Done</strong> ได้ ก็ต่อเมื่อผ่านเกณฑ์คุณภาพครบทุกข้อ (ช่วยป้องกันขยะประเภท "ทำเกือบเสร็จ 90%") ตัวอย่างเกณฑ์ DoD สำหรับ Senior Project:
+            </p>
+            <ul style="font-size: 0.875rem; padding-left: var(--space-md);">
+              <li>โค้ดทำงานตรงตาม Acceptance Criteria ทุกข้อ</li>
+              <li>เขียน Unit Tests และทดสอบผ่าน 100%</li>
+              <li>ผ่าน Peer Code Review อย่างน้อย 1 คนบน GitHub PR</li>
+              <li>Merge เข้าสาขาหลัก (<span class="mono-inline">develop</span> / <span class="mono-inline">main</span>) โดย CI Build ผ่าน</li>
+              <li>อัปเดตเอกสาร API / README ที่เกี่ยวข้องเรียบร้อย</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.3 Scrum Events Interactive Explorer -->
+      <div>
+        <h3 class="subsection-title">2.3 พิธีการและกิจกรรมในสครัม (Scrum Events / Ceremonies)</h3>
+        <p>
+          สครัมขับเคลื่อนเป็นวงรอบที่เรียกว่า <strong>Sprint</strong> ซึ่งมีระยะเวลาคงที่ (Timeboxed) <strong>1–4 สัปดาห์ (โดยทั่วไป 2 สัปดาห์)</strong> และจะไม่มีการยืดเวลา Sprint ออกไปเด็ดขาด หากงานใดทำไม่ทันตามกำหนด งานนั้นจะถูกส่งกลับเข้าสู่ Product Backlog เพื่อจัดลำดับใหม่ในรอบถัดไป คลิกเลือกแต่ละขั้นตอนด้านล่างเพื่อดูรายละเอียด Input / Output และเวลาที่แนะนำ (อ้างอิง Sommerville Fig. 3.9):
+        </p>
+
+        <div class="visual-box">
+          <div class="visual-box-header">
+            <div>
+              <span class="mono-tag">INTERACTIVE EXPLORER 02 // SOMMERVILLE FIG 3.9</span>
+              <h4 class="visual-box-title">วงจรชีวิตของ 1 Sprint Cycle (คลิกเพื่อสำรวจแต่ละกิจกรรม)</h4>
+            </div>
+            <span class="tag" id="scrum-timebox-badge">Timebox: 2–4 ชั่วโมง (สำหรับ Sprint 2 สัปดาห์)</span>
+          </div>
+
+          <div class="scrum-step-strip" role="tablist" aria-label="กิจกรรมใน Scrum">
+            <button type="button" class="scrum-step-btn is-active" id="scrum-tab-0" onclick="selectScrumEvent(0)">
+              <span class="mono-tag">EVENT 01</span>
+              <strong>Sprint Planning</strong>
+              <span style="font-size: 0.8125rem; color: var(--on-surface-variant);">เลือกงาน &amp; แตก Task</span>
+            </button>
+            <button type="button" class="scrum-step-btn" id="scrum-tab-1" onclick="selectScrumEvent(1)">
+              <span class="mono-tag">EVENT 02</span>
+              <strong>Daily Scrum</strong>
+              <span style="font-size: 0.8125rem; color: var(--on-surface-variant);">ซิงค์งานรายวัน 15 นาที</span>
+            </button>
+            <button type="button" class="scrum-step-btn" id="scrum-tab-2" onclick="selectScrumEvent(2)">
+              <span class="mono-tag">ONGOING</span>
+              <strong>Backlog Refinement</strong>
+              <span style="font-size: 0.8125rem; color: var(--on-surface-variant);">ขัดเกลา Story ล่วงหน้า</span>
+            </button>
+            <button type="button" class="scrum-step-btn" id="scrum-tab-3" onclick="selectScrumEvent(3)">
+              <span class="mono-tag">EVENT 03</span>
+              <strong>Sprint Review</strong>
+              <span style="font-size: 0.8125rem; color: var(--on-surface-variant);">Demo ตรวจรับผลงาน</span>
+            </button>
+            <button type="button" class="scrum-step-btn" id="scrum-tab-4" onclick="selectScrumEvent(4)">
+              <span class="mono-tag">EVENT 04</span>
+              <strong>Sprint Retrospective</strong>
+              <span style="font-size: 0.8125rem; color: var(--on-surface-variant);">ทบทวนปรับปรุงทีม</span>
+            </button>
+          </div>
+
+          <div id="scrum-event-detail" class="layer">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <details class="carbon-details" style="margin-top: var(--space-md);">
+          <summary>
+            <span>หัวข้อเสริม: การขยายสเกลสครัมสำหรับทีมใหญ่และทีมกระจายตัว (Scaling Scrum — Sommerville Sec. 3.4 &amp; Fig. 3.10)</span>
+            <span class="mono-tag">EXPAND DETAILS +</span>
+          </summary>
+          <div class="split-6-6">
+            <div>
+              <p style="font-size: 0.9375rem;">
+                <strong>1. Distributed Scrum (การทำงานข้ามพื้นที่/ข้ามประเทศ):</strong> เมื่อทีมพัฒนาอยู่คนละที่กับ Product Owner (เช่น Offshore) Sommerville ระบุเงื่อนไขสำคัญ 5 ข้อ ได้แก่ (ก) Scrum Master ควรนั่งทำงานร่วมกับทีมพัฒนาเพื่อรู้ปัญหาประจำวัน (ข) ใช้ระบบ Video Conferencing และ Instant Messaging แบบ Real-time (ค) PO ควรเดินทางไปสร้างความไว้เนื้อเชื่อใจกับทีมพัฒนา (ง) ใช้สภาพแวดล้อมการพัฒนาและ Issue Tracker เดียวกันทั้งหมด และ (จ) ทำ Continuous Integration เพื่อให้ทุกคนเห็นสถานะล่าสุดของผลิตภัณฑ์ตลอดเวลา
+              </p>
+            </div>
+            <div>
+              <p style="font-size: 0.9375rem;">
+                <strong>2. Multi-Team Scrum (โครงการขนาดใหญ่ที่มีหลายทีม):</strong> ใช้การจำลองบทบาท (Role Replication) โดยแต่ละทีมมี PO และ SM ของตนเอง โดยมี Chief PO ดูแลภาพรวม มี <em>Product Architects</em> จากแต่ละทีมมาออกแบบสถาปัตยกรรมร่วมกัน กำหนด <em>Release Alignment</em> ให้ทุกรอบส่งมอบประสานวันเดียวกัน และจัดประชุม <strong>Scrum of Scrums</strong> ทุกวันให้ตัวแทนแต่ละทีมมาประสาน Dependency ระหว่างทีม
+              </p>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- 2.4 Scrum Metrics & Burndown Simulator -->
+      <div>
+        <h3 class="subsection-title">2.4 การประเมินขนาดงานและติดตามผล: Planning Poker, Velocity และ Sprint Burndown Chart</h3>
+        <div class="split-6-6" style="margin-bottom: var(--space-md);">
+          <div class="carbon-card">
+            <div class="carbon-card-head">
+              <h4 class="carbon-card-title">Story Points &amp; Planning Poker</h4>
+              <span class="tag">Relative Estimation</span>
+            </div>
+            <p style="font-size: 0.9375rem;">
+              มนุษย์ประเมินเวลาเป็นชั่วโมงตรงๆ ได้ไม่แม่นยำสำหรับงานซับซ้อน อไจล์จึงนิยมประเมินความยาก ความซับซ้อน และความเสี่ยงเชิงเปรียบเทียบด้วยหน่วย <strong>Story Points</strong> โดยใช้ตัวเลขลำดับ Fibonacci ดัดแปลง (<span class="mono-inline">1, 2, 3, 5, 8, 13, 21</span>) ผ่านกิจกรรม <strong>Planning Poker</strong>: ทุกคนในทีมชูไพ่ตัวเลขพร้อมกันเพื่อป้องกันอคติการคล้อยตามคนแรก (Anchoring Bias) จากนั้นให้คนที่ประเมินสูงสุดและต่ำสุดอธิบายเหตุผลจนได้ฉันทามติ
+            </p>
+          </div>
+          <div class="carbon-card">
+            <div class="carbon-card-head">
+              <h4 class="carbon-card-title">Velocity (ความเร็วของทีม)</h4>
+              <span class="tag is-green">Forecasting Metric</span>
+            </div>
+            <p style="font-size: 0.9375rem;">
+              <strong>Velocity</strong> คือผลรวมของ Story Points จาก User Stories ที่ทำจนถึงสถานะ <em>Done</em> สมบูรณ์ภายใน 1 Sprint (งานที่เสร็จไม่ครบ DoD นับเป็น 0 Points) เมื่อผ่านไป 3–4 Sprints ค่าเฉลี่ย Velocity จะช่วยให้ทีมพยากรณ์ได้แม่นยำขึ้นว่า Sprint ถัดไปควรหยิบงานกี่ Points จึงจะเสร็จทันเวลา <strong>ข้อควรระวัง:</strong> ห้ามนำ Velocity ของคนละทีมมาเปรียบเทียบวัด KPI เด็ดขาด เพราะ Story Point เป็นสเกลเฉพาะตัวของแต่ละทีม
+            </p>
+          </div>
+        </div>
+
+        <!-- Interactive Sprint Burndown Chart Simulator -->
+        <div class="visual-box">
+          <div class="visual-box-header">
+            <div>
+              <span class="mono-tag">INTERACTIVE SIMULATOR 03 // SPRINT BURNDOWN CHART</span>
+              <h4 class="visual-box-title">จำลองกราฟ Sprint Burndown (2-Week / 10-Day Sprint)</h4>
+            </div>
+            <div class="btn-row" role="group" aria-label="เลือกสถานการณ์ Burndown">
+              <button type="button" class="btn btn-sm btn-ghost is-active" id="bd-btn-ideal" onclick="setBurndownScenario('steady')">สถานการณ์ปกติ (Steady Pace)</button>
+              <button type="button" class="btn btn-sm btn-ghost" id="bd-btn-late" onclick="setBurndownScenario('late')">รอรวมงานวันสุดท้าย (Mini-Waterfall)</button>
+              <button type="button" class="btn btn-sm btn-ghost" id="bd-btn-scope" onclick="setBurndownScenario('scope')">แทรกงานกลาง Sprint (Scope Creep)</button>
+              <button type="button" class="btn btn-sm btn-ghost" id="bd-btn-blocker" onclick="setBurndownScenario('blocker')">ติดปัญหา Blocker วันที่ 3–5</button>
+            </div>
+          </div>
+
+          <div class="split-8-4">
+            <div class="chart-box" style="min-height: 340px;">
+              <canvas id="burndownChart" aria-label="กราฟ Sprint Burndown แสดงเส้นอุดมคติเทียบกับงานคงเหลือจริง"></canvas>
+            </div>
+            <div style="display: grid; gap: var(--space-md);">
+              <div class="metric-tile is-key">
+                <div class="metric-label">Planned Sprint Scope</div>
+                <div class="metric-value" id="bd-planned-val">40 pts</div>
+                <div class="metric-sub">ความสามารถอ้างอิงจาก Velocity เฉลี่ย</div>
+              </div>
+              <div class="metric-tile">
+                <div class="metric-label">Delivered Velocity (Day 10)</div>
+                <div class="metric-value" id="bd-delivered-val">40 pts</div>
+                <div class="metric-sub" id="bd-status-text">งานเสร็จตามเป้าหมาย Sprint Goal 100%</div>
+              </div>
+              <div class="callout is-info" id="bd-diagnosis">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 3: KANBAN METHOD & FLOW MANAGEMENT                          -->
+    <!-- =================================================================== -->
+    <section id="sec-3" class="module-section">
+      <div class="section-head">
+        <span class="section-index">03 // KANBAN METHOD &amp; FLOW MANAGEMENT</span>
+        <h2 class="section-title">ระเบียบวิธีคันบัง (Kanban): <strong>จำกัดงานค้างเพื่อเร่งความเร็วการไหล</strong></h2>
+        <p class="section-subtitle">
+          แตกต่างจาก Scrum ที่แบ่งเวลาเป็นรอบ Sprint คันบัง (Kanban) เน้นการไหลของงานอย่างต่อเนื่อง (Continuous Flow) ด้วยระบบ Pull System และการจำกัด Work in Progress เพื่อเปิดโปงคอขวด (อ้างอิง Dooley &amp; Kazakova บทที่ 2)
+        </p>
+      </div>
+
+      <div class="split-6-6">
+        <div class="carbon-card">
+          <div class="carbon-card-head">
+            <h4 class="carbon-card-title">3.1 Push System vs. Pull System</h4>
+            <span class="tag">Flow Physics</span>
+          </div>
+          <p style="font-size: 0.9375rem;">
+            <strong>Push System (ระบบผลัก):</strong> หัวหน้างานหรือลูกค้าป้อนงานใหม่เข้าสู่นักพัฒนาเรื่อยๆ ทันทีที่มีคำสั่ง โดยไม่สนว่านักพัฒนากำลังทำงานค้างอยู่กี่ชิ้น ผลลัพธ์คือเกิดการทำงานหลายอย่างพร้อมกัน (Multitasking), Task Switching, ความเครียดสะสม และงานทุกชิ้นเสร็จช้าลงพร้อมกันหมด
+          </p>
+          <p style="font-size: 0.9375rem;">
+            <strong>Pull System (ระบบดึง):</strong> ขั้นตอนถัดไป (Downstream) จะ "ดึง" งานใหม่เข้าไปทำได้ <em>ก็ต่อเมื่อ</em> งานเก่าในช่องนั้นถูกทำเสร็จและมีพื้นที่ว่างต่ำกว่าเพดาน <strong>WIP Limit</strong> เท่านั้น ทำให้งานไหลลื่น ลดงานค้าง และบังคับให้ทีมโฟกัสที่การ "ปิดงานให้เสร็จ" มากกว่า "เปิดงานใหม่" (<em>Stop starting, start finishing</em>)
+          </p>
+        </div>
+
+        <div class="carbon-card">
+          <div class="carbon-card-head">
+            <h4 class="carbon-card-title">3.2 Kanban Board, Swimlanes และ WIP Limits</h4>
+            <span class="tag is-warn">Bottleneck Control</span>
+          </div>
+          <p style="font-size: 0.9375rem;">
+            <strong>Kanban Board</strong> แสดงสถานะของงานเป็นคอลัมน์จากซ้ายไปขวา (เช่น <span class="mono-inline">To Do</span> → <span class="mono-inline">In Progress</span> → <span class="mono-inline">Code Review / QA</span> → <span class="mono-inline">Done</span>) และใช้ <strong>Swimlanes (เลนแบ่งแนวนอน)</strong> เพื่อแยกประเภทงานบนกระดานเดียวกัน เช่น แถวบนสุดสำหรับงานเร่งด่วน (Expedite / Critical Bug) แถวถัดมาสำหรับ User Stories ปกติ หรือแยกตามทีมย่อย
+          </p>
+          <p style="font-size: 0.9375rem;">
+            <strong>WIP Limit (Work in Progress Limit)</strong> คือตัวเลขเพดานสูงสุดของจำนวนการ์ดที่อนุญาตให้อยู่ในแต่ละคอลัมน์พร้อมกัน เมื่อช่อง <span class="mono-inline">Review/QA</span> เต็ม (เช่น 2/2) นักพัฒนาในช่อง <span class="mono-inline">In Progress</span> จะไม่สามารถดันโค้ดใหม่เข้าไปได้ จึงต้องหยุดเขียนฟีเจอร์ใหม่แล้วไปช่วยเพื่อนทำ Code Review เพื่อระบาย<strong>คอขวด (Bottleneck)</strong> ทันที
+          </p>
+        </div>
+      </div>
+
+      <!-- 3.3 Flow Metrics -->
+      <div>
+        <h3 class="subsection-title">3.3 ตัววัดประสิทธิภาพในระบบคันบัง (Kanban Flow Metrics)</h3>
+        <div class="card-grid-3">
+          <div class="metric-tile is-key">
+            <div class="metric-label">Lead Time (ระยะเวลานำ)</div>
+            <div class="metric-value">Request → Done</div>
+            <div class="metric-sub">เวลารวมตั้งแต่คำขอเข้าสู่กระดาน (<span class="mono-inline">To Do</span>) จนส่งมอบถึงมือผู้ใช้ (<span class="mono-inline">Done</span>) สะท้อนประสบการณ์ที่ลูกค้ารอคอย</div>
+          </div>
+          <div class="metric-tile is-key">
+            <div class="metric-label">Cycle Time (ระยะเวลารอบผลิต)</div>
+            <div class="metric-value">Doing → Done</div>
+            <div class="metric-sub">เวลาที่ใช้ทำงานจริงตั้งแต่ทีมดึงการ์ดเข้าช่อง <span class="mono-inline">In Progress</span> จนเสร็จ <span class="mono-inline">Done</span> ใช้วัดความคล่องตัวของทีม</div>
+          </div>
+          <div class="metric-tile is-key">
+            <div class="metric-label">Throughput &amp; Little's Law</div>
+            <div class="metric-value">Items / Week</div>
+            <div class="metric-sub">จำนวนงานที่เสร็จสมบูรณ์ต่อหน่วยเวลา ตามกฎ <strong>Little's Law: Avg Cycle Time = Avg WIP / Throughput</strong> ยิ่งคุม WIP ต่ำ งานยิ่งจบไว</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Kanban Board Simulator -->
+      <div class="visual-box">
+        <div class="visual-box-header">
+          <div>
+            <span class="mono-tag">INTERACTIVE LAB 04 // PULL SYSTEM &amp; WIP LIMIT SIMULATOR</span>
+            <h4 class="visual-box-title">ทดลองบริหารกระดาน Kanban: ดึงงาน คุม WIP Limit และแก้ไขคอขวด</h4>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-sm btn-secondary" onclick="addUrgentKanbanBug()">+ จำลอง Urgent Bug เข้ากระดาน</button>
+            <button type="button" class="btn btn-sm btn-ghost" onclick="resetKanbanSim()">รีเซ็ตกระดาน</button>
+          </div>
+        </div>
+
+        <div class="kanban-controls">
+          <div class="control-row">
+            <div class="field-group" style="max-width: 220px;">
+              <label class="field-label" for="wip-doing-input">WIP Limit: In Progress (1–5)</label>
+              <select id="wip-doing-input" class="field-select" onchange="updateKanbanWip()">
+                <option value="1">1 การ์ด (Strict Focus)</option>
+                <option value="2">2 การ์ด</option>
+                <option value="3" selected>3 การ์ด (แนะนำสำหรับทีม 4–5 คน)</option>
+                <option value="4">4 การ์ด</option>
+                <option value="5">5 การ์ด (เสี่ยง Multitasking)</option>
+              </select>
+            </div>
+            <div class="field-group" style="max-width: 220px;">
+              <label class="field-label" for="wip-review-input">WIP Limit: Review / QA (1–4)</label>
+              <select id="wip-review-input" class="field-select" onchange="updateKanbanWip()">
+                <option value="1">1 การ์ด</option>
+                <option value="2" selected>2 การ์ด (จุดตรวจจับคอขวด)</option>
+                <option value="3">3 การ์ด</option>
+                <option value="4">4 การ์ด</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-sm btn-primary" onclick="advanceKanbanDay()">จำลองเวลาผ่านไป +1 วัน (อัปเดต Cycle/Lead Time)</button>
+          </div>
+        </div>
+
+        <div id="kanban-alert-banner" class="callout is-info">
+          <!-- Dynamic feedback on pull / bottleneck -->
+        </div>
+
+        <div class="kanban-metrics-bar">
+          <div class="metric-tile">
+            <div class="metric-label">Simulated Day</div>
+            <div class="metric-value" id="kb-day-val">Day 1</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-label">Current Active WIP</div>
+            <div class="metric-value" id="kb-wip-val">4</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-label">Avg Lead Time</div>
+            <div class="metric-value" id="kb-lead-val">3.0 d</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-label">Avg Cycle Time</div>
+            <div class="metric-value" id="kb-cycle-val">2.0 d</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-label">Throughput (Done)</div>
+            <div class="metric-value" id="kb-done-val">1 item</div>
+          </div>
+        </div>
+
+        <div class="kanban-board" id="kanban-board-grid">
+          <!-- Rendered by JS -->
+        </div>
+
+        <div class="visual-caption">
+          <strong>วิธีทดลอง:</strong> ลองกดปุ่ม <span class="mono-inline">Pull →</span> เพื่อย้ายการ์ดจาก <span class="mono-inline">In Progress</span> เข้าสู่ <span class="mono-inline">Review / QA</span> จนเต็ม WIP Limit (2/2) แล้วสังเกตระบบจะบล็อกไม่ให้ Push งานเพิ่ม เพื่อบังคับให้คุณช่วยเคลียร์การ์ดใน <span class="mono-inline">Review / QA</span> ให้เสร็จเข้าสู่ <span class="mono-inline">Done</span> ก่อน
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 4: SCRUM VS KANBAN & SCRUMBAN                               -->
+    <!-- =================================================================== -->
+    <section id="sec-4" class="module-section">
+      <div class="section-head">
+        <span class="section-index">04 // COMPARATIVE ANALYSIS &amp; SCRUMBAN</span>
+        <h2 class="section-title">เปรียบเทียบ Scrum vs. Kanban และ<strong>แนวคิดลูกผสม Scrumban</strong></h2>
+        <p class="section-subtitle">
+          ไม่มีกรอบการทำงานใดดีที่สุดสำหรับทุกโครงการ การเลือกใช้ Scrum, Kanban หรือ Scrumban ต้องพิจารณาจากธรรมชาติของงาน ความถี่ของการเปลี่ยนแปลง และโครงสร้างทีม
+        </p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>มิติเปรียบเทียบ</th>
+              <th>Scrum</th>
+              <th>Kanban</th>
+              <th>Scrumban (Hybrid)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>รอบการทำงาน (Cadence)</strong></td>
+              <td>แบ่งเป็นรอบ <strong>Timebox (Sprint 1–4 สัปดาห์)</strong> คงที่</td>
+              <td><strong>Continuous Flow</strong> ไหลต่อเนื่อง ไม่มี Sprint</td>
+              <td>อาจใช้รอบวางแผน/ทบทวนเป็นจังหวะ แต่ไม่ล็อกตายตัวต่อการปล่อยงาน</td>
+            </tr>
+            <tr>
+              <td><strong>บทบาทหน้าที่ (Roles)</strong></td>
+              <td>กำหนดชัด: PO, Scrum Master, Dev Team</td>
+              <td>ไม่กำหนดบทบาทตายตัว (ใช้โครงสร้างเดิมขององค์กร)</td>
+              <td>ยืดหยุ่น มีทีมข้ามสายงาน และอาจมีผู้ดูแล Flow/PO</td>
+            </tr>
+            <tr>
+              <td><strong>ความยืดหยุ่นของ Scope</strong></td>
+              <td><strong>ห้ามเปลี่ยน/แทรกงาน</strong> เข้า Sprint Backlog ระหว่าง Sprint (ปกป้อง Sprint Goal)</td>
+              <td><strong>ปรับลำดับใน Backlog ได้ตลอดเวลา</strong> เมื่อมีช่องว่างจึงดึงงานใหม่</td>
+              <td>แทรกงานด่วนในเลน Expedite ได้โดยไม่ล้มกระบวนการวางแผน</td>
+            </tr>
+            <tr>
+              <td><strong>การควบคุมงานค้าง (WIP)</strong></td>
+              <td>คุมทางอ้อมด้วยขนาด Sprint Backlog ตาม Velocity</td>
+              <td><strong>คุมโดยตรงด้วย WIP Limit</strong> ประจำแต่ละคอลัมน์บนบอร์ด</td>
+              <td>ใช้ <strong>WIP Limit</strong> คุมคอขวดร่วมกับการดึงงานจาก Backlog</td>
+            </tr>
+            <tr>
+              <td><strong>การประเมินและตัววัดหลัก</strong></td>
+              <td>Story Points, Velocity, Sprint Burndown Chart</td>
+              <td>Lead Time, Cycle Time, Throughput, Cumulative Flow</td>
+              <td>เน้น Cycle Time &amp; Throughput ควบคู่ Lead Time สำหรับการพยากรณ์</td>
+            </tr>
+            <tr>
+              <td><strong>จังหวะการปล่อยซอฟต์แวร์</strong></td>
+              <td>ทุกสิ้นสุด Sprint (พร้อม Sprint Review Demo)</td>
+              <td>ปล่อยได้ทันทีที่งานผ่านเกณฑ์ (Continuous Delivery)</td>
+              <td>ปล่อยตามรอบหรือตามความพร้อมของ Batch (On-demand Release)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="split-6-6">
+        <div class="callout is-info">
+          <div class="callout-title">บริบทที่เหมาะสม (Context Fit)</div>
+          <div class="callout-body">
+            <ul style="padding-left: var(--space-md);">
+              <li><strong>เลือก Scrum เมื่อ:</strong> พัฒนาผลิตภัณฑ์ใหม่ (Product Development / Senior Project) ที่ต้องการสร้างฟีเจอร์เป็นก้อนๆ มีการสาธิตผลงานให้อาจารย์ที่ปรึกษาหรือลูกค้าทุก 2 สัปดาห์ และต้องการวินัยในการทำงานร่วมกันของทีมที่เพิ่งรวมตัว</li>
+              <li><strong>เลือก Kanban เมื่อ:</strong> งานดูแลระบบ/ซ่อมบำรุง (Maintenance &amp; Support), ทีม Infrastructure / DevOps, หรืองานที่รับ Ticket/Bug เข้ามาแบบคาดเดาไม่ได้ทุกวันและต้องตอบสนองทันที (เช่น Helpdesk / Production Support)</li>
+              <li><strong>เลือก Scrumban เมื่อ:</strong> ทีม Scrum เดิมเริ่มเชี่ยวชาญแต่พบปัญหางานไปกองรอคิวที่ขั้นตอน Code Review/Testing จึงนำ WIP Limits และ Pull System ของ Kanban มาเสริมใน Sprint หรือใช้กับทีมที่พัฒนาผลิตภัณฑ์ควบคู่กับการแก้ Bug จากผู้ใช้จริง</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Interactive Framework Recommender -->
+        <div class="carbon-card bordered">
+          <div class="carbon-card-head">
+            <h4 class="carbon-card-title">เครื่องมือช่วยตัดสินใจเลือก Process Framework</h4>
+            <span class="tag">Decision Helper</span>
+          </div>
+          <div style="display: grid; gap: var(--space-sm);">
+            <div class="field-group">
+              <label class="field-label" for="rec-type">1. ลักษณะงานหลักของโครงการ</label>
+              <select id="rec-type" class="field-select" onchange="evaluateFramework()">
+                <option value="product">พัฒนาผลิตภัณฑ์/ฟีเจอร์ใหม่ (เช่น Senior Project, Web/Mobile App)</option>
+                <option value="ops">ดูแลระบบ แก้ Bug, DevOps หรือ Support Tickets</option>
+                <option value="safety">ระบบวิกฤตความปลอดภัย/ฮาร์ดแวร์ฝังตัว (เช่น การแพทย์, การบิน)</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="rec-interrupt">2. ความถี่ของงานแทรกเร่งด่วน (Unplanned Interrupts)</label>
+              <select id="rec-interrupt" class="field-select" onchange="evaluateFramework()">
+                <option value="low">ต่ำ — สามารถรอจัดลำดับในรอบถัดไปได้</option>
+                <option value="medium">ปานกลาง — มีงานด่วนแทรกบ้างควบคู่งานพัฒนาหลัก</option>
+                <option value="high">สูงมาก — งานเข้ามาแบบ Real-time ต้องสลับคิวตลอด</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="rec-release">3. จังหวะการส่งมอบและการรับ Feedback</label>
+              <select id="rec-release" class="field-select" onchange="evaluateFramework()">
+                <option value="cadence">ต้องการรอบ Demo ชัดเจนทุก 2 สัปดาห์</option>
+                <option value="continuous">ส่งมอบต่อเนื่องทันทีที่เสร็จทีละฟีเจอร์/ทีละแก้บั๊ก</option>
+                <option value="certified">ต้องผ่านการวิเคราะห์และรับรองเอกสารครบก่อนสร้าง</option>
+              </select>
+            </div>
+          </div>
+          <div id="rec-output" class="callout is-success" style="margin-top: var(--space-sm);">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 5: PRACTICAL AGILE & TOOLING FOR SENIOR PROJECT             -->
+    <!-- =================================================================== -->
+    <section id="sec-5" class="module-section">
+      <div class="section-head">
+        <span class="section-index">05 // PRACTICAL AGILE &amp; SENIOR PROJECT TOOLING</span>
+        <h2 class="section-title">การประยุกต์ใช้จริงระดับอุตสาหกรรม: <strong>User Stories, SMART Tasks และ GitHub Workflow</strong></h2>
+        <p class="section-subtitle">
+          แนวปฏิบัติที่เป็นรูปธรรมสำหรับนักศึกษาในการแปลงโจทย์โครงงานเป็น User Stories ที่มีคุณภาพ แตกงานย่อยระดับวัน และบริหารซอร์สโค้ดแบบ Software House (อ้างอิง Dooley &amp; Kazakova บทที่ 6 และ Sommerville กรณีศึกษา Mentcare &amp; iLearn)
+        </p>
+      </div>
+
+      <!-- 5.1 User Stories: 3Cs & INVEST -->
+      <div>
+        <h3 class="subsection-title">5.1 การเขียน User Stories ด้วยโครงสร้าง 3 Cs และเกณฑ์ INVEST</h3>
+        <p>
+          ในกระบวนการอไจล์ ความต้องการเชิงฟังก์ชัน (Functional Requirements) มักเขียนในรูป <strong>User Story</strong> เพื่อสื่อสารคุณค่าแก่ผู้ใช้ด้วยรูปแบบมาตรฐาน:
+          <span class="mono-inline">“As a &lt;Role/บทบาท&gt;, I want to &lt;Action/สิ่งที่ต้องการทำ&gt;, so that &lt;Reason/คุณค่าที่ได้รับ&gt;.”</span>
+        </p>
+
+        <div class="split-6-6">
+          <div class="carbon-card">
+            <div class="carbon-card-head">
+              <h4 class="carbon-card-title">องค์ประกอบ 3 Cs (Ron Jeffries, 2001)</h4>
+              <span class="tag">Story Lifecycle</span>
+            </div>
+            <ol style="font-size: 0.9375rem; padding-left: var(--space-md);">
+              <li><strong>Card (บัตรข้อความ):</strong> ข้อความสั้นๆ บนการ์ดหรือ GitHub Issue เพื่อเป็นตัวแทนเตือนความจำ (Token for a conversation) ไม่ใช่เอกสารสเปกยาวเหยียด</li>
+              <li><strong>Conversation (การสนทนา):</strong> การพูดคุยซักถามระหว่าง Product Owner กับนักพัฒนาเพื่อทำความเข้าใจรายละเอียด เงื่อนไขขอบเขต และ UX/UI</li>
+              <li><strong>Confirmation (การยืนยัน/Acceptance Criteria):</strong> เงื่อนไขทดสอบที่ชัดเจน (เช่น รูปแบบ <em>Given–When–Then</em>) เพื่อยืนยันว่าเมื่อเขียนโค้ดเสร็จ ถือว่า Story นี้ทำงานถูกต้องตรงตามที่ตกลงกัน</li>
+            </ol>
+          </div>
+
+          <div class="carbon-card">
+            <div class="carbon-card-head">
+              <h4 class="carbon-card-title">เกณฑ์คุณภาพ 6 ข้อ: INVEST</h4>
+              <span class="tag is-green">Quality Checklist</span>
+            </div>
+            <div class="principles-grid" style="grid-template-columns: 1fr; gap: var(--space-xs);">
+              <div class="principle-item"><span class="p-num">I</span><span><strong>Independent:</strong> เป็นอิสระจาก Story อื่นมากที่สุด เพื่อจัดลำดับและพัฒนาขนานกันได้</span></div>
+              <div class="principle-item"><span class="p-num">N</span><span><strong>Negotiable:</strong> ยืดหยุ่นต่อรองรายละเอียดได้ผ่าน Conversation ไม่ใช่สเปกตายตัว</span></div>
+              <div class="principle-item"><span class="p-num">V</span><span><strong>Valuable:</strong> ต้องส่งมอบคุณค่าที่จับต้องได้ให้ผู้ใช้/ลูกค้า (ไม่ใช่แค่ "สร้างตาราง DB")</span></div>
+              <div class="principle-item"><span class="p-num">E</span><span><strong>Estimable:</strong> ชัดเจนพอที่ทีมพัฒนาจะประเมินขนาด Story Points ได้</span></div>
+              <div class="principle-item"><span class="p-num">S</span><span><strong>Small:</strong> เล็กพอที่จะพัฒนาและทดสอบจน Done ได้ภายใน 1 Sprint</span></div>
+              <div class="principle-item"><span class="p-num">T</span><span><strong>Testable:</strong> มี Acceptance Criteria ที่เขียน Test Case ตรวจผ่าน/ไม่ผ่านได้</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5.2 SMART Tasks & Interactive Story Analyzer -->
+      <div>
+        <h3 class="subsection-title">5.2 การแตก User Story เป็น SMART Tasks สำหรับ Sprint Planning</h3>
+        <p>
+          เมื่อเลือก User Story เข้าสู่ Sprint Backlog แล้ว <strong>ทีมพัฒนา (ไม่ใช่ PO)</strong> จะทำหน้าที่แตก Story ออกเป็น <strong>Tasks</strong> ซึ่งเป็นงานเชิงเทคนิคระดับลงมือทำ โดย Dooley &amp; Kazakova (บทที่ 6) กำหนดว่าทุก Task ควรผ่านเกณฑ์ <strong>SMART</strong> และสำคัญที่สุดคือแต่ละ Task <strong>ควรใช้เวลาไม่เกิน 1 วันทำงาน (หรือ 1 รอบนั่งทำงานต่อเนื่อง)</strong> เพื่อหลีกเลี่ยงการคาดคะเนผิดพลาดและลด Task Switching:
+        </p>
+
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); margin-bottom: var(--space-md);">
+          <div class="metric-tile">
+            <div class="metric-label">S — Specific</div>
+            <div class="metric-sub" style="color: var(--on-surface);">เจาะจงชัดเจนทั้ง Data Structure, API Endpoint หรือ UI Component</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-label">M — Measurable</div>
+            <div class="metric-sub" style="color: var(--on-surface);">วัดผลความเสร็จได้ตาม DoD เช่น Unit Tests ผ่านและ Review แล้ว</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-label">A — Achievable</div>
+            <div class="metric-sub" style="color: var(--on-surface);">ทำได้จริงใน Sprint ด้วยทักษะที่มี หรือใช้ Pair Programming ช่วยกัน</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-label">R — Relevant</div>
+            <div class="metric-sub" style="color: var(--on-surface);">เกี่ยวข้องโดยตรงกับการทำให้ User Story และ Sprint Goal สำเร็จ</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-label">T — Time-boxed</div>
+            <div class="metric-sub" style="color: var(--on-surface);">จำกัดเวลาทำไม่เกิน 1 วัน (ถ้าใหญ่กว่า 1 วัน ต้องซอยย่อยอีก)</div>
+          </div>
+        </div>
+
+        <!-- Interactive INVEST & SMART Story Inspector -->
+        <div class="visual-box">
+          <div class="visual-box-header">
+            <div>
+              <span class="mono-tag">INTERACTIVE WORKSHOP TOOL 05 // INVEST &amp; SMART BREAKDOWN</span>
+              <h4 class="visual-box-title">ตรวจสอบ User Story (กรณีศึกษา Mentcare &amp; iLearn) และแตกเป็น SMART Tasks</h4>
+            </div>
+            <div class="btn-row">
+              <button type="button" class="btn btn-sm btn-ghost is-active" id="story-btn-0" onclick="selectStorySample(0)">ตัวอย่างดี: Mentcare Alert (5 pts)</button>
+              <button type="button" class="btn btn-sm btn-ghost" id="story-btn-1" onclick="selectStorySample(1)">ตัวอย่างดี: iLearn Quiz (3 pts)</button>
+              <button type="button" class="btn btn-sm btn-ghost" id="story-btn-2" onclick="selectStorySample(2)">ตัวอย่างควรปรับปรุง (Anti-Pattern)</button>
+            </div>
+          </div>
+
+          <div id="story-inspector-view" class="split-6-6">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 5.3 Software House Environment: GitHub Projects + Git Flow + PR Review -->
+      <div>
+        <h3 class="subsection-title">5.3 การจำลองสภาพแวดล้อม Software House: GitHub Projects / Jira และ Git Flow</h3>
+        <p>
+          สำหรับโครงงาน Senior Project การใช้เครื่องมือบริหารจัดการอย่างเป็นระบบช่วยให้ทีมทำงานแบบ <strong>Collective Ownership</strong> ได้โดยไม่ทำโค้ดทับกัน ขั้นตอนมาตรฐาน 4 ขั้นที่ทีมซอฟต์แวร์ยุคใหม่ใช้ร่วมกันมีดังนี้:
+        </p>
+
+        <div class="split-6-6">
+          <div>
+            <div class="carbon-card bordered" style="margin-bottom: var(--space-md);">
+              <div class="carbon-card-head">
+                <h4 class="carbon-card-title">ขั้นที่ 1: แปลง User Story เป็น GitHub Issue Template</h4>
+                <span class="tag">Traceability</span>
+              </div>
+              <pre class="code-panel">Title: [US-14] แจ้งเตือนแพทย์เมื่อผู้ป่วยขาดนัดเกิน 14 วัน
+Labels: user-story, priority:high, module:mentcare-alert
+Milestone: Sprint 1 | Story Points: 5 | Assignee: @dev-somchai
+
+## User Story
+As a จิตแพทย์ประจำคลินิก (Doctor),
+I want to ได้รับรายการแจ้งเตือนผู้ป่วยที่ขาดนัดติดต่อกันเกิน 14 วัน,
+So that ทีมแพทย์สามารถติดตามเยี่ยมบ้านได้ทันท่วงทีและลดความเสี่ยงต่อผู้ป่วย
+
+## Acceptance Criteria (Confirmation)
+- [ ] Given ผู้ป่วยมีนัดหมายล่าสุดเกิน 14 วันและยังไม่มาตรวจ When เปิด Dashboard ระบบแสดงแถบเตือนสีแดง
+- [ ] ระบบบันทึก Log การแจ้งเตือนเพื่อให้ตรวจสอบย้อนหลังได้ตามกฎหมาย
+
+## SMART Tasks
+- [ ] Task 1: สร้าง Query ดึงรายชื่อผู้ป่วยขาดนัด > 14 วัน + Unit Test (4 hrs)
+- [ ] Task 2: สร้าง REST API `GET /api/alerts/overdue` (4 hrs)
+- [ ] Task 3: สร้าง UI Alert Banner บน Mentcare Dashboard (6 hrs)</pre>
+            </div>
+          </div>
+
+          <div style="display: grid; gap: var(--space-md);">
+            <div class="carbon-card">
+              <div class="carbon-card-head">
+                <h4 class="carbon-card-title">ขั้นที่ 2: เชื่อม GitHub Projects (Kanban + WIP Limits)</h4>
+                <span class="tag is-green">Visual Workflow</span>
+              </div>
+              <p style="font-size: 0.9375rem;">
+                สร้างบอร์ดที่มีคอลัมน์ <span class="mono-inline">Backlog</span> → <span class="mono-inline">Sprint Ready</span> → <span class="mono-inline">In Progress (WIP: 3)</span> → <span class="mono-inline">In Review (WIP: 2)</span> → <span class="mono-inline">Done</span> เปิดใช้ GitHub Automation เพื่อให้การ์ดย้ายไป <span class="mono-inline">In Review</span> อัตโนมัติเมื่อเปิด Pull Request และย้ายไป <span class="mono-inline">Done</span> เมื่อ PR ถูก Merge
+              </p>
+            </div>
+
+            <div class="carbon-card">
+              <div class="carbon-card-head">
+                <h4 class="carbon-card-title">ขั้นที่ 3 &amp; 4: Git Flow Branching &amp; Pull Request Review</h4>
+                <span class="tag">Code Quality</span>
+              </div>
+              <p style="font-size: 0.9375rem;">
+                ห้าม Push โค้ดลงสาขา <span class="mono-inline">main</span> โดยตรง! ใช้รูปแบบ <strong>Git Flow</strong> (หรือ Trunk-Based แบบ Feature Branch): แตกสาขาใหม่ <span class="mono-inline">feature/US-14-overdue-alert</span> จาก <span class="mono-inline">develop</span> เขียนโค้ดพร้อม Unit Tests (Dooley &amp; Kazakova: F.I.R.S.T. tests — Fast, Isolated, Repeatable, Self-validating, Timely) แล้วเปิด <strong>Pull Request</strong> ระบุ <span class="mono-inline">Closes #14</span> เพื่อรอเพื่อนร่วมทีมทำ Peer Code Review ตรวจหลักการ DRY, Single Responsibility และความปลอดภัยก่อน Merge
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Crisp Git Flow SVG Schematic -->
+        <div class="visual-box" style="margin-top: var(--space-md);">
+          <div class="visual-box-header">
+            <div>
+              <span class="mono-tag">VISUAL SCHEMATIC // GIT FLOW &amp; CI/CD BRANCHING</span>
+              <h4 class="visual-box-title">โครงสร้างสายการพัฒนาซอฟต์แวร์แบบ Git Flow สำหรับทีม Senior Project</h4>
+            </div>
+            <span class="tag is-gray">Protected Main Branch</span>
+          </div>
+          <div style="width: 100%; overflow-x: auto;">
+            <svg viewBox="0 0 880 230" width="100%" style="min-width: 640px; height: auto; display: block;" role="img" aria-label="แผนภาพ Git Flow แสดงสาขา main, release, develop, feature และ hotfix">
+              <!-- Branch lane lines -->
+              <text x="12" y="42" fill="var(--on-surface)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">main (prod)</text>
+              <line x1="120" y1="38" x2="850" y2="38" stroke="var(--on-surface)" stroke-width="2.5"/>
+
+              <text x="12" y="88" fill="var(--error)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">hotfix/*</text>
+              <path d="M 220 38 C 235 38, 235 84, 255 84 L 350 84 C 370 84, 370 38, 385 38" fill="none" stroke="var(--error)" stroke-width="2" stroke-dasharray="4 3"/>
+
+              <text x="12" y="138" fill="var(--primary)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">develop</text>
+              <line x1="120" y1="134" x2="850" y2="134" stroke="var(--primary)" stroke-width="2.5"/>
+
+              <text x="12" y="192" fill="var(--tertiary)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">feature/US-14</text>
+              <path d="M 180 134 C 195 134, 195 188, 215 188 L 520 188 C 540 188, 540 134, 555 134" fill="none" stroke="var(--tertiary)" stroke-width="2.5"/>
+
+              <!-- Merge hotfix back to develop -->
+              <path d="M 350 84 C 370 84, 370 134, 390 134" fill="none" stroke="var(--error)" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+              <!-- Release branch to main -->
+              <path d="M 640 134 C 660 134, 660 38, 685 38" fill="none" stroke="var(--data-2)" stroke-width="2.5"/>
+
+              <!-- Commit nodes -->
+              <circle cx="150" cy="38" r="7" fill="var(--on-surface)"/>
+              <text x="150" y="20" text-anchor="middle" fill="var(--on-surface-variant)" font-family="IBM Plex Mono, monospace" font-size="11">v1.0</text>
+
+              <circle cx="300" cy="84" r="6" fill="var(--error)"/>
+              <text x="300" y="72" text-anchor="middle" fill="var(--error)" font-family="IBM Plex Mono, monospace" font-size="10">Fix Auth Bug</text>
+
+              <circle cx="385" cy="38" r="7" fill="var(--on-surface)"/>
+              <text x="385" y="20" text-anchor="middle" fill="var(--on-surface-variant)" font-family="IBM Plex Mono, monospace" font-size="11">v1.0.1</text>
+
+              <circle cx="260" cy="188" r="6" fill="var(--tertiary)"/>
+              <circle cx="360" cy="188" r="6" fill="var(--tertiary)"/>
+              <circle cx="470" cy="188" r="6" fill="var(--tertiary)"/>
+              <text x="365" y="212" text-anchor="middle" fill="var(--tertiary)" font-family="IBM Plex Mono, monospace" font-size="11">TDD Commits + Unit Tests</text>
+
+              <!-- PR Review gate -->
+              <rect x="495" y="147" width="122" height="26" fill="var(--primary-container)" stroke="var(--primary)" stroke-width="1.5"/>
+              <text x="556" y="164" text-anchor="middle" fill="var(--on-surface)" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600">PR + CI + Review</text>
+
+              <circle cx="555" cy="134" r="7" fill="var(--primary)"/>
+              <circle cx="640" cy="134" r="7" fill="var(--primary)"/>
+              <circle cx="685" cy="38" r="8" fill="var(--data-2)"/>
+              <text x="685" y="20" text-anchor="middle" fill="var(--data-2)" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600">v1.1 (Sprint 1)</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 6: WORKSHOP 4 SIMULATION                                    -->
+    <!-- =================================================================== -->
+    <section id="sec-6" class="module-section">
+      <div class="section-head">
+        <span class="section-index">06 // HANDS-ON CALL TO ACTION</span>
+        <h2 class="section-title">Workshop 4: <strong>Lego Scrum &amp; GitHub Kanban Board Simulation</strong></h2>
+        <p class="section-subtitle">
+          คู่มือปฏิบัติการกลุ่มความยาว 105 นาที เพื่อให้นักศึกษาฝึกปฏิบัติวงจร Sprint 1 เต็มรูปแบบ ตั้งแต่ Planning Poker การแตก SMART Tasks การคุม WIP Limit บน GitHub Projects จนถึง Sprint Review และ Retrospective
+        </p>
+      </div>
+
+      <div class="split-8-4">
+        <div class="carbon-card">
+          <div class="carbon-card-head">
+            <h4 class="carbon-card-title">การเตรียมความพร้อมและโจทย์จำลอง (Setup)</h4>
+            <span class="tag is-green">Group of 5–7 Students</span>
+          </div>
+          <ul style="font-size: 0.9375rem;">
+            <li><strong>การจัดทีม:</strong> แบ่งกลุ่ม 5–7 คน กำหนดบทบาท 1 Product Owner (อาจารย์ผู้สอนหรือตัวแทนกลุ่ม), 1 Scrum Master (จับเวลาและคุมกติกา WIP), และ 3–5 Developers</li>
+            <li><strong>อุปกรณ์และเครื่องมือ:</strong> ตัวต่อ Lego / กระดาษสีและปากกาเมจิก (สำหรับสร้างเมืองต้นแบบ "Smart Campus Facility") + บอร์ด <strong>GitHub Projects</strong> ที่ตั้งค่าคอลัมน์ <span class="mono-inline">Product Backlog</span>, <span class="mono-inline">Sprint Backlog</span>, <span class="mono-inline">In Progress (WIP: 3)</span>, <span class="mono-inline">QA/Review (WIP: 2)</span>, <span class="mono-inline">Done</span></li>
+            <li><strong>เกณฑ์ Definition of Done (DoD) ประจำ Workshop:</strong> (1) สิ่งปลูกสร้างตรงตามขนาด/สีใน Acceptance Criteria (2) เชื่อมต่อถนน/โครงสร้างหลักได้ไม่พัง (Integration) (3) PO หรือ QA เพื่อนร่วมทีมตรวจผ่านและย้ายการ์ด GitHub Issue ไป <span class="mono-inline">Done</span></li>
+          </ul>
+        </div>
+
+        <!-- Interactive Workshop Timer -->
+        <div class="carbon-card bordered" style="border-top: 3px solid var(--primary);">
+          <div class="carbon-card-head">
+            <h4 class="carbon-card-title">ตัวจับเวลาจำลอง (Workshop Timer)</h4>
+            <span class="mono-tag" id="ws-phase-tag">PHASE 01</span>
+          </div>
+          <div style="text-align: left; padding: var(--space-sm) 0;">
+            <div style="font-size: 0.875rem; color: var(--on-surface-variant);" id="ws-timer-label">Phase 1: Backlog &amp; Planning Poker</div>
+            <div style="font-family: var(--font-label); font-size: 2.75rem; font-weight: 300; line-height: 1.2;" id="ws-timer-display">15:00</div>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-sm btn-primary" id="ws-start-btn" onclick="toggleWorkshopTimer()">เริ่มจับเวลา</button>
+            <button type="button" class="btn btn-sm btn-ghost" onclick="resetWorkshopTimer()">รีเซ็ตเวลา</button>
+          </div>
+          <div style="font-size: 0.8125rem; color: var(--on-surface-variant); margin-top: var(--space-xs);">
+            คลิกที่แต่ละ Phase ด้านล่างเพื่อโหลดเวลาของขั้นตอนนั้น
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 Phases Interactive Guide + Checklist -->
+      <div class="visual-box">
+        <div class="visual-box-header">
+          <div>
+            <span class="mono-tag">WORKSHOP EXECUTION TIMELINE // 105 MINUTES TOTAL</span>
+            <h4 class="visual-box-title">ขั้นตอนปฏิบัติการ 6 ระยะ (คลิกเพื่อดูคำสั่งและเช็กลิสต์ส่งมอบ)</h4>
+          </div>
+          <span class="tag" id="ws-progress-badge">Checklist: 0 / 6 เสร็จสิ้น</span>
+        </div>
+
+        <div id="ws-phases-container" style="display: grid; gap: var(--space-sm);">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer & Sources -->
+    <footer class="page-footer">
+      <div>
+        <strong>เอกสารอ้างอิงทางวิชาการ (Academic Sources &amp; Attribution)</strong>
+      </div>
+      <div class="split-6-6">
+        <div>
+          <ul style="padding-left: var(--space-md); margin: 0;">
+            <li>Sommerville, I. (2016). <em>Software Engineering</em> (10th Global Edition). Pearson Education. — บทที่ 1 (Case Studies), บทที่ 2 (Software Processes), บทที่ 3 (Agile Software Development), บทที่ 9 (Refactoring), บทที่ 23 (Project Planning)</li>
+            <li>Dooley, J. F., &amp; Kazakova, V. A. (2024). <em>Software Development, Design, and Coding</em>. Apress. — บทที่ 2 (Agile Values, Lean Principles, Scrum, Kanban, Dark Scrum) และบทที่ 6 (Requirements, User Stories, 3 Cs, SMART Tasks)</li>
+          </ul>
+        </div>
+        <div>
+          <ul style="padding-left: var(--space-md); margin: 0;">
+            <li>Beck, K., et al. (2001). <em>Manifesto for Agile Software Development</em> (agilemanifesto.org).</li>
+            <li>Poppendieck, M., &amp; Poppendieck, T. (2003). <em>Lean Software Development: An Agile Toolkit</em>. Addison-Wesley.</li>
+            <li>Schwaber, K., &amp; Sutherland, J. (2020). <em>The Scrum Guide</em> (scrumguides.org).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="mono-tag" style="padding-top: var(--space-sm); border-top: var(--rule);">
+        MODULE 4 // AGILE PROCESS FRAMEWORKS: SCRUM &amp; KANBAN — READY FOR GITHUB PAGES DEPLOYMENT
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. PLAN-DRIVEN VS AGILE INTERACTIVE DIAGRAM
+    // =========================================================================
+    const processModeData = {
+      plan: {
+        title: `Plan-Driven Development: การวนซ้ำภายในแต่ละขั้น (Iteration within activities)`,
+        text: `อ้างอิง Sommerville (2016) รูปที่ 3.1: ความต้องการ (Requirements) ต้องถูกวิเคราะห์และลงนามในเอกสาร Specification ให้สมบูรณ์ก่อน จึงส่งต่อไปยังขั้น Design & Implementation มีเอกสารที่เป็นทางการคั่นกลางระหว่างเฟส เหมาะกับระบบที่ต้องการการรับรองความปลอดภัยสูง (Safety-critical) หรือทีมขนาดใหญ่ข้ามองค์กร`
+      },
+      agile: {
+        title: `Agile Development: การวนซ้ำข้ามกิจกรรม (Iteration across activities)`,
+        text: `อ้างอิง Sommerville (2016) รูปที่ 3.1: วิศวกรรมความต้องการ การออกแบบ และการเขียนโค้ดทำงานสอดประสานกันเป็นรอบสั้นๆ (2–4 สัปดาห์) โดยดึงลูกค้ามาร่วมตรวจรับและปรับแก้ความต้องการตลอดเวลา ลดต้นทุนการแก้ไขงานเมื่อความต้องการเปลี่ยน`
+      },
+      hybrid: {
+        title: `Hybrid Reality (Sommerville Sec. 3.4.2): ผสาน Plan-Driven และ Agile อย่างลงตัว`,
+        text: `ในอุตสาหกรรมจริง โครงการขนาดใหญ่หรือ Senior Project มักใช้ Plan-Driven สำหรับกำหนดขอบเขตสถาปัตยกรรมเบื้องต้นและตาราง Milestone หลัก แต่ใช้ Agile (Scrum/Kanban + TDD + CI) ในการพัฒนาและส่งมอบชิ้นงานแต่ละรอบ`
+      }
+    };
+
+    function setProcessMode(mode) {
+      const modes = [`plan`, `agile`, `hybrid`];
+      modes.forEach(function (m) {
+        const btn = document.getElementById(`mode-btn-${m}`);
+        if (btn) btn.classList.toggle(`is-active`, m === mode);
+      });
+
+      const container = document.getElementById(`process-svg-container`);
+      const descEl = document.getElementById(`process-mode-desc`);
+      const info = processModeData[mode] || processModeData.plan;
+
+      if (descEl) {
+        descEl.innerHTML = `<div class="callout-title">${info.title}</div><div class="callout-body">${info.text}</div>`;
+      }
+
+      if (!container) return;
+      if (mode === `plan`) {
+        container.innerHTML = `
+          <svg viewBox="0 0 820 175" width="100%" style="min-width: 580px; height: auto; display: block;" role="img" aria-label="แผนภาพ Plan-Driven Development">
+            <rect x="20" y="45" width="210" height="72" fill="var(--surface-container)" stroke="var(--on-surface)" stroke-width="1.5"/>
+            <text x="125" y="76" text-anchor="middle" fill="var(--on-surface)" font-family="Noto Sans Thai, sans-serif" font-size="14" font-weight="600">1. Requirements Engineering</text>
+            <text x="125" y="98" text-anchor="middle" fill="var(--on-surface-variant)" font-family="IBM Plex Mono, monospace" font-size="11">Iteration within stage</text>
+
+            <path d="M 230 81 L 285 81" stroke="var(--on-surface)" stroke-width="2" marker-end="url(#arrow-dark)"/>
+            <rect x="285" y="45" width="210" height="72" fill="var(--surface-container)" stroke="var(--on-surface)" stroke-width="1.5"/>
+            <text x="390" y="76" text-anchor="middle" fill="var(--on-surface)" font-family="Noto Sans Thai, sans-serif" font-size="14" font-weight="600">2. Requirements Specification</text>
+            <text x="390" y="98" text-anchor="middle" fill="var(--on-surface-variant)" font-family="IBM Plex Mono, monospace" font-size="11">Formal Sign-Off Doc</text>
+
+            <path d="M 495 81 L 550 81" stroke="var(--on-surface)" stroke-width="2" marker-end="url(#arrow-dark)"/>
+            <rect x="550" y="45" width="230" height="72" fill="var(--surface-container)" stroke="var(--on-surface)" stroke-width="1.5"/>
+            <text x="665" y="76" text-anchor="middle" fill="var(--on-surface)" font-family="Noto Sans Thai, sans-serif" font-size="14" font-weight="600">3. Design &amp; Implementation</text>
+            <text x="665" y="98" text-anchor="middle" fill="var(--on-surface-variant)" font-family="IBM Plex Mono, monospace" font-size="11">Build against fixed spec</text>
+
+            <path d="M 665 117 L 665 152 L 125 152 L 125 117" fill="none" stroke="var(--error)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow-err)"/>
+            <text x="395" y="144" text-anchor="middle" fill="var(--error)" font-family="Noto Sans Thai, sans-serif" font-size="12" font-weight="600">Change Request (ต้นทุนการแก้ไขย้อนหลังสูง)</text>
+
+            <defs>
+              <marker id="arrow-dark" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--on-surface)"/>
+              </marker>
+              <marker id="arrow-err" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--error)"/>
+              </marker>
+            </defs>
+          </svg>`;
+      } else if (mode === `agile`) {
+        container.innerHTML = `
+          <svg viewBox="0 0 820 175" width="100%" style="min-width: 580px; height: auto; display: block;" role="img" aria-label="แผนภาพ Agile Development">
+            <rect x="90" y="38" width="240" height="84" fill="var(--info-container)" stroke="var(--primary)" stroke-width="2"/>
+            <text x="210" y="72" text-anchor="middle" fill="var(--on-surface)" font-family="Noto Sans Thai, sans-serif" font-size="15" font-weight="600">Requirements Engineering</text>
+            <text x="210" y="96" text-anchor="middle" fill="var(--primary)" font-family="IBM Plex Mono, monospace" font-size="11">User Stories &amp; Backlog</text>
+
+            <rect x="490" y="38" width="240" height="84" fill="var(--tertiary-container)" stroke="var(--tertiary)" stroke-width="2"/>
+            <text x="610" y="72" text-anchor="middle" fill="var(--on-surface)" font-family="Noto Sans Thai, sans-serif" font-size="15" font-weight="600">Design &amp; Implementation</text>
+            <text x="610" y="96" text-anchor="middle" fill="var(--tertiary)" font-family="IBM Plex Mono, monospace" font-size="11">TDD, Refactoring &amp; Working MVP</text>
+
+            <path d="M 330 62 C 390 42, 430 42, 490 62" fill="none" stroke="var(--primary)" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+            <text x="410" y="36" text-anchor="middle" fill="var(--primary)" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600">Sprint Increment (2–4 Wks)</text>
+
+            <path d="M 490 100 C 430 120, 390 120, 330 100" fill="none" stroke="var(--tertiary)" stroke-width="2.5" marker-end="url(#arrow-green)"/>
+            <text x="410" y="142" text-anchor="middle" fill="var(--tertiary)" font-family="Noto Sans Thai, sans-serif" font-size="12" font-weight="600">Customer Feedback &amp; Rapid Adaptation (วนซ้ำข้ามกิจกรรม)</text>
+
+            <defs>
+              <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--primary)"/>
+              </marker>
+              <marker id="arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--tertiary)"/>
+              </marker>
+            </defs>
+          </svg>`;
+      } else {
+        container.innerHTML = `
+          <svg viewBox="0 0 820 175" width="100%" style="min-width: 580px; height: auto; display: block;" role="img" aria-label="แผนภาพ Hybrid Development">
+            <rect x="20" y="45" width="180" height="75" fill="var(--surface-container-high)" stroke="var(--on-surface)" stroke-width="1.5"/>
+            <text x="110" y="75" text-anchor="middle" fill="var(--on-surface)" font-family="Noto Sans Thai, sans-serif" font-size="13" font-weight="600">Up-Front Architecture</text>
+            <text x="110" y="96" text-anchor="middle" fill="var(--on-surface-variant)" font-family="IBM Plex Mono, monospace" font-size="11">Plan-Driven Milestones</text>
+
+            <path d="M 200 82 L 245 82" stroke="var(--on-surface)" stroke-width="2" marker-end="url(#arrow-h1)"/>
+
+            <rect x="245" y="28" width="350" height="110" fill="var(--info-container)" stroke="var(--primary)" stroke-width="2" stroke-dasharray="6 3"/>
+            <text x="420" y="52" text-anchor="middle" fill="var(--primary)" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600">AGILE DELIVERY ENGINE (SCRUM / KANBAN)</text>
+            <rect x="265" y="66" width="90" height="50" fill="var(--background)" stroke="var(--primary)" stroke-width="1.5"/>
+            <text x="310" y="95" text-anchor="middle" fill="var(--on-surface)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">Sprint 1</text>
+            <rect x="375" y="66" width="90" height="50" fill="var(--background)" stroke="var(--primary)" stroke-width="1.5"/>
+            <text x="420" y="95" text-anchor="middle" fill="var(--on-surface)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">Sprint 2</text>
+            <rect x="485" y="66" width="90" height="50" fill="var(--background)" stroke="var(--primary)" stroke-width="1.5"/>
+            <text x="530" y="95" text-anchor="middle" fill="var(--on-surface)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">Sprint N</text>
+
+            <path d="M 595 82 L 635 82" stroke="var(--on-surface)" stroke-width="2" marker-end="url(#arrow-h1)"/>
+
+            <rect x="635" y="45" width="165" height="75" fill="var(--tertiary-container)" stroke="var(--tertiary)" stroke-width="1.5"/>
+            <text x="717" y="75" text-anchor="middle" fill="var(--on-surface)" font-family="Noto Sans Thai, sans-serif" font-size="13" font-weight="600">Formal Acceptance</text>
+            <text x="717" y="96" text-anchor="middle" fill="var(--tertiary)" font-family="IBM Plex Mono, monospace" font-size="11">Compliance / Release</text>
+
+            <defs>
+              <marker id="arrow-h1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--on-surface)"/>
+              </marker>
+            </defs>
+          </svg>`;
+      }
+    }
+
+    // =========================================================================
+    // 2. SCRUM EVENTS EXPLORER
+    // =========================================================================
+    const scrumEvents = [
+      {
+        badge: `Timebox: 2–4 ชั่วโมง (สำหรับ Sprint 2 สัปดาห์)`,
+        title: `Sprint Planning (การวางแผนสปรินต์)`,
+        who: `Product Owner + Scrum Master + Development Team`,
+        purpose: `กำหนดเป้าหมายร่วมของรอบนี้ (Sprint Goal) คัดเลือก User Stories จากด้านบนสุดของ Product Backlog ตามกำลังที่ทีมทำไหว (อ้างอิงจาก Velocity เดิม) และแตก User Stories เป็น SMART Tasks ที่ใช้เวลาไม่เกิน 1 วันต่องาน`,
+        outputs: `Sprint Goal + Sprint Backlog ที่ทีมเห็นพ้องต้องกัน`,
+        pitfall: `PO ยัดเยียดจำนวนงานเกิน Velocity ของทีม หรือแตก Task ใหญ่เกินไปจนประเมิน Effort ไม่แม่นยำ`
+      },
+      {
+        badge: `Timebox: สูงสุด 15–30 นาที (ทุกวัน เวลาเดิม)`,
+        title: `Daily Scrum / Daily Stand-up (ประชุมสั้นประจำวัน)`,
+        who: `Development Team (SM ช่วยอำนวยความสะดวก)`,
+        purpose: `การซิงค์สถานะระหว่างเพื่อนร่วมทีมเพื่อตรวจจับปัญหาหรือตัวขวาง (Blockers) ให้เร็วที่สุด โดยทุกคนตอบ 3 คำถามหลัก: (1) เมื่อวานทำอะไรเสร็จไปแล้วบ้าง? (2) วันนี้จะทำอะไรต่อเพื่อเข้าใกล้ Sprint Goal? (3) มีอุปสรรคอะไรขวางอยู่หรือไม่?`,
+        outputs: `แผนการทำงานร่วมกันสำหรับ 24 ชั่วโมงข้างหน้า และรายการ Blockers ที่ SM ต้องรีบเคลียร์`,
+        pitfall: `Dark Scrum — กลายเป็นการรายงานความคืบหน้าให้หัวหน้าจับผิด หรือถกแก้ปัญหาเชิงลึกเกิน 15 นาที (ควรแยกไปคุยต่อหลังเลิก Stand-up)`
+      },
+      {
+        badge: `Timebox: ประมาณ 5–10% ของเวลา Sprint (เช่น สัปดาห์ละ 1 ชม.)`,
+        title: `Backlog Refinement / Story Time (การขัดเกลา Backlog)`,
+        who: `Product Owner + Development Team`,
+        purpose: `เตรียม User Stories สำหรับ Sprint ถัดไปให้พร้อมใช้งาน แยก Story ที่ใหญ่เกินไป (Epics) ให้เล็กลง เขียน Acceptance Criteria ให้ชัดเจน และประเมิน Story Points ล่วงหน้าด้วย Planning Poker`,
+        outputs: `Product Backlog ส่วนบนที่ชัดเจนและพร้อมหยิบเข้า Sprint Planning ถัดไปทันที`,
+        pitfall: `ละเลยการทำ Refinement ทำให้วัน Sprint Planning เสียเวลาถกเถียงเรื่อง Requirement ที่ยังไม่ชัดเจน`
+      },
+      {
+        badge: `Timebox: 1–2 ชั่วโมง (สิ้นสุด Sprint)`,
+        title: `Sprint Review (การตรวจรับและสาธิตผลงาน)`,
+        who: `Scrum Team + Stakeholders / อาจารย์ที่ปรึกษา / ลูกค้า`,
+        purpose: `สาธิต (Demo) ซอฟต์แวร์ที่ใช้งานได้จริง (Working Increment / MVP) บนเครื่องหรือ Staging จริง ไม่ใช่แค่เปิดสไลด์ เพื่อรับ Feedback จากผู้ใช้จริงและปรับปรุง Product Backlog สำหรับรอบต่อไป`,
+        outputs: `Feedback เชิงผลิตภัณฑ์ และ Product Backlog ฉบับอัปเดต`,
+        pitfall: `นำเสนอเฉพาะสไลด์หรือโค้ดที่ยังไม่ Integrate หรืออวดงานที่ยังไม่ผ่านเกณฑ์ Definition of Done`
+      },
+      {
+        badge: `Timebox: 45–90 นาที (หลัง Sprint Review ทันที)`,
+        title: `Sprint Retrospective (การทบทวนและปรับปรุงกระบวนการ)`,
+        who: `Scrum Team (เฉพาะคนในทีม — ปลอดภัยต่อการพูดความจริง)`,
+        purpose: `ปิดท้าย Sprint อย่างเป็นทางการด้วยการมองย้อนกลับไปที่ "วิธีการทำงานร่วมกัน" (คน กระบวนการ เครื่องมือ) ว่าสิ่งใดทำได้ดี สิ่งใดติดขัด และเลือก Action Items ที่จับต้องได้ 1–2 ข้อไปปรับใช้ใน Sprint หน้า`,
+        outputs: `แผนปรับปรุงกระบวนการทำงาน (Process Improvement Actions) เพื่อเพิ่ม Velocity และคุณภาพในรอบถัดไป`,
+        pitfall: `ใช้เวทีนี้กล่าวโทษตัวบุคคล (Blame Culture) แทนที่จะแก้ไขที่ระบบและกระบวนการ หรือสรุปแล้วไม่เคยนำไปปฏิบัติจริง`
+      }
+    ];
+
+    function selectScrumEvent(idx) {
+      for (let i = 0; i < scrumEvents.length; i++) {
+        const tab = document.getElementById(`scrum-tab-${i}`);
+        if (tab) tab.classList.toggle(`is-active`, i === idx);
+      }
+      const ev = scrumEvents[idx];
+      if (!ev) return;
+      const badge = document.getElementById(`scrum-timebox-badge`);
+      if (badge) badge.textContent = ev.badge;
+
+      const detail = document.getElementById(`scrum-event-detail`);
+      if (detail) {
+        detail.innerHTML = `
+          <div style="display: grid; gap: var(--space-sm);">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-sm); align-items: baseline;">
+              <h5 style="margin: 0; font-size: 1.125rem; font-weight: 600;">${ev.title}</h5>
+              <span class="mono-tag">PARTICIPANTS: ${ev.who}</span>
+            </div>
+            <p style="margin: 0; font-size: 0.9375rem;"><strong>วัตถุประสงค์:</strong> ${ev.purpose}</p>
+            <div class="split-6-6" style="margin-top: var(--space-xs);">
+              <div class="callout is-success" style="padding: var(--space-sm) var(--space-md);">
+                <div class="callout-body" style="font-size: 0.875rem;"><strong>ผลลัพธ์ (Output):</strong> ${ev.outputs}</div>
+              </div>
+              <div class="callout is-warning" style="padding: var(--space-sm) var(--space-md);">
+                <div class="callout-body" style="font-size: 0.875rem;"><strong>ข้อควรระวัง (Anti-Pattern):</strong> ${ev.pitfall}</div>
+              </div>
+            </div>
+          </div>`;
+      }
+    }
+
+    // =========================================================================
+    // 3. SPRINT BURNDOWN CHART SIMULATOR (CHART.JS)
+    // =========================================================================
+    let burndownChartInstance = null;
+
+    const burndownScenarios = {
+      steady: {
+        actual: [40, 36, 32, 27, 23, 19, 15, 10, 5, 2, 0],
+        delivered: `40 pts`,
+        status: `บรรลุ Sprint Goal 100% งานทยอยปิดต่อเนื่อง`,
+        diagnosisTitle: `การวิเคราะห์: Steady Progress (สุขภาพดี)`,
+        diagnosisText: `ทีมแตก Task ย่อยขนาดเล็ก (≤ 1 วัน) และทำ Pull Request / Test ต่อเนื่องทุกวัน ทำให้งานคงเหลือลดลงเกาะติดเส้นอุดมคติ ไม่มีงานไปกองรอลุ้นวันสุดท้าย`,
+        tone: `is-success`
+      },
+      late: {
+        actual: [40, 40, 40, 38, 38, 38, 35, 35, 30, 18, 12],
+        delivered: `28 pts (ค้าง 12 pts)`,
+        status: `หลุดเป้า 12 pts ต้องคืน Backlog`,
+        diagnosisTitle: `การวิเคราะห์: Mini-Waterfall / Late Integration`,
+        diagnosisText: `กราฟราบเรียบช่วงต้นเพราะนักพัฒนาต่างคนต่างเขียนโค้ดเก็บไว้ไม่ยอม Merge และไม่ยอมทดสอบจนวันท้ายๆ เกิดปัญหา Merge Conflict และ Bug กองใหญ่ ทำให้งานไม่ผ่านเกณฑ์ DoD ทันกำหนด`,
+        tone: `is-error`
+      },
+      scope: {
+        actual: [40, 36, 32, 28, 39, 35, 30, 25, 19, 14, 10],
+        delivered: `30 pts (ค้าง 10 pts)`,
+        status: `Scope Creep วันที่ 4 (+11 pts)`,
+        diagnosisTitle: `การวิเคราะห์: Scope Creep (แทรกงานกลาง Sprint)`,
+        diagnosisText: `สังเกตเส้นกราฟดีดตัวสูงขึ้นในวันที่ 4 เพราะ PO หรือ Stakeholder แทรกฟีเจอร์ใหม่เข้ามาโดยไม่นำงานเดิมออก ส่งผลให้ Sprint Goal เดิมเสียสมดุลและงานจบไม่ทันในวันที่ 10`,
+        tone: `is-warning`
+      },
+      blocker: {
+        actual: [40, 36, 33, 33, 33, 32, 24, 17, 11, 5, 0],
+        delivered: `40 pts`,
+        status: `แก้ Blocker สำเร็จวันที่ 6 และเร่งปิดครบ`,
+        diagnosisTitle: `การวิเคราะห์: Early Blocker Detection`,
+        diagnosisText: `วันที่ 3–5 กราฟหยุดนิ่งเพราะติดปัญหา External API/Database แต่ทีมแจ้งปัญหาทันทีใน Daily Scrum ทำให้ Scrum Master เข้ามาปลดล็อกในวันที่ 5 ทีมจึงกลับมาทำงานต่อจนเสร็จทัน`,
+        tone: `is-info`
+      }
+    };
+
+    function getCssToken(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function setBurndownScenario(key) {
+      const keys = [`steady`, `late`, `scope`, `blocker`];
+      const btnMap = { steady: `bd-btn-ideal`, late: `bd-btn-late`, scope: `bd-btn-scope`, blocker: `bd-btn-blocker` };
+      keys.forEach(function (k) {
+        const b = document.getElementById(btnMap[k]);
+        if (b) b.classList.toggle(`is-active`, k === key);
+      });
+
+      const sc = burndownScenarios[key] || burndownScenarios.steady;
+      const delEl = document.getElementById(`bd-delivered-val`);
+      const stEl = document.getElementById(`bd-status-text`);
+      const diagEl = document.getElementById(`bd-diagnosis`);
+      if (delEl) delEl.textContent = sc.delivered;
+      if (stEl) stEl.textContent = sc.status;
+      if (diagEl) {
+        diagEl.className = `callout ${sc.tone}`;
+        diagEl.innerHTML = `<div class="callout-title">${sc.diagnosisTitle}</div><div class="callout-body">${sc.diagnosisText}</div>`;
+      }
+
+      const canvas = document.getElementById(`burndownChart`);
+      if (!canvas || typeof Chart === `undefined`) return;
+
+      const labels = [`Start`, `Day 1`, `Day 2`, `Day 3`, `Day 4`, `Day 5`, `Day 6`, `Day 7`, `Day 8`, `Day 9`, `Day 10`];
+      const idealLine = [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0];
+      const colorPrimary = getCssToken(`--data-1`) || `#0f62fe`;
+      const colorContext = getCssToken(`--data-context`) || `#8d8d8d`;
+      const colorGrid = getCssToken(`--outline-variant`) || `#e0e0e0`;
+      const colorText = getCssToken(`--on-surface-variant`) || `#525252`;
+
+      if (burndownChartInstance) {
+        burndownChartInstance.data.datasets[1].data = sc.actual;
+        burndownChartInstance.update();
+        return;
+      }
+
+      burndownChartInstance = new Chart(canvas, {
+        type: `line`,
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: `Ideal Guideline (เส้นอุดมคติ)`,
+              data: idealLine,
+              borderColor: colorContext,
+              borderDash: [6, 4],
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0
+            },
+            {
+              label: `Actual Remaining Story Points (งานคงเหลือจริง)`,
+              data: sc.actual,
+              borderColor: colorPrimary,
+              backgroundColor: colorPrimary,
+              borderWidth: 3,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              tension: 0
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: `top`,
+              align: `start`,
+              labels: { color: colorText, boxWidth: 14, usePointStyle: false }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 45,
+              title: { display: true, text: `Remaining Story Points`, color: colorText },
+              grid: { color: colorGrid },
+              ticks: { color: colorText }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: colorText }
+            }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 4. KANBAN BOARD & WIP LIMIT SIMULATOR
+    // =========================================================================
+    let kanbanDay = 1;
+    let kanbanNextId = 108;
+    let kanbanCards = [];
+
+    function initKanbanData() {
+      kanbanDay = 1;
+      kanbanNextId = 108;
+      kanbanCards = [
+        { id: `US-101`, title: `API ลงทะเบียนผู้ป่วยคลินิก Mentcare`, lane: `feature`, col: `done`, createdDay: 0, startedDay: 0, doneDay: 1 },
+        { id: `US-102`, title: `หน้าจอค้นหาประวัติการรักษาผู้ป่วย`, lane: `feature`, col: `review`, createdDay: 0, startedDay: 0, doneDay: null },
+        { id: `US-103`, title: `ระบบยืนยันสิทธิ์แพทย์ (JWT Auth)`, lane: `feature`, col: `review`, createdDay: 0, startedDay: 1, doneDay: null },
+        { id: `US-104`, title: `บันทึกผลตรวจสุขภาพจิตและใบสั่งยา`, lane: `feature`, col: `doing`, createdDay: 0, startedDay: 1, doneDay: null },
+        { id: `US-105`, title: `ส่งออกรายงานสรุปจำนวนผู้ป่วยรายเดือน`, lane: `feature`, col: `doing`, createdDay: 0, startedDay: 1, doneDay: null },
+        { id: `US-106`, title: `ระบบซิงค์ข้อมูลออฟไลน์บน Laptop คลินิก`, lane: `feature`, col: `todo`, createdDay: 1, startedDay: null, doneDay: null },
+        { id: `US-107`, title: `แจ้งเตือนการตรวจติดตามผู้ป่วยกลุ่มเสี่ยง`, lane: `feature`, col: `todo`, createdDay: 1, startedDay: null, doneDay: null }
+      ];
+    }
+
+    function setKanbanAlert(tone, title, msg) {
+      const banner = document.getElementById(`kanban-alert-banner`);
+      if (!banner) return;
+      banner.className = `callout ${tone}`;
+      banner.innerHTML = `<div class="callout-title">${title}</div><div class="callout-body">${msg}</div>`;
+    }
+
+    function getKanbanWipLimits() {
+      const doingEl = document.getElementById(`wip-doing-input`);
+      const reviewEl = document.getElementById(`wip-review-input`);
+      return {
+        doing: doingEl ? parseInt(doingEl.value, 10) : 3,
+        review: reviewEl ? parseInt(reviewEl.value, 10) : 2
+      };
+    }
+
+    function updateKanbanWip() {
+      renderKanbanBoard();
+      const limits = getKanbanWipLimits();
+      setKanbanAlert(`is-info`, `ปรับปรุง WIP Limits เรียบร้อย`, `กำหนดเพดาน In Progress = ${limits.doing} งาน และ Review / QA = ${limits.review} งาน สังเกตสีของคอลัมน์เมื่อจำนวนการ์ดชนเพดาน`);
+    }
+
+    function pullKanbanCard(cardId) {
+      const card = kanbanCards.find(function (c) { return c.id === cardId; });
+      if (!card) return;
+      const limits = getKanbanWipLimits();
+      const order = [`todo`, `doing`, `review`, `done`];
+      const curIdx = order.indexOf(card.col);
+      if (curIdx === -1 || curIdx >= 3) return;
+      const nextCol = order[curIdx + 1];
+
+      if (nextCol === `doing`) {
+        const countDoing = kanbanCards.filter(function (c) { return c.col === `doing`; }).length;
+        if (countDoing >= limits.doing) {
+          setKanbanAlert(`is-error`, `WIP Limit Blocker: ช่อง In Progress เต็ม (${countDoing}/${limits.doing})`, `ตามหลัก Pull System คุณไม่สามารถเปิดงานใหม่จาก To Do ได้จนกว่าจะช่วยปิดงานใน In Progress ให้เดินหน้าต่อไปยัง Review / QA`);
+          return;
+        }
+        if (card.startedDay === null) card.startedDay = kanbanDay;
+      }
+
+      if (nextCol === `review`) {
+        const countReview = kanbanCards.filter(function (c) { return c.col === `review`; }).length;
+        if (countReview >= limits.review) {
+          setKanbanAlert(`is-error`, `พบคอขวด (Bottleneck) ที่ Review / QA (${countReview}/${limits.review})`, `คอลัมน์ Review / QA เต็มแล้ว! ห้าม Push งานเพิ่มเข้าไป ให้ทีมหยุดเปิดโค้ดใหม่แล้วเข้าไปช่วยกันทำ Code Review / Testing เพื่อระบายการ์ดในช่อง Review เข้าสู่ Done ก่อน`);
+          return;
+        }
+      }
+
+      if (nextCol === `done`) {
+        card.doneDay = kanbanDay;
+      }
+
+      card.col = nextCol;
+      setKanbanAlert(`is-success`, `Pull สำเร็จ: ย้าย ${card.id} ไปยัง ${nextCol.toUpperCase()}`, `ระบบดึงงานทำงานอย่างราบรื่น ลองสังเกตค่า Active WIP, Cycle Time และ Throughput ด้านบน`);
+      renderKanbanBoard();
+    }
+
+    function addUrgentKanbanBug() {
+      const idStr = `BUG-${kanbanNextId++}`;
+      kanbanCards.unshift({
+        id: idStr,
+        title: `แก้ไขบั๊กความปลอดภัยการเข้าถึงบันทึกผู้ป่วย`,
+        lane: `bug`,
+        col: `todo`,
+        createdDay: kanbanDay,
+        startedDay: null,
+        doneDay: null
+      });
+      setKanbanAlert(`is-warning`, `มีงานเร่งด่วนเข้ากระดาน: ${idStr} (Expedite Swimlane)`, `การ์ด Bug ถูกเพิ่มเข้าช่อง To Do (กรอบสีแดง) ทีมสามารถจัดคิว Pull เข้าทำได้ทันทีเมื่อช่อง In Progress ว่าง`);
+      renderKanbanBoard();
+    }
+
+    function advanceKanbanDay() {
+      kanbanDay += 1;
+      setKanbanAlert(`is-info`, `เข้าสู่ Day ${kanbanDay}`, `เวลาจำลองเดินหน้าไป 1 วัน ลองปิดการ์ดเข้า Done เพื่อดูผลกระทบต่อ Average Lead Time และ Average Cycle Time`);
+      renderKanbanBoard();
+    }
+
+    function resetKanbanSim() {
+      initKanbanData();
+      setKanbanAlert(`is-info`, `รีเซ็ตกระดาน Kanban เรียบร้อย`, `ปัจจุบันช่อง Review / QA มี 2/2 การ์ด (ชน WIP Limit) ลองกด Pull การ์ดจาก In Progress เพื่อดูระบบป้องกันคอขวด`);
+      renderKanbanBoard();
+    }
+
+    function renderKanbanBoard() {
+      const limits = getKanbanWipLimits();
+      const cols = [
+        { key: `todo`, label: `To Do (Ready)`, limit: null },
+        { key: `doing`, label: `In Progress (Doing)`, limit: limits.doing },
+        { key: `review`, label: `Code Review / QA`, limit: limits.review },
+        { key: `done`, label: `Done (Released)`, limit: null }
+      ];
+
+      const boardEl = document.getElementById(`kanban-board-grid`);
+      if (boardEl) {
+        boardEl.innerHTML = cols.map(function (col) {
+          const items = kanbanCards.filter(function (c) { return c.col === col.key; });
+          const atLimit = col.limit !== null && items.length >= col.limit;
+          const badgeText = col.limit !== null ? `${items.length} / ${col.limit}` : `${items.length}`;
+
+          const cardsHtml = items.map(function (card) {
+            const laneBadge = card.lane === `bug` ? `<span class="tag is-red">Urgent Bug</span>` : `<span class="tag">Feature</span>`;
+            const age = card.col === `done`
+              ? `Lead: ${Math.max(1, card.doneDay - card.createdDay)}d | Cycle: ${Math.max(1, card.doneDay - card.startedDay)}d`
+              : (card.startedDay !== null ? `In flow: ${kanbanDay - card.startedDay}d` : `Queued: ${kanbanDay - card.createdDay}d`);
+
+            const actionBtn = col.key !== `done`
+              ? `<button type="button" class="btn btn-sm btn-secondary" onclick="pullKanbanCard('${card.id}')">Pull →</button>`
+              : `<span class="tag is-green">Verified</span>`;
+
+            return `
+              <div class="kanban-card ${card.lane === `bug` ? `lane-bug` : ``}">
+                <div class="kanban-card-id">
+                  <span>${card.id}</span>
+                  <span>${age}</span>
+                </div>
+                <div class="kanban-card-title">${card.title}</div>
+                <div class="kanban-card-actions">
+                  ${laneBadge}
+                  ${actionBtn}
+                </div>
+              </div>`;
+          }).join(``);
+
+          return `
+            <div class="kanban-col ${atLimit ? `is-at-limit` : ``}">
+              <div class="kanban-col-head">
+                <span class="kanban-col-title">${col.label}</span>
+                <span class="kanban-wip-badge">${badgeText}</span>
+              </div>
+              ${cardsHtml || `<div style="font-size: 0.8125rem; color: var(--on-surface-variant); padding: var(--space-sm) 0;">ไม่มีงานในคอลัมน์นี้</div>`}
+            </div>`;
+        }).join(``);
+      }
+
+      // Update live metrics
+      const activeWip = kanbanCards.filter(function (c) { return c.col === `doing` || c.col === `review`; }).length;
+      const doneCards = kanbanCards.filter(function (c) { return c.col === `done`; });
+      let avgLead = 0;
+      let avgCycle = 0;
+      if (doneCards.length > 0) {
+        const sumLead = doneCards.reduce(function (acc, c) { return acc + Math.max(1, c.doneDay - c.createdDay); }, 0);
+        const sumCycle = doneCards.reduce(function (acc, c) { return acc + Math.max(1, c.doneDay - c.startedDay); }, 0);
+        avgLead = (sumLead / doneCards.length).toFixed(1);
+        avgCycle = (sumCycle / doneCards.length).toFixed(1);
+      }
+
+      const dayEl = document.getElementById(`kb-day-val`);
+      const wipEl = document.getElementById(`kb-wip-val`);
+      const leadEl = document.getElementById(`kb-lead-val`);
+      const cycleEl = document.getElementById(`kb-cycle-val`);
+      const doneEl = document.getElementById(`kb-done-val`);
+
+      if (dayEl) dayEl.textContent = `Day ${kanbanDay}`;
+      if (wipEl) wipEl.textContent = `${activeWip} items`;
+      if (leadEl) leadEl.textContent = `${avgLead} d`;
+      if (cycleEl) cycleEl.textContent = `${avgCycle} d`;
+      if (doneEl) doneEl.textContent = `${doneCards.length} items`;
+    }
+
+    // =========================================================================
+    // 5. FRAMEWORK DECISION HELPER (SCRUM VS KANBAN VS SCRUMBAN VS HYBRID)
+    // =========================================================================
+    function evaluateFramework() {
+      const typeEl = document.getElementById(`rec-type`);
+      const intEl = document.getElementById(`rec-interrupt`);
+      const relEl = document.getElementById(`rec-release`);
+      const outEl = document.getElementById(`rec-output`);
+      if (!typeEl || !intEl || !relEl || !outEl) return;
+
+      const t = typeEl.value;
+      const i = intEl.value;
+      const r = relEl.value;
+
+      let title = `แนะนำ: Scrum Framework`;
+      let reason = `เหมาะกับการพัฒนาผลิตภัณฑ์ใหม่หรือ Senior Project ที่ต้องการแบ่งงานเป็น Sprint 2 สัปดาห์ มี Sprint Goal ชัดเจน และสาธิตผลงาน (Review) เพื่อรับ Feedback อย่างสม่ำเสมอ`;
+      let tone = `is-success`;
+
+      if (t === `safety` || r === `certified`) {
+        title = `แนะนำ: Plan-Driven + Agile Hybrid (Sommerville Sec. 3.4.2)`;
+        reason = `ระบบวิกฤตความปลอดภัยหรือระบบฮาร์ดแวร์ฝังตัวต้องวิเคราะห์ข้อกำหนด (Specification) และเอกสารรับรองความปลอดภัยให้ครบถ้วนก่อน จึงควรใช้ Plan-Driven คุมสถาปัตยกรรมและ Verification แต่สามารถนำ TDD และ Continuous Integration ของ Agile มาใช้ในช่วงเขียนโค้ดได้`;
+        tone = `is-info`;
+      } else if (t === `ops` || (i === `high` && r === `continuous`)) {
+        title = `แนะนำ: Kanban Method`;
+        reason = `งานดูแลระบบ Support หรือ DevOps มีงานด่วนแทรกเข้ามาไม่แน่นอน ไม่สามารถล็อก Sprint Backlog 2 สัปดาห์ได้ การใช้ Pull System + WIP Limits + Swimlane สำหรับงานด่วนจะช่วยให้ Cycle Time สั้นลงและส่งมอบต่อเนื่องได้ทันที`;
+        tone = `is-success`;
+      } else if (i === `medium` || (t === `product` && r === `continuous`)) {
+        title = `แนะนำ: Scrumban (ลูกผสม Scrum + Kanban)`;
+        reason = `คุณยังได้ประโยชน์จากโครงสร้างทีม การวางแผน และ Retrospective ของ Scrum แต่เสริมด้วย WIP Limits ของ Kanban เพื่อแก้ปัญหาคอขวดในขั้นตอน Review/Testing และรองรับงานแทรกเร่งด่วนได้ยืดหยุ่นกว่าเดิม`;
+        tone = `is-warning`;
+      }
+
+      outEl.className = `callout ${tone}`;
+      outEl.innerHTML = `<div class="callout-title">${title}</div><div class="callout-body">${reason}</div>`;
+    }
+
+    // =========================================================================
+    // 6. INVEST & SMART USER STORY INSPECTOR
+    // =========================================================================
+    const storySamples = [
+      {
+        badge: `Story Points: 5 | Mentcare Case Study (Sommerville)`,
+        story: `As a แพทย์ประจำคลินิก (Clinician), I want to ดูสรุปประวัติผู้ป่วยและคำเตือนความเสี่ยงอัตโนมัติในหน้าเดียว, so that ฉันสามารถประเมินอาการผู้ป่วยที่ไม่เคยพบมาก่อนได้รวดเร็วและปลอดภัย`,
+        criteria: [
+          `Given ผู้ป่วยมีสถานะความเสี่ยงหรือขาดนัดเกินกำหนด When แพทย์เปิดหน้าประวัติ ระบบแสดง Banner เตือนชัดเจนภายใน 2 วินาที`,
+          `Given แพทย์ไม่ได้รับอนุญาตให้เข้าถึงคลินิกนี้ When เรียกดูข้อมูล ระบบต้องปฏิเสธการเข้าถึงและบันทึก Audit Log`
+        ],
+        invest: [
+          { k: `I`, pass: true, note: `แยกพัฒนาเป็นโมดูล Summary Card ได้อิสระ` },
+          { k: `N`, pass: true, note: `รูปแบบการแสดงผล Banner ปรับคุยกับแพทย์ได้` },
+          { k: `V`, pass: true, note: `ลดเวลาตรวจและเพิ่มความปลอดภัยผู้ป่วยโดยตรง` },
+          { k: `E`, pass: true, note: `ทีมประเมินได้ 5 Points จากความซับซ้อน Query + สิทธิ์` },
+          { k: `S`, pass: true, note: `จบได้ใน 1 Sprint (2 สัปดาห์)` },
+          { k: `T`, pass: true, note: `มี Given–When–Then ตรวจเวลาตอบสนองและสิทธิ์ได้` }
+        ],
+        tasks: [
+          { name: `ออกแบบ REST API GET /patients/:id/summary + RBAC Check`, est: `6 hrs (≤ 1 day)` },
+          { name: `เขียน Unit & Integration Tests ตรวจสิทธิ์การเข้าถึงข้อมูล`, est: `4 hrs (≤ 1 day)` },
+          { name: `สร้าง UI Summary Card พร้อม Risk Alert Banner`, est: `6 hrs (≤ 1 day)` }
+        ]
+      },
+      {
+        badge: `Story Points: 3 | iLearn Digital Learning Case Study (Sommerville)`,
+        story: `As a นักเรียน (Student), I want to ส่งแบบฝึกหัดออนไลน์และดูผลคะแนนตรวจเบื้องต้นทันที, so that ฉันทราบจุดที่ต้องทบทวนก่อนสอบโดยไม่ต้องรออาจารย์ตรวจด้วยมือ`,
+        criteria: [
+          `Given นักเรียนกดปุ่ม Submit Quiz When คำตอบถูกบันทึก ระบบคำนวณคะแนนปรนัยและแสดงเฉลยทันที`,
+          `Given หมดเวลาทำข้อสอบ When ระบบปิดรับคำตอบ ระบบต้องบันทึกคำตอบล่าสุดอัตโนมัติ`
+        ],
+        invest: [
+          { k: `I`, pass: true, note: `แยกจากระบบจัดการบทเรียนหลักได้` },
+          { k: `N`, pass: true, note: `รูปแบบเฉลยปรับได้ระหว่าง Conversation` },
+          { k: `V`, pass: true, note: `ได้ Feedback การเรียนรู้ทันที` },
+          { k: `E`, pass: true, note: `ประเมินชัดเจนที่ 3 Points` },
+          { k: `S`, pass: true, note: `ขนาดกะทัดรัด จบไวในครึ่งสัปดาห์` },
+          { k: `T`, pass: true, note: `ทดสอบ Auto-submit และสูตรคำนวณคะแนนได้` }
+        ],
+        tasks: [
+          { name: `สร้าง Endpoint POST /quizzes/:id/submit และ Logic ตรวจคะแนน`, est: `5 hrs (≤ 1 day)` },
+          { name: `เขียน Automated Tests กรณีส่งปกติและกรณีหมดเวลา`, est: `3 hrs (≤ 1 day)` },
+          { name: `พัฒนาหน้าจอแสดงผลคะแนนและเฉลยข้อผิดพลาด`, est: `4 hrs (≤ 1 day)` }
+        ]
+      },
+      {
+        badge: `Anti-Pattern Story | ควรแยกและเขียนใหม่ (Should Rewrite)`,
+        story: `“ในฐานะนักพัฒนา ฉันอยากสร้างระบบฐานข้อมูลและระบบสมาชิกทั้งหมดของเว็บให้เสร็จสมบูรณ์”`,
+        criteria: [
+          `ไม่มี Acceptance Criteria ที่ชัดเจน (ตรวจไม่ได้ว่าคำว่า "เสร็จสมบูรณ์" หมายถึงอะไร)`
+        ],
+        invest: [
+          { k: `I`, pass: false, note: `ผูกมัดทุกโมดูลเข้าด้วยกันเป็นก้อนใหญ่` },
+          { k: `N`, pass: false, note: `พูดถึงวิธีทำเชิงเทคนิค (DB) ไม่ใช่ความต้องการผู้ใช้` },
+          { k: `V`, pass: false, note: `ผู้ใช้ปลายทางไม่ได้คุณค่าจากการมีแค่ "ตารางฐานข้อมูล"` },
+          { k: `E`, pass: false, note: `กว้างเกินไป ประเมิน Effort ไม่ได้` },
+          { k: `S`, pass: false, note: `ใหญ่ระดับ Epic ทำไม่จบใน 1 Sprint แน่นอน` },
+          { k: `T`, pass: false, note: `ไม่มีเงื่อนไขวัดผลที่ชัดเจน` }
+        ],
+        tasks: [
+          { name: `คำแนะนำ: ให้ซอยออกเป็น Story ย่อย เช่น "สมัครสมาชิก", "เข้าสู่ระบบ", "รีเซ็ตรหัสผ่าน" แล้วค่อยแตกเป็น SMART Tasks`, est: `ต้อง Rewrite ก่อนเข้า Sprint` }
+        ]
+      }
+    ];
+
+    function selectStorySample(idx) {
+      for (let i = 0; i < 3; i++) {
+        const b = document.getElementById(`story-btn-${i}`);
+        if (b) b.classList.toggle(`is-active`, i === idx);
+      }
+      const s = storySamples[idx];
+      const view = document.getElementById(`story-inspector-view`);
+      if (!s || !view) return;
+
+      const criteriaHtml = s.criteria.map(function (c) { return `<li>${c}</li>`; }).join(``);
+      const investHtml = s.invest.map(function (item) {
+        const tag = item.pass ? `<span class="tag is-green">PASS</span>` : `<span class="tag is-red">FAIL</span>`;
+        return `<div class="principle-item" style="justify-content: space-between; align-items: center;">
+          <div><span class="p-num">${item.k}</span> <span style="font-size: 0.875rem;">${item.note}</span></div>
+          ${tag}
+        </div>`;
+      }).join(``);
+
+      const tasksHtml = s.tasks.map(function (t, ti) {
+        return `<div class="principle-item" style="justify-content: space-between;">
+          <span><strong>Task ${ti + 1}:</strong> ${t.name}</span>
+          <span class="mono-tag">${t.est}</span>
+        </div>`;
+      }).join(``);
+
+      view.innerHTML = `
+        <div style="display: grid; gap: var(--space-md);">
+          <div class="layer">
+            <span class="mono-tag">${s.badge}</span>
+            <p style="font-size: 1rem; font-weight: 600; margin: var(--space-xs) 0 0;">${s.story}</p>
+          </div>
+          <div>
+            <strong style="font-size: 0.9375rem;">Confirmation (Acceptance Criteria):</strong>
+            <ul style="font-size: 0.875rem; margin-top: var(--space-xs); padding-left: var(--space-md);">${criteriaHtml}</ul>
+          </div>
+          <div>
+            <strong style="font-size: 0.9375rem;">SMART Tasks Breakdown (≤ 1 วันต่องาน):</strong>
+            <div style="margin-top: var(--space-xs); border-top: var(--rule);">${tasksHtml}</div>
+          </div>
+        </div>
+        <div>
+          <strong style="font-size: 0.9375rem; display: block; margin-bottom: var(--space-xs);">ผลการประเมินเกณฑ์ INVEST (6 ข้อ):</strong>
+          <div style="border-top: var(--rule);">${investHtml}</div>
+        </div>`;
+    }
+
+    // =========================================================================
+    // 7. WORKSHOP 4 TIMELINE, CHECKLIST & TIMER
+    // =========================================================================
+    const workshopPhases = [
+      {
+        num: `01`,
+        title: `Phase 1: Product Backlog & Planning Poker`,
+        minutes: 15,
+        desc: `PO แจก 6 User Stories สำหรับสร้างเมืองจำลอง "Smart Campus" (เช่น โรงพยาบาลอัจฉริยะ, อาคารเรียนสีเขียว, ระบบขนส่งพลังงานสะอาด) ทีมพัฒนาใช้ไพ่ Planning Poker ประเมิน Story Points (1, 2, 3, 5, 8) พร้อมซักถาม Acceptance Criteria (3 Cs) ให้ชัดเจน`,
+        deliverable: `Product Backlog มี Story Points และ Acceptance Criteria ครบทุกใบ`
+      },
+      {
+        num: `02`,
+        title: `Phase 2: Sprint 1 Planning & SMART Tasks on GitHub`,
+        minutes: 15,
+        desc: `ทีมตั้งสมมติฐาน Sprint 1 Capacity (เช่น 13 Points) เลือก Stories เข้า Sprint Backlog แตกเป็น SMART Tasks บน GitHub Projects โดยกำหนด WIP Limit: In Progress = 3 และ QA/Review = 2`,
+        deliverable: `สร้าง GitHub Issues และตั้งค่าคอลัมน์ + WIP Limit บน GitHub Projects เสร็จสมบูรณ์`
+      },
+      {
+        num: `03`,
+        title: `Phase 3: Execution Round 1 + Daily Stand-up`,
+        minutes: 25,
+        desc: `Developers ดึง Task จาก Sprint Backlog (ห้ามเกิน WIP Limit!) ลงมือต่อ Lego / ออกแบบระบบตาม Task จากนั้นนาทีที่ 15 ให้ SM เรียกหยุดทำ Daily Stand-up 3 นาที เพื่อตอบ 3 คำถามหลักและตรวจดูคอขวดบนกระดาน`,
+        deliverable: `มีการย้ายการ์ดตามจริงบนบอร์ดและทำ Daily Stand-up ครบทุกคน`
+      },
+      {
+        num: `04`,
+        title: `Phase 4: Execution Round 2 + Bottleneck Challenge`,
+        minutes: 20,
+        desc: `PO จำลองเหตุการณ์ฉุกเฉินส่ง Urgent Bug ("สะพานเชื่อมอาคารขาด ต้องแก้ด่วน") เข้าเลน Expedite ทีมต้องบริหารจัดการ WIP โดยหยุดเปิดฟีเจอร์ใหม่แล้วระดมคนไปแก้ Bug และช่วยกันทำ QA/Review ให้ชิ้นงานผ่าน DoD`,
+        deliverable: `แก้ไข Urgent Bug สำเร็จโดยไม่ทำลายระบบเดิมและเคลียร์งานเข้า Done`
+      },
+      {
+        num: `05`,
+        title: `Phase 5: Sprint Review & Demo`,
+        minutes: 15,
+        desc: `ทีมสาธิตเมืองต้นแบบที่สร้างเสร็จจริงต่อหน้า PO และกลุ่มอื่น ตรวจสอบทีละ User Story ตาม Acceptance Criteria และ DoD (เฉพาะงานที่ผ่าน DoD เท่านั้นจึงจะนับเป็น Velocity ของ Sprint 1)`,
+        deliverable: `สรุปคะแนน Velocity จริงของ Sprint 1 และจดบันทึก Feedback จาก PO`
+      },
+      {
+        num: `06`,
+        title: `Phase 6: Sprint Retrospective & Flow Metrics`,
+        minutes: 15,
+        desc: `ทีมร่วมทบทวนกระบวนการ (Start / Stop / Continue) คำนวณ Cycle Time เฉลี่ยจากกระดาน GitHub Projects และสรุป 2 แนวทางปรับปรุงที่จะนำไปใช้ทันทีในโครงงาน Senior Project จริง`,
+        deliverable: `ได้ Action Items 2 ข้อสำหรับปรับปรุงการทำงานในสัปดาห์ถัดไป`
+      }
+    ];
+
+    let wsChecked = [false, false, false, false, false, false];
+    let wsActivePhase = 0;
+    let wsSecondsLeft = workshopPhases[0].minutes * 60;
+    let wsTimerInterval = null;
+
+    function formatTimeMMSS(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, `0`)}:${String(s).padStart(2, `0`)}`;
+    }
+
+    function updateTimerUI() {
+      const disp = document.getElementById(`ws-timer-display`);
+      const lbl = document.getElementById(`ws-timer-label`);
+      const tag = document.getElementById(`ws-phase-tag`);
+      const p = workshopPhases[wsActivePhase];
+      if (disp) disp.textContent = formatTimeMMSS(wsSecondsLeft);
+      if (lbl && p) lbl.textContent = p.title;
+      if (tag && p) tag.textContent = `PHASE ${p.num}`;
+    }
+
+    function loadWorkshopPhase(idx) {
+      if (wsTimerInterval) {
+        clearInterval(wsTimerInterval);
+        wsTimerInterval = null;
+        const btn = document.getElementById(`ws-start-btn`);
+        if (btn) btn.textContent = `เริ่มจับเวลา`;
+      }
+      wsActivePhase = idx;
+      wsSecondsLeft = workshopPhases[idx].minutes * 60;
+      updateTimerUI();
+      renderWorkshopPhases();
+    }
+
+    function toggleWorkshopTimer() {
+      const btn = document.getElementById(`ws-start-btn`);
+      if (wsTimerInterval) {
+        clearInterval(wsTimerInterval);
+        wsTimerInterval = null;
+        if (btn) btn.textContent = `ดำเนินการต่อ`;
+        return;
+      }
+      if (btn) btn.textContent = `หยุดชั่วคราว`;
+      wsTimerInterval = setInterval(function () {
+        if (wsSecondsLeft > 0) {
+          wsSecondsLeft -= 1;
+          updateTimerUI();
+        } else {
+          clearInterval(wsTimerInterval);
+          wsTimerInterval = null;
+          if (btn) btn.textContent = `หมดเวลา Phase นี้`;
+        }
+      }, 1000);
+    }
+
+    function resetWorkshopTimer() {
+      loadWorkshopPhase(wsActivePhase);
+    }
+
+    function toggleWorkshopCheck(idx) {
+      wsChecked[idx] = !wsChecked[idx];
+      const count = wsChecked.filter(Boolean).length;
+      const badge = document.getElementById(`ws-progress-badge`);
+      if (badge) badge.textContent = `Checklist: ${count} / ${workshopPhases.length} เสร็จสิ้น`;
+    }
+
+    function renderWorkshopPhases() {
+      const container = document.getElementById(`ws-phases-container`);
+      if (!container) return;
+
+      container.innerHTML = workshopPhases.map(function (p, i) {
+        const isCurrent = i === wsActivePhase;
+        return `
+          <div class="carbon-card ${isCurrent ? `bordered` : ``}" style="${isCurrent ? `border-left: 3px solid var(--primary);` : ``}">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-sm);">
+              <label class="check-item" style="background: transparent; border: 0; padding: 0; flex: 1;">
+                <input type="checkbox" ${wsChecked[i] ? `checked` : ``} onchange="toggleWorkshopCheck(${i})">
+                <span>
+                  <strong style="font-size: 1rem;">${p.title}</strong>
+                  <span class="mono-tag" style="margin-left: var(--space-sm);">[${p.minutes} MIN]</span>
+                </span>
+              </label>
+              <button type="button" class="btn btn-sm ${isCurrent ? `btn-primary` : `btn-ghost`}" onclick="loadWorkshopPhase(${i})">
+                ${isCurrent ? `กำลังโหลดในตัวจับเวลา` : `โหลดเวลา (${p.minutes} นาที)`}
+              </button>
+            </div>
+            <p style="font-size: 0.9375rem; margin: 0;">${p.desc}</p>
+            <div style="font-size: 0.875rem; color: var(--tertiary); font-weight: 500;">
+              Deliverable: ${p.deliverable}
+            </div>
+          </div>`;
+      }).join(``);
+    }
+
+    // =========================================================================
+    // INITIALIZATION
+    // =========================================================================
+    document.addEventListener(`DOMContentLoaded`, function () {
+      if (typeof lucide !== `undefined`) {
+        lucide.createIcons();
+      }
+      setProcessMode(`plan`);
+      selectScrumEvent(0);
+      setBurndownScenario(`steady`);
+      initKanbanData();
+      renderKanbanBoard();
+      setKanbanAlert(`is-info`, `กระดานพร้อมทดสอบระบบ Pull`, `ปัจจุบัน Review / QA มี 2/2 การ์ด (ชน WIP Limit) ลองกด Pull → ที่การ์ดใน In Progress เพื่อดูการป้องกันคอขวด หรือกด Pull → ที่ช่อง Review / QA เพื่อส่งมอบเข้า Done`);
+      evaluateFramework();
+      selectStorySample(0);
+      renderWorkshopPhases();
+      updateTimerUI();
+    });
+  </script>
+</body>
+</html>
