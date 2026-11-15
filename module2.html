@@ -1,0 +1,2593 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="narrative">
+  <meta name="design-style" content="carbon">
+  <title>Module 2: Traditional Software Process Models &amp; Their Limitations</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* Page and surfaces (Carbon light ramp) */
+      --background: #ffffff;
+      --surface-container-low: #f4f4f4;
+      --surface-container: #f4f4f4;
+      --surface-container-high: #e0e0e0;
+      --surface-hover: #e8e8e8;
+
+      /* Ink */
+      --on-surface: #161616;
+      --on-surface-variant: #525252;
+
+      /* Rules */
+      --outline: #8d8d8d;
+      --outline-variant: #e0e0e0;
+
+      /* Accents */
+      --primary: #0f62fe;
+      --primary-hover: #0353e9;
+      --on-primary: #ffffff;
+      --primary-container: #d0e2ff;
+      --on-primary-container: #161616;
+      --secondary: #6f6f6f;
+      --tertiary: #198038;
+      --tertiary-container: #defbe6;
+      --error: #da1e28;
+      --error-container: #fff1f1;
+      --on-error: #ffffff;
+
+      /* Shared semantic & focus tokens */
+      --positive: #198038;
+      --warning: #b28600;
+      --warning-container: #fcf4d6;
+      --focus: #0f62fe;
+
+      /* Data series */
+      --data-1: #0f62fe;
+      --data-2: #6929c4;
+      --data-3: #005d5d;
+      --data-4: #9f1853;
+      --data-context: #8d8d8d;
+
+      /* Fonts (Thai-first paired with Plex Sans & Plex Mono) */
+      --font-headline: 'Noto Sans Thai', 'IBM Plex Sans', sans-serif;
+      --font-body: 'Noto Sans Thai', 'IBM Plex Sans', sans-serif;
+      --font-label: 'IBM Plex Mono', 'Noto Sans Thai', monospace;
+
+      /* Type scale (Narrative) */
+      --display-size: clamp(2.125rem, 1.35rem + 2.6vw, 3.25rem);
+      --headline-size: clamp(1.5rem, 1.15rem + 1.3vw, 2.125rem);
+      --subhead-size: clamp(1.1875rem, 1.05rem + 0.5vw, 1.375rem);
+      --body-size: clamp(1rem, 0.96rem + 0.18vw, 1.0625rem);
+      --label-size: 0.75rem;
+
+      /* Shape (Carbon square discipline) */
+      --rounded: 0.125rem;
+      --rounded-lg: 0.25rem;
+      --rounded-full: 0.75rem;
+
+      /* Style effects */
+      --shadow-1: 0 2px 6px rgba(0, 0, 0, 0.1);
+      --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.12);
+      --rule: 1px solid var(--outline-variant);
+      --field-rule: 1px solid var(--outline);
+      --indicator: 2px solid var(--primary);
+      --state-bar-blue: 3px solid var(--primary);
+      --state-bar-green: 3px solid var(--positive);
+      --state-bar-red: 3px solid var(--error);
+      --state-bar-amber: 3px solid var(--warning);
+
+      /* Spacing scale (4pt base) */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+    button, input, select, textarea { font-family: inherit; }
+
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .page-grid {
+      display: grid;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      max-width: 1200px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Typography helpers */
+    .mono-code {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--on-surface-variant);
+    }
+    .label-th {
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--on-surface-variant);
+    }
+    .headline-display {
+      font-family: var(--font-headline);
+      font-size: var(--display-size);
+      font-weight: 300;
+      line-height: 1.2;
+      letter-spacing: 0;
+      margin: 0 0 var(--space-md) 0;
+      color: var(--on-surface);
+    }
+    .headline-display strong {
+      font-weight: 600;
+    }
+    .section-title {
+      font-family: var(--font-headline);
+      font-size: var(--headline-size);
+      font-weight: 300;
+      line-height: 1.25;
+      margin: 0 0 var(--space-sm) 0;
+      color: var(--on-surface);
+    }
+    .section-title strong {
+      font-weight: 600;
+    }
+    .subhead {
+      font-family: var(--font-headline);
+      font-size: var(--subhead-size);
+      font-weight: 600;
+      line-height: 1.35;
+      margin: var(--space-xl) 0 var(--space-sm) 0;
+      color: var(--on-surface);
+    }
+    .prose {
+      max-width: 68ch;
+      margin: 0 0 var(--space-md) 0;
+      color: var(--on-surface);
+    }
+    .prose-muted {
+      max-width: 68ch;
+      margin: 0 0 var(--space-md) 0;
+      color: var(--on-surface-variant);
+      font-size: 0.9375rem;
+    }
+
+    /* Carbon structural layers */
+    .layer {
+      background: var(--surface-container);
+      border-radius: 0;
+      padding: var(--space-md);
+    }
+    .layer-lg {
+      background: var(--surface-container);
+      border-radius: 0;
+      padding: var(--space-lg);
+    }
+    .layer .layer, .layer-lg .layer {
+      background: var(--surface-container-high);
+    }
+
+    /* Header / Masthead */
+    .lecture-header {
+      border-bottom: var(--rule);
+      padding-bottom: var(--space-xl);
+      margin-bottom: var(--space-md);
+    }
+    .top-meta-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+      padding-bottom: var(--space-sm);
+      margin-bottom: var(--space-lg);
+      border-bottom: var(--rule);
+    }
+    .course-tag {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 var(--space-sm);
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border-radius: var(--rounded-full);
+      font-size: var(--label-size);
+      font-weight: 500;
+    }
+    .header-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+      gap: var(--space-sm);
+      margin-top: var(--space-lg);
+    }
+    .metric-tile {
+      background: var(--surface-container);
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .metric-tile.key-tile {
+      border-bottom: var(--indicator);
+    }
+    .metric-value {
+      font-family: var(--font-label);
+      font-size: 1.75rem;
+      font-weight: 300;
+      line-height: 1.15;
+      color: var(--on-surface);
+    }
+
+    /* Two-column editorial workspace (3 + 9 on desktop, single column on small) */
+    .lecture-layout {
+      display: grid;
+      grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+      gap: var(--space-xl);
+      align-items: start;
+    }
+    .lecture-sidebar {
+      position: sticky;
+      top: var(--space-lg);
+      background: var(--surface-container);
+      padding: var(--space-md);
+    }
+    .toc-list {
+      list-style: none;
+      margin: var(--space-sm) 0 0 0;
+      padding: 0;
+    }
+    .toc-item + .toc-item {
+      border-top: var(--rule);
+    }
+    .toc-link {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 0;
+      border-left: 2px solid transparent;
+      padding: var(--space-sm) var(--space-sm);
+      cursor: pointer;
+      color: var(--on-surface);
+      text-decoration: none;
+      transition: background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+    .toc-link:hover {
+      background: var(--surface-container-high);
+    }
+    .toc-link.is-active {
+      border-left: var(--indicator);
+      font-weight: 600;
+      background: var(--background);
+    }
+    .toc-num {
+      font-family: var(--font-label);
+      font-size: 0.6875rem;
+      color: var(--primary);
+      letter-spacing: 0.08em;
+    }
+    .toc-link.is-active .toc-num {
+      font-weight: 600;
+    }
+    .toc-text {
+      font-size: 0.875rem;
+      line-height: 1.35;
+    }
+
+    .progress-box {
+      margin-top: var(--space-md);
+      padding-top: var(--space-md);
+      border-top: var(--rule);
+    }
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: var(--surface-container-high);
+      margin: var(--space-xs) 0;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width var(--dur-short) var(--ease-out);
+    }
+
+    /* Section Structure */
+    .lecture-main {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2xl);
+    }
+    .lecture-section {
+      padding-top: var(--space-lg);
+      border-top: 2px solid var(--on-surface);
+    }
+    .section-head {
+      border-bottom: var(--rule);
+      padding-bottom: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+    .section-code-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-xs);
+    }
+    .section-id {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 600;
+      color: var(--primary);
+      letter-spacing: 0.08em;
+    }
+
+    /* Callout Strips (Carbon Notifications) */
+    .callout {
+      background: var(--surface-container);
+      border-left: var(--state-bar-blue);
+      padding: var(--space-md) var(--space-lg);
+      margin: var(--space-lg) 0;
+      max-width: 68ch;
+    }
+    .callout.callout-success { border-left: var(--state-bar-green); }
+    .callout.callout-danger { border-left: var(--state-bar-red); }
+    .callout.callout-warn { border-left: var(--state-bar-amber); }
+    .callout-title {
+      font-weight: 600;
+      margin: 0 0 var(--space-xs) 0;
+      color: var(--on-surface);
+      font-size: 0.9375rem;
+    }
+    .callout p {
+      margin: 0;
+      font-size: 0.9375rem;
+      color: var(--on-surface);
+    }
+
+    /* Quote Block */
+    .source-quote {
+      background: var(--surface-container);
+      padding: var(--space-md) var(--space-lg);
+      margin: var(--space-lg) 0;
+      border-left: 2px solid var(--on-surface);
+      max-width: 68ch;
+    }
+    .source-quote blockquote {
+      margin: 0 0 var(--space-xs) 0;
+      font-style: italic;
+      color: var(--on-surface);
+    }
+    .source-quote cite {
+      font-style: normal;
+      font-size: 0.8125rem;
+      color: var(--on-surface-variant);
+      display: block;
+    }
+
+    /* Lists & Cards */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    .structured-list {
+      margin: var(--space-md) 0 var(--space-lg) 0;
+      border-top: var(--rule);
+      max-width: 68ch;
+    }
+    .structured-list-item {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr);
+      gap: var(--space-md);
+      padding: var(--space-md) 0;
+      border-bottom: var(--rule);
+      align-items: start;
+    }
+    .list-index {
+      font-family: var(--font-label);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--primary);
+      padding-top: 2px;
+    }
+
+    /* Tables (Carbon zebra + mono headers) */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin: var(--space-lg) 0;
+      border-top: 1px solid var(--on-surface);
+    }
+    table.carbon-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9375rem;
+    }
+    table.carbon-table thead th {
+      background: var(--surface-container-high);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--on-surface);
+      vertical-align: bottom;
+    }
+    table.carbon-table thead th .mono-sub {
+      display: block;
+      font-family: var(--font-label);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--on-surface-variant);
+      margin-bottom: 2px;
+    }
+    table.carbon-table tbody td {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: var(--rule);
+      vertical-align: top;
+    }
+    table.carbon-table tbody tr:nth-child(even) {
+      background: var(--surface-container);
+    }
+    .num-cell {
+      font-family: var(--font-label);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    /* Interactive Panels */
+    .interactive-panel {
+      background: var(--surface-container);
+      padding: var(--space-lg);
+      margin: var(--space-xl) 0;
+      border-top: var(--indicator);
+    }
+    .panel-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-md);
+      padding-bottom: var(--space-md);
+      border-bottom: var(--rule);
+      margin-bottom: var(--space-md);
+    }
+    .panel-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--on-surface);
+    }
+    .panel-desc {
+      font-size: 0.875rem;
+      color: var(--on-surface-variant);
+      margin: var(--space-xs) 0 0 0;
+      max-width: 60ch;
+    }
+
+    /* Carbon Buttons */
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-lg) var(--space-sm) var(--space-md);
+      border: 1px solid transparent;
+      border-radius: 0;
+      font-size: 0.875rem;
+      font-weight: 400;
+      cursor: pointer;
+      text-align: left;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+    .btn-secondary {
+      background: var(--background);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+    .btn-secondary:hover {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--primary);
+    }
+    .btn-ghost:hover {
+      background: var(--surface-container-high);
+    }
+    .btn-tab {
+      background: var(--background);
+      color: var(--on-surface);
+      border: 1px solid var(--outline-variant);
+      border-bottom: 2px solid transparent;
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+    }
+    .btn-tab:hover {
+      background: var(--surface-container-high);
+    }
+    .btn-tab.is-active {
+      border-bottom: var(--indicator);
+      font-weight: 600;
+      background: var(--surface-container-high);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Interactive Waterfall Explorer */
+    .waterfall-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+    .waterfall-steps {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .wf-step-btn {
+      width: 100%;
+      background: var(--background);
+      border: 1px solid var(--outline-variant);
+      border-left: 3px solid transparent;
+      padding: var(--space-sm) var(--space-md);
+      text-align: left;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr) auto;
+      gap: var(--space-sm);
+      align-items: center;
+      min-height: 52px;
+      transition: background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+    .wf-step-btn:hover {
+      background: var(--surface-container-high);
+    }
+    .wf-step-btn.is-active {
+      background: var(--background);
+      border-left: 3px solid var(--primary);
+      border-color: var(--primary);
+    }
+    .wf-step-code {
+      font-family: var(--font-label);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    .wf-gate-divider {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: 2px var(--space-sm);
+      font-family: var(--font-label);
+      font-size: 0.6875rem;
+      color: var(--on-surface-variant);
+    }
+    .wf-gate-line {
+      flex: 1;
+      height: 1px;
+      background: var(--outline);
+    }
+    .detail-box {
+      background: var(--background);
+      border: 1px solid var(--outline-variant);
+      padding: var(--space-lg);
+    }
+
+    /* Interactive V-Model SVG Container */
+    .svg-stage {
+      background: var(--background);
+      border: 1px solid var(--outline-variant);
+      padding: var(--space-md);
+      overflow-x: auto;
+    }
+    .v-node {
+      cursor: pointer;
+      transition: opacity var(--dur-micro) var(--ease-out);
+    }
+    .v-node:hover rect {
+      stroke: var(--primary);
+      stroke-width: 2;
+    }
+    .v-node.is-active rect {
+      fill: var(--primary-container);
+      stroke: var(--primary);
+      stroke-width: 2;
+    }
+
+    /* Inputs & Sliders (Carbon style) */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+      gap: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .field-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+    .field-hint {
+      font-size: 0.75rem;
+      color: var(--on-surface-variant);
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-top: var(--space-xs);
+    }
+    input[type="range"] {
+      flex: 1;
+      accent-color: var(--primary);
+      height: 4px;
+      cursor: pointer;
+    }
+    .number-input {
+      width: 68px;
+      height: 40px;
+      background: var(--background);
+      border: 0;
+      border-bottom: var(--field-rule);
+      padding: 0 var(--space-sm);
+      font-family: var(--font-label);
+      font-size: 0.9375rem;
+      color: var(--on-surface);
+      text-align: right;
+    }
+    .select-input {
+      height: 40px;
+      background: var(--background);
+      border: 0;
+      border-bottom: var(--field-rule);
+      padding: 0 var(--space-lg) 0 var(--space-sm);
+      font-size: 0.9375rem;
+      color: var(--on-surface);
+      width: 100%;
+    }
+    .sim-output-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+    .sim-kpi {
+      background: var(--background);
+      padding: var(--space-md);
+      border-bottom: 2px solid var(--outline-variant);
+    }
+    .sim-kpi.kpi-blue { border-bottom-color: var(--primary); }
+    .sim-kpi.kpi-green { border-bottom-color: var(--positive); }
+    .sim-kpi.kpi-red { border-bottom-color: var(--error); }
+    .sim-kpi.kpi-amber { border-bottom-color: var(--warning); }
+
+    /* Chart Container */
+    .chart-box {
+      background: var(--background);
+      border: 1px solid var(--outline-variant);
+      padding: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    .chart-canvas-wrap {
+      position: relative;
+      min-height: 360px;
+      width: 100%;
+    }
+
+    /* Case Study Comparison Grid */
+    .case-card {
+      background: var(--surface-container);
+      padding: var(--space-lg);
+      border-top: 3px solid var(--on-surface);
+      margin: var(--space-lg) 0;
+    }
+    .case-card.case-fail { border-top-color: var(--error); }
+    .case-card.case-pass { border-top-color: var(--positive); }
+    .case-meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 var(--space-sm);
+      border-radius: var(--rounded-full);
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .tag-error {
+      background: var(--error-container);
+      color: var(--error);
+    }
+    .tag-success {
+      background: var(--tertiary-container);
+      color: var(--positive);
+    }
+    .tag-warn {
+      background: var(--warning-container);
+      color: var(--on-surface);
+    }
+
+    /* Quiz & Checklist */
+    .quiz-item {
+      background: var(--background);
+      border: 1px solid var(--outline-variant);
+      padding: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      margin-top: var(--space-sm);
+    }
+    .quiz-opt-btn {
+      width: 100%;
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--surface-container);
+      border: 1px solid transparent;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.9375rem;
+      color: var(--on-surface);
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+    .quiz-opt-btn:hover {
+      background: var(--surface-container-high);
+    }
+    .quiz-opt-btn.is-correct {
+      background: var(--tertiary-container);
+      border-left: 3px solid var(--positive);
+      font-weight: 600;
+    }
+    .quiz-opt-btn.is-wrong {
+      background: var(--error-container);
+      border-left: 3px solid var(--error);
+    }
+    .quiz-feedback {
+      margin-top: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      font-size: 0.875rem;
+      background: var(--surface-container);
+      border-left: var(--state-bar-blue);
+      display: none;
+    }
+    .quiz-feedback.is-visible { display: block; }
+
+    .checklist-row {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      padding: var(--space-sm) 0;
+      border-bottom: var(--rule);
+      cursor: pointer;
+    }
+    .checklist-row input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Footer */
+    .lecture-footer {
+      border-top: 2px solid var(--on-surface);
+      padding-top: var(--space-lg);
+      margin-top: var(--space-xl);
+      color: var(--on-surface-variant);
+      font-size: 0.875rem;
+    }
+
+    @media (max-width: 900px) {
+      .lecture-layout {
+        grid-template-columns: 1fr;
+      }
+      .lecture-sidebar {
+        position: static;
+      }
+      .waterfall-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-grid {
+        padding: var(--space-md);
+        gap: var(--space-md);
+      }
+      .wf-step-btn {
+        grid-template-columns: 44px minmax(0, 1fr);
+      }
+      .wf-step-btn .wf-artifact-hint {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-grid">
+    <!-- HEADER -->
+    <header class="lecture-header">
+      <div class="top-meta-strip">
+        <span class="mono-code">COMPUTER SCIENCE &amp; SOFTWARE ENGINEERING · MODULE 02</span>
+        <span class="course-tag">เอกสารประกอบการบรรยายระดับปริญญาตรี</span>
+      </div>
+
+      <h1 class="headline-display">
+        โมเดลกระบวนการพัฒนาซอฟต์แวร์แบบดั้งเดิม <strong>และข้อจำกัดในทางปฏิบัติ</strong>
+      </h1>
+      <p class="prose" style="font-size: 1.125rem; color: var(--on-surface-variant);">
+        Traditional Software Process Models &amp; Their Limitations — การวิเคราะห์เชิงลึกเกี่ยวกับสถาปัตยกรรมของ Waterfall Model และ V-Model ปรัชญาการวางแผนล่วงหน้า (Plan-Driven Development) บริบทที่ยังจำเป็นต้องพึ่งพาแนวทางแบบดั้งเดิม ตลอดจนคอขวดในอุตสาหกรรมซอฟต์แวร์จริง อ้างอิงจากตำรา <em>Software Engineering</em> (10th ed.) โดย Ian Sommerville และ <em>Software Development, Design, and Coding</em> (2024) โดย John F. Dooley และ Vera A. Kazakova
+      </p>
+
+      <div class="header-meta-grid">
+        <div class="metric-tile key-tile">
+          <span class="mono-code">ORIGIN · ROYCE (1970)</span>
+          <span class="metric-value">5–7 Phases</span>
+          <span class="label-th">โมเดลลำดับขั้นพร้อมประตูตรวจสอบ (Gate Reviews)</span>
+        </div>
+        <div class="metric-tile">
+          <span class="mono-code">TESTING COST · SOMMERVILLE</span>
+          <span class="metric-value">~40% / 60%</span>
+          <span class="label-th">สัดส่วนต้นทุนทดสอบ 40% ต่อพัฒนา 60% (ไม่รวมบำรุงรักษา)</span>
+        </div>
+        <div class="metric-tile">
+          <span class="mono-code">V &amp; V · BOEHM (1979)</span>
+          <span class="metric-value">2 คำถามหลัก</span>
+          <span class="label-th">Verification (สร้างถูกวิธี) vs. Validation (สร้างถูกตัว)</span>
+        </div>
+        <div class="metric-tile">
+          <span class="mono-code">INSPECTION LIMIT · DOOLEY</span>
+          <span class="metric-value">&le; 2 ชม. / 10%</span>
+          <span class="label-th">เพดานเวลาประชุมตรวจงาน และเกณฑ์ตรวจซ้ำเมื่อแก้เกิน 10%</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN 2-COL WORKSPACE -->
+    <div class="lecture-layout">
+      <!-- SIDEBAR NAVIGATION & PROGRESS -->
+      <aside class="lecture-sidebar" aria-label="สารบัญบทเรียน">
+        <span class="mono-code">MODULE 02 · SYLLABUS</span>
+        <nav>
+          <ul class="toc-list" id="toc-list">
+            <li class="toc-item">
+              <a class="toc-link is-active" href="#sec-1" onclick="setActiveToc(0)">
+                <span class="toc-num">SECTION 01</span>
+                <span class="toc-text">Waterfall Model โครงสร้างและ Gate Reviews</span>
+              </a>
+            </li>
+            <li class="toc-item">
+              <a class="toc-link" href="#sec-2" onclick="setActiveToc(1)">
+                <span class="toc-num">SECTION 02</span>
+                <span class="toc-text">V-Model, V&amp;V และระดับการทดสอบ</span>
+              </a>
+            </li>
+            <li class="toc-item">
+              <a class="toc-link" href="#sec-3" onclick="setActiveToc(2)">
+                <span class="toc-num">SECTION 03</span>
+                <span class="toc-text">บริบทที่เหมาะสมสำหรับ Traditional Models</span>
+              </a>
+            </li>
+            <li class="toc-item">
+              <a class="toc-link" href="#sec-4" onclick="setActiveToc(3)">
+                <span class="toc-num">SECTION 04</span>
+                <span class="toc-text">ข้อจำกัดและคอขวดในทางปฏิบัติ</span>
+              </a>
+            </li>
+            <li class="toc-item">
+              <a class="toc-link" href="#sec-5" onclick="setActiveToc(4)">
+                <span class="toc-num">SECTION 05</span>
+                <span class="toc-text">กรณีศึกษาในอุตสาหกรรมซอฟต์แวร์จริง</span>
+              </a>
+            </li>
+            <li class="toc-item">
+              <a class="toc-link" href="#sec-6" onclick="setActiveToc(5)">
+                <span class="toc-num">SECTION 06</span>
+                <span class="toc-text">สรุปและแบบทดสอบประเมินความเข้าใจ</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="progress-box">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="mono-code">STUDY PROGRESS</span>
+            <span class="mono-code" id="sidebar-progress-pct">0%</span>
+          </div>
+          <div class="progress-track" aria-hidden="true">
+            <div class="progress-fill" id="sidebar-progress-fill"></div>
+          </div>
+          <p class="prose-muted" style="font-size:0.8125rem; margin:0;" id="sidebar-progress-text">
+            ทำเครื่องหมายหัวข้อที่ทบทวนแล้วและทำแบบทดสอบในส่วนท้ายเพื่อบันทึกความคืบหน้า
+          </p>
+        </div>
+      </aside>
+
+      <!-- MAIN LECTURE CONTENT -->
+      <main class="lecture-main">
+
+        <!-- ======================================================= -->
+        <!-- SECTION 1: WATERFALL MODEL -->
+        <!-- ======================================================= -->
+        <section id="sec-1" class="lecture-section">
+          <div class="section-head">
+            <div class="section-code-row">
+              <span class="section-id">01 · PLAN-DRIVEN FOUNDATION</span>
+              <span class="mono-code">SOMMERVILLE CH. 2 · DOOLEY &amp; KAZAKOVA CH. 2</span>
+            </div>
+            <h2 class="section-title">
+              <strong>Waterfall Model:</strong> โครงสร้าง ระยะการทำงาน ลักษณะเชิงลำดับ และประตูตรวจสอบ
+            </h2>
+          </div>
+
+          <h3 class="subhead">1.1 รากฐานทางประวัติศาสตร์: จากวิกฤตการณ์ซอฟต์แวร์สู่กระบวนการแบบแผน</h3>
+          <p class="prose">
+            แนวคิดเรื่องวิศวกรรมซอฟต์แวร์ (Software Engineering) ถือกำเนิดขึ้นอย่างเป็นทางการในการประชุมขององค์การ NATO เมื่อปี ค.ศ. 1968 (Naur and Randell 1969) เพื่อรับมือกับสิ่งที่เรียกว่า <strong>วิกฤตการณ์ซอฟต์แวร์ (Software Crisis)</strong> เนื่องจากในทศวรรษ 1960 วิธีการพัฒนาโปรแกรมแบบปัจเจกบุคคลไม่สามารถขยายสเกล (Scale up) ไปสู่ระบบขนาดใหญ่และซับซ้อนได้ ส่งผลให้โครงการจำนวนมากขาดความน่าเชื่อถือ ส่งมอบล่าช้า และงบประมาณบานปลาย Ian Sommerville (2016) ได้นิยามว่าซอฟต์แวร์ในมุมมองวิศวกรรมไม่ใช่เพียงรหัสคำสั่ง (Computer Programs) เท่านั้น แต่หมายรวมถึงเอกสารระบบ เอกสารผู้ใช้ ไลบรารี ข้อมูลการตั้งค่า (Configuration Data) และโครงสร้างสนับสนุนทั้งหมดที่ทำให้โปรแกรมทำงานได้อย่างสมบูรณ์ในระยะยาว
+          </p>
+          <p class="prose">
+            เพื่อนำความมีระเบียบมาสู่การผลิตซอฟต์แวร์ กระบวนการพัฒนาซอฟต์แวร์ (Software Process) จึงถูกจัดโครงสร้างให้ประกอบด้วยกิจกรรมพื้นฐาน 4 ประการที่ปรากฏในทุกโมเดล ได้แก่ (1) <strong>Software Specification</strong> การทำความเข้าใจและกำหนดความต้องการ (2) <strong>Software Development</strong> การออกแบบและเขียนโปรแกรม (3) <strong>Software Validation</strong> การตรวจสอบว่าซอฟต์แวร์ตรงตามข้อกำหนดและความคาดหวังของผู้ใช้ และ (4) <strong>Software Evolution</strong> การปรับปรุงซอฟต์แวร์ตามความเปลี่ยนแปลงของธุรกิจ ขณะที่ John F. Dooley และ Vera A. Kazakova (2024) ได้จำแนกวงจรชีวิตการพัฒนาซอฟต์แวร์ (SDLC) อย่างละเอียดออกเป็น 8 ขั้นตอน ตั้งแต่ Conception, Requirements Gathering/Modeling, Design, Coding &amp; Debugging, Testing, Release, Maintenance/Evolution ไปจนถึง Retirement
+          </p>
+          <p class="prose">
+            รูปแบบแรกที่ถูกตีพิมพ์อย่างเป็นทางการในกลุ่ม <strong>กระบวนการที่ขับเคลื่อนด้วยแผน (Plan-Driven Processes)</strong> คือ <strong>Waterfall Model</strong> ซึ่งนำเสนอโดย Winston W. Royce ในปี ค.ศ. 1970 โดยดัดแปลงมาจากโมเดลวิศวกรรมระบบทางทหารและฮาร์ดแวร์ขนาดใหญ่ (Royce 1970) หลักการสำคัญของ Plan-driven development คือทีมงานต้องวางแผนและจัดตารางเวลากิจกรรมทั้งหมดล่วงหน้าก่อนลงมือเขียนโค้ด โดยเปรียบเสมือนสายพานการผลิตในโรงงานอุตสาหกรรม (Assembly-line approach) ที่งานไหลลงมาจากขั้นบนสู่ขั้นล่างคล้ายน้ำตก
+          </p>
+
+          <div class="callout">
+            <p class="callout-title">ข้อเท็จจริงทางประวัติศาสตร์ที่มักถูกเข้าใจคลาดเคลื่อนเกี่ยวกับ Royce (1970)</p>
+            <p>
+              แม้โมเดล Waterfall แบบเส้นตรงสมบูรณ์จะถูกอ้างอิงจากบทความของ Winston Royce ในปี 1970 แต่ในบทความต้นฉบับ Royce ได้ระบุชัดเจนว่าโมเดลแบบลำดับขั้นที่ไม่ย้อนกลับนั้น “มีความเสี่ยงและเชื้อเชิญความล้มเหลว” (risky and invites failure) เขาจึงเสนอให้มีการวนกลับ (Feedback loops) ระหว่างระยะที่ติดกันและการสร้างต้นแบบ (Prototype) ทว่าองค์กรภาครัฐและกองทัพในยุคต่อมาได้นำภาพไดอะแกรมขั้นบันไดหน้าแรกของเขามาใช้เป็นมาตรฐานจัดซื้อจัดจ้างแบบตายตัวโดยตัดวงจรป้อนกลับออกไป
+            </p>
+          </div>
+
+          <h3 class="subhead">1.2 โครงสร้างของระยะการทำงาน (Phases) และลักษณะเชิงลำดับ (Sequential Nature)</h3>
+          <p class="prose">
+            ตามกรอบของ Sommerville (Section 2.1.1) โมเดล Waterfall แบ่งกิจกรรมหลักออกเป็น 5 ระยะต่อเนื่องกันอย่างเคร่งครัด ขณะที่ Dooley &amp; Kazakova (Figure 2-2) ขยายรายละเอียดเชิงปฏิบัติออกเป็น 7 ขั้นตอนย่อยเพื่อให้เห็นจุดตัดของงานสถาปัตยกรรมและการทดสอบหน่วย ดังรายละเอียดของแต่ละระยะต่อไปนี้
+          </p>
+
+          <div class="structured-list">
+            <div class="structured-list-item">
+              <span class="list-index">PH 01</span>
+              <div>
+                <strong>Requirements Analysis and Definition (การวิเคราะห์และนิยามความต้องการ)</strong>
+                <p class="prose-muted" style="margin-top:4px;">
+                  เก็บข้อมูลจากผู้มีส่วนได้ส่วนเสียเพื่อกำหนดบริการ (Services) ข้อจำกัด (Constraints) และเป้าหมายของระบบให้ครบถ้วนสมบูรณ์ แล้วจัดทำเป็นเอกสารข้อกำหนดความต้องการของระบบ (System Requirements Specification — SRS) ซึ่งทำหน้าที่เป็นสัญญาผูกมัดระหว่างผู้ว่าจ้างและผู้พัฒนา
+                </p>
+              </div>
+            </div>
+            <div class="structured-list-item">
+              <span class="list-index">PH 02</span>
+              <div>
+                <strong>System and Software Design (การออกแบบระบบและซอฟต์แวร์)</strong>
+                <p class="prose-muted" style="margin-top:4px;">
+                  แบ่งเป็นสองระดับตาม Dooley &amp; Kazakova ได้แก่ <em>Architectural Design</em> (การจัดสรรความต้องการไปยังฮาร์ดแวร์หรือซอฟต์แวร์และการวางโครงสร้างระดับสูง) และ <em>Detailed Design</em> (การนิยามมอดูล คลาส อินเทอร์เฟซ โครงสร้างข้อมูล และอัลกอริทึมเชิงลึก)
+                </p>
+              </div>
+            </div>
+            <div class="structured-list-item">
+              <span class="list-index">PH 03</span>
+              <div>
+                <strong>Implementation and Unit Testing (การพัฒนาโปรแกรมและการทดสอบหน่วย)</strong>
+                <p class="prose-muted" style="margin-top:4px;">
+                  แปลงแบบจำลองการออกแบบให้เป็นโปรแกรมหรือยูนิตซอฟต์แวร์จริง พร้อมการดีบัก (Debugging) จากนั้นผู้พัฒนาจะทำการทดสอบระดับหน่วย (Unit Testing) เพื่อยืนยันว่าฟังก์ชันหรือคลาสย่อยทำงานสอดคล้องกับ Detailed Design ที่กำหนดไว้
+                </p>
+              </div>
+            </div>
+            <div class="structured-list-item">
+              <span class="list-index">PH 04</span>
+              <div>
+                <strong>Integration and System Testing (การบูรณาการและการทดสอบทั้งระบบ)</strong>
+                <p class="prose-muted" style="margin-top:4px;">
+                  นำโปรแกรมย่อยทั้งหมดมารวมกันเป็นระบบสมบูรณ์ ตรวจสอบปัญหาที่เกิดจากการเชื่อมต่อระหว่างส่วนประกอบ (Interface interactions) และทดสอบสมบัติเชิงระบบ (Emergent properties) รวมถึงข้อกำหนดเชิงฟังก์ชันและไม่ใช่ฟังก์ชัน ก่อนส่งมอบให้ลูกค้า (Release)
+                </p>
+              </div>
+            </div>
+            <div class="structured-list-item">
+              <span class="list-index">PH 05</span>
+              <div>
+                <strong>Operation and Maintenance (การใช้งานจริงและการบำรุงรักษา)</strong>
+                <p class="prose-muted" style="margin-top:4px;">
+                  เป็นระยะที่ยาวนานที่สุดและมักมีต้นทุนสูงที่สุดในวงจรชีวิต (มักสูงกว่าค่าพัฒนาเริ่มต้นสำหรับซอฟต์แวร์เฉพาะทาง) ครอบคลุมการแก้ไขข้อบกพร่องที่หลุดรอดจากการทดสอบ (Corrective) การปรับระบบให้เข้ากับสภาพแวดล้อมใหม่ (Adaptive) และการเพิ่มความสามารถตามความต้องการที่เพิ่งค้นพบ (Perfective)
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="subhead">1.3 กลไกการควบคุมผ่านประตูตรวจสอบ (Gate Reviews, Sign-offs &amp; Formal Inspections)</h3>
+          <p class="prose">
+            หัวใจสำคัญที่ทำให้ Waterfall แตกต่างจากการพัฒนาแบบลองผิดลองถูก คือระบบ <strong>Document-Driven Gate Reviews (หรือ Phase-Gate Control)</strong> ในหลักการของ Waterfall ผลลัพธ์ของทุกระยะคือ “เอกสารที่ได้รับการอนุมัติและลงนามรับรอง (Signed off)” ระยะถัดไปจะไม่สามารถเริ่มต้นได้จนกว่าระยะก่อนหน้าจะผ่านการตรวจรับและปิดประตู (Gate) อย่างเป็นทางการ เหตุผลเบื้องหลังคือการลดความคลุมเครือ การจัดทำเอกสารเก็บเข้าคลัง (Archiving) และการควบคุมการเปลี่ยนแปลง (Configuration Management)
+          </p>
+          <p class="prose">
+            Dooley &amp; Kazakova (2024) และ Sommerville (Section 24.3) อธิบายว่าในองค์กรที่ใช้แนวทาง Plan-driven การผ่าน Gate Review มักอาศัยกระบวนการ <strong>Formal Inspection</strong> หรือการทบทวนงานอย่างเป็นระบบ (Static V &amp; V) ซึ่งตรวจสอบทั้งเอกสาร SRS, สถาปัตยกรรม, แบบรายละเอียด, แผนทดสอบ และซอร์สโค้ด โดยแบ่งเป็น 6 ขั้นตอนที่มีวินัยสูง:
+          </p>
+
+          <div class="table-wrap">
+            <table class="carbon-table">
+              <thead>
+                <tr>
+                  <th><span class="mono-sub">PHASE</span>ขั้นตอนการตรวจงาน</th>
+                  <th><span class="mono-sub">KEY ROLES</span>ผู้รับผิดชอบหลัก</th>
+                  <th><span class="mono-sub">OPERATIONAL RULES</span>กติกาและข้อจำกัดเชิงปฏิบัติ (Dooley &amp; Sommerville)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>1. Planning</strong><br>การวางแผนและคัดเลือกเอกสาร</td>
+                  <td>Moderator, Author</td>
+                  <td>จัดตั้งทีมผู้ตรวจ กำหนดเวลา/สถานที่ และแจกจ่ายเอกสารมาตรฐานล่วงหน้า</td>
+                </tr>
+                <tr>
+                  <td><strong>2. Overview Meeting</strong><br>การประชุมปูพื้นฐาน (ถ้าจำเป็น)</td>
+                  <td>Author เป็นผู้นำ</td>
+                  <td>จำกัดเวลาไม่เกิน 2 ชั่วโมง มักถูกหลีกเลี่ยงในงานโค้ดเพราะอาจทำให้ผู้ตรวจเกิดอคติตามผู้เขียน (Taint the evidence)</td>
+                </tr>
+                <tr>
+                  <td><strong>3. Preparation</strong><br>การเตรียมตัวรายบุคคล</td>
+                  <td>Reviewers</td>
+                  <td>ผู้ตรวจแต่ละคนอ่านและวิเคราะห์เอกสารหรือโค้ดเทียบกับมาตรฐานและรายการตรวจสอบ (Checklist) โดยอิสระ</td>
+                </tr>
+                <tr>
+                  <td><strong>4. Inspection Meeting</strong><br>การประชุมตรวจรับอย่างเป็นทางการ</td>
+                  <td>Moderator, Reader, Recorder, Author</td>
+                  <td>ห้ามเกิน 2 ชั่วโมง Reader ทำหน้าที่ถอดความทีละส่วน Recorder บันทึก Defect และระดับความรุนแรง ห้ามอภิปรายวิธีแก้ปัญหาในห้องประชุม</td>
+                </tr>
+                <tr>
+                  <td><strong>5. Rework</strong><br>การแก้ไขข้อบกพร่อง</td>
+                  <td>Author</td>
+                  <td>ผู้เขียนแก้ไขข้อบกพร่องระดับวิกฤต (Severity 1–3) พร้อมบันทึกเวลาที่ใช้จริงในระบบติดตาม Defect เพื่อใช้ประมาณการโครงการถัดไป</td>
+                </tr>
+                <tr>
+                  <td><strong>6. Follow-up</strong><br>การตรวจซ้ำและปิด Gate</td>
+                  <td>Moderator</td>
+                  <td>หากมีการแก้ไขเกินเกณฑ์ <strong>10%</strong> ของขอบเขตที่ตรวจ (เช่น แก้เกิน 20 บรรทัดจาก 200 บรรทัด) ต้องเปิด Inspection ใหม่ทั้งชุด หากต่ำกว่า 10% ใช้ Walkthrough แทนได้</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="prose">
+            อย่างไรก็ตาม กลไกการลงนามรับรองที่เข้มงวดก่อให้เกิดอาการข้างเคียงที่ Sommerville เรียกว่า <strong>การแช่แข็งข้อกำหนดก่อนเวลาอันควร (Premature Freezing of Specifications)</strong> เนื่องจากในทางปฏิบัติเมื่อทีมเข้าสู่ระยะออกแบบหรือเขียนโค้ดแล้วพบว่าความต้องการบางข้อทำได้ยากหรือแพงเกินไป การย้อนกลับไปแก้เอกสาร SRS ต้องขออนุมัติจากลูกค้าใหม่และทำให้โครงการล่าช้า ทั้งลูกค้าและทีมพัฒนาจึงมักหลีกเลี่ยงด้วยการ “แช่แข็ง” เอกสารไว้ไม่ให้แก้ ส่งผลให้ปัญหาถูกซุกไว้ใต้พรมหรือถูกแก้ด้วยกลเม็ดเฉพาะหน้าในโค้ด (Implementation tricks) จนโครงสร้างระบบเสื่อมโทรมตั้งแต่ยังไม่ส่งมอบ
+          </p>
+
+          <!-- INTERACTIVE ELEMENT 1: WATERFALL & GATE REVIEW EXPLORER -->
+          <div class="interactive-panel" id="wf-explorer">
+            <div class="panel-header">
+              <div>
+                <span class="mono-code">INTERACTIVE DIAGRAM 01 · WATERFALL &amp; GATE INSPECTOR</span>
+                <h3 class="panel-title">สำรวจโครงสร้าง Waterfall, Gate Reviews และจุดป้อนกลับที่หายไป</h3>
+                <p class="panel-desc">คลิกเลือกระยะ (Phase) หรือประตูตรวจสอบ (Gate) เพื่อดูเอกสารส่งมอบ เกณฑ์การอนุมัติ และความเสี่ยงเมื่อเกิดปัญหาในทางปฏิบัติ</p>
+              </div>
+              <div class="btn-row">
+                <button type="button" class="btn btn-tab is-active" id="wf-mode-ideal" onclick="setWaterfallMode('ideal')">มุมมองตามทฤษฎี (Ideal Linear)</button>
+                <button type="button" class="btn btn-tab" id="wf-mode-reality" onclick="setWaterfallMode('reality')">มุมมองความจริง (Feedback &amp; Freeze)</button>
+              </div>
+            </div>
+
+            <div class="waterfall-grid">
+              <div class="waterfall-steps" id="wf-steps-container">
+                <button type="button" class="wf-step-btn is-active" data-wf="0" onclick="selectWaterfallStage(0)">
+                  <span class="wf-step-code">PH 01</span>
+                  <span><strong>Requirements Analysis</strong><br><span class="label-th" style="font-weight:400;">วิเคราะห์และกำหนดความต้องการ</span></span>
+                  <span class="mono-code wf-artifact-hint">SRS DOC</span>
+                </button>
+                <div class="wf-gate-divider">
+                  <span>GATE 1: SRS SIGN-OFF</span>
+                  <span class="wf-gate-line"></span>
+                </div>
+                <button type="button" class="wf-step-btn" data-wf="1" onclick="selectWaterfallStage(1)">
+                  <span class="wf-step-code">PH 02</span>
+                  <span><strong>System &amp; Software Design</strong><br><span class="label-th" style="font-weight:400;">สถาปัตยกรรมและการออกแบบละเอียด</span></span>
+                  <span class="mono-code wf-artifact-hint">ARCH / SDD</span>
+                </button>
+                <div class="wf-gate-divider">
+                  <span>GATE 2: DESIGN REVIEW</span>
+                  <span class="wf-gate-line"></span>
+                </div>
+                <button type="button" class="wf-step-btn" data-wf="2" onclick="selectWaterfallStage(2)">
+                  <span class="wf-step-code">PH 03</span>
+                  <span><strong>Implementation &amp; Unit Test</strong><br><span class="label-th" style="font-weight:400;">เขียนโปรแกรมและทดสอบหน่วย</span></span>
+                  <span class="mono-code wf-artifact-hint">CODE + JUNIT</span>
+                </button>
+                <div class="wf-gate-divider">
+                  <span>GATE 3: CODE FREEZE</span>
+                  <span class="wf-gate-line"></span>
+                </div>
+                <button type="button" class="wf-step-btn" data-wf="3" onclick="selectWaterfallStage(3)">
+                  <span class="wf-step-code">PH 04</span>
+                  <span><strong>Integration &amp; System Test</strong><br><span class="label-th" style="font-weight:400;">บูรณาการและทดสอบทั้งระบบ</span></span>
+                  <span class="mono-code wf-artifact-hint">RELEASE CANDIDATE</span>
+                </button>
+                <div class="wf-gate-divider">
+                  <span>GATE 4: ACCEPTANCE SIGN-OFF</span>
+                  <span class="wf-gate-line"></span>
+                </div>
+                <button type="button" class="wf-step-btn" data-wf="4" onclick="selectWaterfallStage(4)">
+                  <span class="wf-step-code">PH 05</span>
+                  <span><strong>Operation &amp; Maintenance</strong><br><span class="label-th" style="font-weight:400;">ใช้งานจริงและวิวัฒนาการระบบ</span></span>
+                  <span class="mono-code wf-artifact-hint">CHANGE REQUESTS</span>
+                </button>
+              </div>
+
+              <div class="detail-box" id="wf-detail-box" aria-live="polite">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ======================================================= -->
+        <!-- SECTION 2: V-MODEL -->
+        <!-- ======================================================= -->
+        <section id="sec-2" class="lecture-section">
+          <div class="section-head">
+            <div class="section-code-row">
+              <span class="section-id">02 · VERIFICATION &amp; VALIDATION ARCHITECTURE</span>
+              <span class="mono-code">SOMMERVILLE CH. 2 &amp; 8 · DOOLEY &amp; KAZAKOVA CH. 18</span>
+            </div>
+            <h2 class="section-title">
+              <strong>V-Model:</strong> Verification กับ Validation และระดับของการทดสอบซอฟต์แวร์
+            </h2>
+          </div>
+
+          <h3 class="subhead">2.1 การแยกแยะระหว่าง Verification และ Validation (V &amp; V)</h3>
+          <p class="prose">
+            ในโมเดล Waterfall แบบดั้งเดิม การทดสอบมักถูกมองว่าเป็นเพียงขั้นตอนท้ายสุดหลังจากเขียนโค้ดเสร็จแล้ว ทำให้ปัญหาความไม่สอดคล้องของความต้องการถูกค้นพบช้าเกินไป แนวคิดของ <strong>V-Model</strong> (แสดงใน Sommerville Figure 2.7 ในฐานะรูปแบบการทดสอบของกระบวนการแบบ Plan-driven) จึงเกิดขึ้นเพื่อย้ำว่าการวางแผนทดสอบต้องเริ่มต้นควบคู่ไปกับการเขียนข้อกำหนดและการออกแบบตั้งแต่ต้น โดยพับเส้นทางการพัฒนาขึ้นเป็นรูปตัวอักษร V: แขนซ้ายแทนการแตกย่อยรายละเอียดจากนามธรรมสู่โค้ด (Decomposition &amp; Design) จุดยอดล่างสุดแทนการเขียนโค้ด (Coding) และแขนขวาแทนการประกอบและทดสอบกลับขึ้นไป (Integration &amp; Verification/Validation)
+          </p>
+          <p class="prose">
+            หัวใจทางปรัชญาของ V-Model คือการแยกความรับผิดชอบของ <strong>Verification</strong> และ <strong>Validation</strong> ออกจากกันอย่างชัดเจน แม้คนทั่วไปมักใช้สองคำนี้ปะปนกัน แต่ Barry Boehm (1979) ผู้บุกเบิกวิศวกรรมซอฟต์แวร์ได้สรุปความแตกต่างไว้อย่างคมคายและเป็นมาตรฐานอ้างอิงสากล:
+          </p>
+
+          <div class="card-grid">
+            <div class="layer" style="border-left: var(--state-bar-blue);">
+              <span class="mono-code">VERIFICATION · BOEHM (1979)</span>
+              <h4 style="margin: var(--space-xs) 0; font-size: 1.0625rem;">“Are we building the product right?”</h4>
+              <p class="prose-muted" style="margin:0;">
+                <strong>การทวนสอบ:</strong> เรากำลังสร้างผลิตภัณฑ์อย่างถูกต้องตามข้อกำหนดหรือไม่? เป็นกระบวนการตรวจสอบว่าผลลัพธ์ของแต่ละระยะสอดคล้องกับเอกสารข้อกำหนดเชิงฟังก์ชันและไม่ใช่ฟังก์ชัน (Specification) ที่กำหนดไว้ในระยะก่อนหน้า ครอบคลุมทั้ง <em>Static V &amp; V</em> (การตรวจโค้ด การทบทวนแบบจำลอง) และ <em>Dynamic Verification</em> (Unit &amp; Integration tests)
+              </p>
+            </div>
+            <div class="layer" style="border-left: var(--state-bar-green);">
+              <span class="mono-code">VALIDATION · BOEHM (1979)</span>
+              <h4 style="margin: var(--space-xs) 0; font-size: 1.0625rem;">“Are we building the right product?”</h4>
+              <p class="prose-muted" style="margin:0;">
+                <strong>การตรวจสอบความถูกต้อง:</strong> เรากำลังสร้างผลิตภัณฑ์ที่ถูกต้องตรงใจผู้ใช้หรือไม่? เป็นกระบวนการระดับสูงกว่า Verification เพราะเอกสารความต้องการ (SRS) อาจเขียนผิดพลาดหรือไม่สะท้อนความต้องการแท้จริงของผู้ใช้ตั้งแต่แรก Validation จึงมุ่งสร้างความมั่นใจว่าระบบ <em>เหมาะสมต่อการใช้งานจริง (Fit for purpose)</em> ผ่าน System Testing และ Acceptance Testing
+              </p>
+            </div>
+          </div>
+
+          <div class="source-quote">
+            <blockquote>“Testing can only show the presence of errors, not their absence.”</blockquote>
+            <cite>— Edsger W. Dijkstra (1972), “The Humble Programmer”, Communications of the ACM (อ้างอิงใน Sommerville บทที่ 8)</cite>
+          </div>
+
+          <p class="prose">
+            คำกล่าวของ Dijkstra เตือนให้นักศึกษาเข้าใจขีดจำกัดของการทดสอบแบบ Dynamic: ต่อให้กรณีทดสอบผ่านทั้งหมด ก็ไม่ได้แปลว่าซอฟต์แวร์ปลอดจากบั๊ก 100% ดังนั้นในกรอบของ Sommerville (Figure 8.1 &amp; 8.2) การประกันคุณภาพจึงต้องอาศัยทั้ง <strong>Static V &amp; V</strong> (การตรวจทานเอกสารและโค้ดโดยไม่ต้องรันโปรแกรม เช่น Inspections และ Static Analysis) ควบคู่กับ <strong>Dynamic Testing</strong> ซึ่งแบ่งเป้าหมายย่อยออกเป็น <em>Validation Testing</em> (ทดสอบด้วยอินพุตปกติที่คาดหวังเพื่อพิสูจน์ว่าทำงานได้ตามต้องการ) และ <em>Defect Testing</em> (จงใจป้อนอินพุตผิดปกติหรือขอบเขตสุดโต่ง $I_e$ เพื่อกระตุ้นให้เกิดเอาต์พุตที่ผิดพลาด $O_e$ และเปิดเผยข้อบกพร่องที่ซ่อนอยู่)
+          </p>
+
+          <h3 class="subhead">2.2 การจับคู่ระดับการทดสอบใน V-Model และมุมมอง White / Gray / Black-Box</h3>
+          <p class="prose">
+            จุดแข็งที่สุดของ V-Model คือ <strong>ความสามารถในการตรวจสอบย้อนกลับในแนวนอน (Horizontal Traceability)</strong> กล่าวคือเอกสารแต่ละขั้นบนแขนซ้ายจะต้องสร้าง <strong>แผนการทดสอบ (Test Plan)</strong> คู่ขนานเตรียมไว้ล่วงหน้าเพื่อใช้ทดสอบที่ระดับเดียวกันบนแขนขวา เมื่อรวมกรอบของ Sommerville (Figure 2.7 &amp; Chapter 8) เข้ากับการจำแนกมุมมองการทดสอบของ Dooley &amp; Kazakova (Chapter 18) จะเห็นโครงสร้างการทดสอบ 4 ระดับดังนี้:
+          </p>
+
+          <div class="table-wrap">
+            <table class="carbon-table">
+              <thead>
+                <tr>
+                  <th><span class="mono-sub">TESTING LEVEL</span>ระดับการทดสอบ</th>
+                  <th><span class="mono-sub">LEFT-ARM ANCHOR</span>เอกสารอ้างอิงฝั่งซ้าย</th>
+                  <th><span class="mono-sub">BOX PERSPECTIVE</span>มุมมองการทดสอบ (Dooley)</th>
+                  <th><span class="mono-sub">OWNER &amp; FOCUS</span>ผู้รับผิดชอบและเป้าหมายหลัก</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>1. Unit / Component Testing</strong><br>การทดสอบระดับหน่วย</td>
+                  <td>Component Design / Detailed Design</td>
+                  <td><strong>White-box (Glass-box)</strong><br>เห็นโครงสร้างโค้ดภายในทั้งหมด</td>
+                  <td><strong>ผู้พัฒนา (Developer):</strong> ทดสอบเมธอด คลาส โครงสร้างข้อมูล และการคืนค่า (มักใช้ Test Automation เช่น JUnit) เน้น Verification ว่าโค้ดตรงตามแบบละเอียด</td>
+                </tr>
+                <tr>
+                  <td><strong>2. Sub-system &amp; System Integration Testing</strong><br>การทดสอบการบูรณาการ</td>
+                  <td>System Design / Architectural Design</td>
+                  <td><strong>Gray-box</strong><br>เห็นเฉพาะอินเทอร์เฟซ ไม่เห็นตรรกะภายในทั้งหมด</td>
+                  <td><strong>ทีมทดสอบแยกอิสระ (ตาม Dooley):</strong> ทดสอบการสื่อสารและอินเทอร์เฟซระหว่างมอดูลที่ต่างทีมกันพัฒนา ตรวจหา Interface mismatch และข้อผิดพลาดหลังแก้โค้ดแล้วรวมกลับ</td>
+                </tr>
+                <tr>
+                  <td><strong>3. System Testing (Release Testing)</strong><br>การทดสอบทั้งระบบก่อนปล่อย</td>
+                  <td>System Specification</td>
+                  <td><strong>Black-box</strong><br>ไม่สนวิธีเขียนโค้ด ดูเฉพาะอินพุต/เอาต์พุต</td>
+                  <td><strong>ทีมทดสอบอิสระ (Separate QA Team):</strong> พิสูจน์สมรรถนะ ความปลอดภัย ความน่าเชื่อถือ และพฤติกรรมรวมของระบบ (Emergent properties) เทียบกับ System Spec</td>
+                </tr>
+                <tr>
+                  <td><strong>4. Customer / Acceptance Testing</strong><br>การทดสอบการยอมรับ</td>
+                  <td>Requirements Specification (User Needs)</td>
+                  <td><strong>Black-box (Operational)</strong><br>ทดสอบด้วยข้อมูลและสภาพแวดล้อมจริง</td>
+                  <td><strong>ลูกค้าหรือผู้ใช้ตัวแทน:</strong> แบ่งเป็น Alpha, Beta และ Acceptance testing เพื่อยืนยัน Validation ว่าระบบแก้ปัญหาธุรกิจได้จริงก่อนเซ็นรับมอบ</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- INTERACTIVE ELEMENT 2: V-MODEL TRACEABILITY EXPLORER -->
+          <div class="interactive-panel" id="vmodel-explorer">
+            <div class="panel-header">
+              <div>
+                <span class="mono-code">INTERACTIVE DIAGRAM 02 · V-MODEL TRACEABILITY MAPPER</span>
+                <h3 class="panel-title">แผนภาพ V-Model เชิงโต้ตอบ: การจับคู่เอกสารออกแบบกับระดับการทดสอบ</h3>
+                <p class="panel-desc">คลิกที่กล่องใดก็ได้บนแขนซ้าย (Verification Design) หรือแขนขวา (Testing Levels) เพื่อตรวจสอบความเชื่อมโยงของ Test Plan, ประเภทการทดสอบ (V vs. V) และมุมมอง Box Testing</p>
+              </div>
+            </div>
+
+            <div class="svg-stage">
+              <svg viewBox="0 0 820 380" width="100%" style="min-width:620px; display:block;" role="img" aria-label="แผนภาพ V-Model แสดงความเชื่อมโยงระหว่างแขนซ้ายและแขนขวา">
+                <!-- Background axis indicators -->
+                <text x="20" y="26" fill="var(--on-surface-variant)" font-family="var(--font-label)" font-size="11" letter-spacing="1">LEFT ARM: SPECIFICATION &amp; DESIGN (ABSTRACTION DOWN)</text>
+                <text x="515" y="26" fill="var(--on-surface-variant)" font-family="var(--font-label)" font-size="11" letter-spacing="1">RIGHT ARM: TESTING &amp; V&amp;V (INTEGRATION UP)</text>
+
+                <!-- Horizontal Test Plan links -->
+                <line id="v-link-0" x1="230" y1="70" x2="590" y2="70" stroke="var(--outline)" stroke-width="1.5" stroke-dasharray="5,4" />
+                <text x="410" y="63" text-anchor="middle" fill="var(--on-surface-variant)" font-family="var(--font-label)" font-size="10">ACCEPTANCE TEST PLAN (VALIDATION)</text>
+
+                <line id="v-link-1" x1="275" y1="140" x2="545" y2="140" stroke="var(--outline)" stroke-width="1.5" stroke-dasharray="5,4" />
+                <text x="410" y="133" text-anchor="middle" fill="var(--on-surface-variant)" font-family="var(--font-label)" font-size="10">SYSTEM TEST PLAN (BLACK-BOX)</text>
+
+                <line id="v-link-2" x1="320" y1="210" x2="500" y2="210" stroke="var(--outline)" stroke-width="1.5" stroke-dasharray="5,4" />
+                <text x="410" y="203" text-anchor="middle" fill="var(--on-surface-variant)" font-family="var(--font-label)" font-size="10">INTEGRATION TEST PLAN (GRAY-BOX)</text>
+
+                <line id="v-link-3" x1="365" y1="280" x2="455" y2="280" stroke="var(--outline)" stroke-width="1.5" stroke-dasharray="5,4" />
+
+                <!-- Sequential diagonal connectors -->
+                <path d="M 130 96 L 175 114 M 175 166 L 220 184 M 220 236 L 265 254 M 315 296 L 365 316" stroke="var(--on-surface)" stroke-width="1.5" fill="none" />
+                <path d="M 455 316 L 505 296 M 555 254 L 600 236 M 600 184 L 645 166 M 645 114 L 690 96" stroke="var(--primary)" stroke-width="1.5" fill="none" />
+
+                <!-- Left Arm Nodes -->
+                <g class="v-node is-active" data-vnode="0" onclick="selectVNode(0)" tabindex="0" role="button" aria-label="ระดับ 1 Requirements and Acceptance">
+                  <rect x="20" y="44" width="210" height="52" fill="var(--surface-container)" stroke="var(--outline-variant)" stroke-width="1" />
+                  <text x="32" y="65" fill="var(--primary)" font-family="var(--font-label)" font-size="10" font-weight="600">L1 · REQUIREMENTS SPEC</text>
+                  <text x="32" y="84" fill="var(--on-surface)" font-family="var(--font-body)" font-size="13" font-weight="600">ความต้องการของผู้ใช้ (SRS)</text>
+                </g>
+
+                <g class="v-node" data-vnode="1" onclick="selectVNode(1)" tabindex="0" role="button" aria-label="ระดับ 2 System Spec and System Testing">
+                  <rect x="65" y="114" width="210" height="52" fill="var(--surface-container)" stroke="var(--outline-variant)" stroke-width="1" />
+                  <text x="77" y="135" fill="var(--primary)" font-family="var(--font-label)" font-size="10" font-weight="600">L2 · SYSTEM SPECIFICATION</text>
+                  <text x="77" y="154" fill="var(--on-surface)" font-family="var(--font-body)" font-size="13" font-weight="600">ข้อกำหนดเชิงเทคนิคระบบ</text>
+                </g>
+
+                <g class="v-node" data-vnode="2" onclick="selectVNode(2)" tabindex="0" role="button" aria-label="ระดับ 3 Architectural Design and Integration Testing">
+                  <rect x="110" y="184" width="210" height="52" fill="var(--surface-container)" stroke="var(--outline-variant)" stroke-width="1" />
+                  <text x="122" y="205" fill="var(--primary)" font-family="var(--font-label)" font-size="10" font-weight="600">L3 · ARCHITECTURAL DESIGN</text>
+                  <text x="122" y="224" fill="var(--on-surface)" font-family="var(--font-body)" font-size="13" font-weight="600">สถาปัตยกรรมและระบบย่อย</text>
+                </g>
+
+                <g class="v-node" data-vnode="3" onclick="selectVNode(3)" tabindex="0" role="button" aria-label="ระดับ 4 Detailed Design and Unit Testing">
+                  <rect x="155" y="254" width="210" height="52" fill="var(--surface-container)" stroke="var(--outline-variant)" stroke-width="1" />
+                  <text x="167" y="275" fill="var(--primary)" font-family="var(--font-label)" font-size="10" font-weight="600">L4 · DETAILED / MODULE DESIGN</text>
+                  <text x="167" y="294" fill="var(--on-surface)" font-family="var(--font-body)" font-size="13" font-weight="600">การออกแบบระดับมอดูล</text>
+                </g>
+
+                <!-- Vertex: Coding -->
+                <g class="v-node" data-vnode="4" onclick="selectVNode(4)" tabindex="0" role="button" aria-label="จุดยอดการเขียนโปรแกรม Implementation">
+                  <rect x="305" y="316" width="210" height="48" fill="var(--surface-container-high)" stroke="var(--on-surface)" stroke-width="1.5" />
+                  <text x="410" y="336" text-anchor="middle" fill="var(--on-surface)" font-family="var(--font-label)" font-size="10" font-weight="600">VERTEX · IMPLEMENTATION</text>
+                  <text x="410" y="354" text-anchor="middle" fill="var(--on-surface)" font-family="var(--font-body)" font-size="13" font-weight="600">การเขียนโค้ดและดีบัก</text>
+                </g>
+
+                <!-- Right Arm Nodes -->
+                <g class="v-node" data-vnode="3" onclick="selectVNode(3)" tabindex="0" role="button" aria-label="ระดับ 4 Unit Testing">
+                  <rect x="455" y="254" width="210" height="52" fill="var(--surface-container)" stroke="var(--outline-variant)" stroke-width="1" />
+                  <text x="467" y="275" fill="var(--tertiary)" font-family="var(--font-label)" font-size="10" font-weight="600">VERIFICATION · WHITE-BOX</text>
+                  <text x="467" y="294" fill="var(--on-surface)" font-family="var(--font-body)" font-size="13" font-weight="600">Unit Testing (ทดสอบหน่วย)</text>
+                </g>
+
+                <g class="v-node" data-vnode="2" onclick="selectVNode(2)" tabindex="0" role="button" aria-label="ระดับ 3 Integration Testing">
+                  <rect x="500" y="184" width="210" height="52" fill="var(--surface-container)" stroke="var(--outline-variant)" stroke-width="1" />
+                  <text x="512" y="205" fill="var(--tertiary)" font-family="var(--font-label)" font-size="10" font-weight="600">VERIFICATION · GRAY-BOX</text>
+                  <text x="512" y="224" fill="var(--on-surface)" font-family="var(--font-body)" font-size="13" font-weight="600">Integration Testing (เชื่อมระบบ)</text>
+                </g>
+
+                <g class="v-node" data-vnode="1" onclick="selectVNode(1)" tabindex="0" role="button" aria-label="ระดับ 2 System Testing">
+                  <rect x="545" y="114" width="210" height="52" fill="var(--surface-container)" stroke="var(--outline-variant)" stroke-width="1" />
+                  <text x="557" y="135" fill="var(--data-2)" font-family="var(--font-label)" font-size="10" font-weight="600">V &amp; V · BLACK-BOX</text>
+                  <text x="557" y="154" fill="var(--on-surface)" font-family="var(--font-body)" font-size="13" font-weight="600">System / Release Testing</text>
+                </g>
+
+                <g class="v-node" data-vnode="0" onclick="selectVNode(0)" tabindex="0" role="button" aria-label="ระดับ 1 Acceptance Testing">
+                  <rect x="590" y="44" width="210" height="52" fill="var(--surface-container)" stroke="var(--outline-variant)" stroke-width="1" />
+                  <text x="602" y="65" fill="var(--data-2)" font-family="var(--font-label)" font-size="10" font-weight="600">VALIDATION · OPERATIONAL</text>
+                  <text x="602" y="84" fill="var(--on-surface)" font-family="var(--font-body)" font-size="13" font-weight="600">Customer Acceptance Testing</text>
+                </g>
+              </svg>
+            </div>
+
+            <div class="detail-box" id="vnode-detail-box" style="margin-top: var(--space-md);" aria-live="polite">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ======================================================= -->
+        <!-- SECTION 3: APPROPRIATE CONTEXTS -->
+        <!-- ======================================================= -->
+        <section id="sec-3" class="lecture-section">
+          <div class="section-head">
+            <div class="section-code-row">
+              <span class="section-id">03 · DOMAIN SUITABILITY</span>
+              <span class="mono-code">SOMMERVILLE CH. 1, 2, 10, 12, 19</span>
+            </div>
+            <h2 class="section-title">
+              <strong>บริบทที่เหมาะสม:</strong> เมื่อใดที่โมเดลแบบดั้งเดิมยังคงเป็นทางเลือกที่ถูกต้อง
+            </h2>
+          </div>
+
+          <p class="prose">
+            ในยุคที่วิธีคิดแบบ Agile ได้รับความนิยมอย่างแพร่หลาย นักศึกษาอาจเข้าใจผิดว่าโมเดล Waterfall และ V-Model เป็นเทคโนโลยีที่ล้าสมัยและไม่ควรนำมาใช้อีกต่อไป แต่ Sommerville (Chapter 1 &amp; 2) ย้ำอย่างหนักแน่นว่า <strong>“ไม่มีวิธีการหรือกระบวนการวิศวกรรมซอฟต์แวร์ใดที่ดีที่สุดสำหรับระบบทุกประเภท”</strong> (There are no universal methods) การเลือกใช้กระบวนการต้องพิจารณาจากระดับความเสี่ยง ลักษณะของฮาร์ดแวร์ ข้อบังคับทางกฎหมาย และโครงสร้างองค์กร โดยในทางวิศวกรรมสมัยใหม่ Traditional Plan-Driven Models ยังคงเป็นมาตรฐานหลักใน 3 บริบทสำคัญต่อไปนี้
+          </p>
+
+          <h3 class="subhead">3.1 ระบบวิกฤตต่อความปลอดภัย (Safety-Critical Systems)</h3>
+          <p class="prose">
+            ระบบวิกฤตต่อความปลอดภัยคือระบบที่ความล้มเหลวเพียงครั้งเดียวอาจนำไปสู่การบาดเจ็บ การเสียชีวิตของมนุษย์ หรือความเสียหายร้ายแรงต่อสิ่งแวดล้อม Sommerville (Section 12.1) แบ่งออกเป็น <strong>Primary safety-critical software</strong> (ซอฟต์แวร์ฝังตัวที่ควบคุมฮาร์ดแวร์โดยตรง เช่น ระบบควบคุมเครื่องปั๊มอินซูลินอัตโนมัติสำหรับผู้ป่วยเบาหวาน หรือระบบควบคุมพื้นผิวการบินของเครื่องบินรบ) และ <strong>Secondary safety-critical software</strong> (ระบบโครงสร้างพื้นฐานระดับชาติ เช่น ระบบบำบัดน้ำเสียหรือระบบจ่ายไฟฟ้า ซึ่งหากล่มเป็นเวลานานจะก่อให้เกิดโรคระบาดหรืออันตรายต่อชีวิต)
+          </p>
+          <p class="prose">
+            เหตุผลที่ระบบเหล่านี้ไม่สามารถใช้วิธีลองผิดลองถูกแบบ Agile เต็มรูปแบบได้ (Sommerville Section 10.4 &amp; 12.3) ก็คือ การสร้างระบบที่ปลอดภัยต้องอาศัย <strong>Hazard-driven Requirements Specification</strong> — ต้องระบุอันตราย (Hazards) ทั้งหมด วิเคราะห์ต้นตอด้วย Fault Tree Analysis (FTA) และพิสูจน์ว่าไม่มีข้อกำหนดใดขัดแย้งกันเองจนสร้างช่องโหว่ด้านความปลอดภัย<em>ก่อน</em>ที่จะลงมือเขียนโค้ด ความผิดพลาดในระดับข้อกำหนดหรือสถาปัตยกรรมมีต้นทุนในการแก้ไขสูงมากหากปล่อยให้หลุดไปถึงขั้น Implementation ในบางกรณีเช่นระบบอาณัติสัญญาณรถไฟหรือระบบการบินของ Airbus ยังต้องใช้ <strong>Formal Methods</strong> (เช่น B-Method โดย Abrial 2005, 2010) และ Model Checking เพื่อพิสูจน์ทางคณิตศาสตร์ว่าโค้ดสอดคล้องกับแบบจำลองอย่างสมบูรณ์ 100% ซึ่งเข้ากันได้กับโครงสร้างแบบ V-Model มากกว่าการปรับเปลี่ยนความต้องการรายสัปดาห์
+          </p>
+
+          <h3 class="subhead">3.2 การออกแบบร่วมระหว่างฮาร์ดแวร์และซอฟต์แวร์ (Hardware–Software Co-Design)</h3>
+          <p class="prose">
+            ในระบบฝังตัว (Embedded Systems) และระบบวิศวกรรมขนาดใหญ่ (Systems Engineering, Sommerville Chapter 19) ซอฟต์แวร์ไม่ได้ทำงานอยู่ในสุญญากาศ แต่ต้องสื่อสารกับเซ็นเซอร์ ตัวกระตุ้น (Actuators) แผงวงจร และโครงสร้างทางกล ตัวอย่างเช่น ซอฟต์แวร์ควบคุมระบบเบรก ABS ในรถยนต์ที่ต้องเขียนลงในหน่วยความจำแบบ ROM ก่อนผลิตรถออกสู่ตลาด หรือสถานีตรวจอากาศในป่าห่างไกล (Wilderness Weather Station — Sommerville Section 1.3.3) ที่ต้องพึ่งพาพลังงานแสงอาทิตย์ แบตเตอรี่ และดาวเทียมแบนด์วิดท์ต่ำ
+          </p>
+          <p class="prose">
+            ความไม่ยืดหยุ่นทางกายภาพของฮาร์ดแวร์เป็นข้อจำกัดที่สำคัญ: บริษัทผู้ผลิตชิปหรือผู้รับเหมาสร้างชิ้นส่วนกลไกต้องใช้เวลาสั่งผลิตหลายเดือนหรือหลายปี และเมื่อขึ้นสายการผลิตแล้วการแก้แบบฮาร์ดแวร์แทบเป็นไปไม่ได้ ดังนั้น <strong>อินเทอร์เฟซ (Interfaces) ระหว่างฮาร์ดแวร์และซอฟต์แวร์จึงต้องถูกตกลงและแช่แข็งล่วงหน้า</strong> ก่อนที่ทีมซอฟต์แวร์และทีมฮาร์ดแวร์จากหลายบริษัทคู่ค้าจะแยกย้ายกันไปพัฒนาส่วนของตน (Independent subsystem development) กระบวนการ Plan-driven จึงทำหน้าที่เป็นภาษากลางที่ช่วยให้ทุกฝ่ายทำงานคู่ขนานกันได้โดยไม่ชนกันเมื่อนำมารวมร่าง
+          </p>
+
+          <h3 class="subhead">3.3 ข้อกำหนดด้านกฎหมาย การกำกับดูแล และสัญญา (Regulatory Compliance &amp; Certification)</h3>
+          <p class="prose">
+            อุตสาหกรรมที่มีหน่วยงานภาครัฐกำกับดูแลอย่างเข้มงวด (เช่น การบินพลเรือน โรงไฟฟ้านิวเคลียร์ เครื่องมือแพทย์ และระบบราง) บังคับให้ผู้พัฒนาต้องจัดทำเอกสารที่เรียกว่า <strong>Safety Case</strong> (Sommerville Section 12.4) ซึ่งเป็นชุดหลักฐานและข้อโต้แย้งเชิงโครงสร้างเพื่อโน้มน้าวผู้ตรวจสอบ (Regulators) ว่าระบบปลอดภัยเพียงพอก่อนได้รับใบอนุญาตใช้งานจริง ต้นทุนในการจัดทำเอกสารรับรองมาตรฐานนี้อาจสูงพอๆ กับต้นทุนการเขียนซอฟต์แวร์ทั้งระบบ (Sommerville Chapter 10)
+          </p>
+          <p class="prose">
+            แม้ในอุตสาหกรรมที่ไม่มีหน่วยงานกลางกำกับโดยตรงอย่างซอฟต์แวร์ยานยนต์ ผู้ผลิตก็ยังคงต้องเก็บบันทึกกระบวนการพัฒนา การวิเคราะห์การเปลี่ยนแปลงอย่างเป็นทางการ (Formal change impact analysis) และหลักฐานการทดสอบทุกขั้นตอนไว้อย่างครบถ้วนเพื่อใช้ป้องกันการฟ้องร้องทางกฎหมาย (Legal liability) หากเกิดอุบัติเหตุ นอกจากนี้ ในการจัดซื้อจัดจ้างของภาครัฐหรือองค์กรขนาดใหญ่ <strong>เอกสาร SRS มักถูกผนวกเป็นส่วนหนึ่งของสัญญาทางกฎหมาย (Fixed-price, Fixed-scope Contract)</strong> ทำให้รูปแบบสัญญาไม่เอื้อต่อการพัฒนาที่ความต้องการยังไม่นิ่งตั้งแต่ต้น
+          </p>
+
+          <div class="table-wrap">
+            <table class="carbon-table">
+              <thead>
+                <tr>
+                  <th><span class="mono-sub">SYSTEM PROFILE</span>ประเภทระบบ / โครงการ</th>
+                  <th><span class="mono-sub">RECOMMENDED PROCESS</span>กระบวนการที่เหมาะสม</th>
+                  <th><span class="mono-sub">KEY RATIONALE</span>เหตุผลเชิงวิศวกรรม (อ้างอิง Sommerville &amp; Dooley)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>ระบบควบคุมปั๊มอินซูลิน / อุปกรณ์การแพทย์</strong></td>
+                  <td><span class="tag">V-Model + Formal Spec</span></td>
+                  <td>เป็น Primary safety-critical ต้องวิเคราะห์ Hazard ครบถ้วน และสร้าง Safety Case ให้ผู้กำกับดูแลอนุมัติ</td>
+                </tr>
+                <tr>
+                  <td><strong>ระบบวิศวกรรมอากาศยาน / ยานยนต์หลายบริษัท</strong></td>
+                  <td><span class="tag">Plan-Driven / Waterfall</span></td>
+                  <td>ฮาร์ดแวร์มีต้นทุนแก้สูงมาก และต้องล็อก Interface เพื่อให้หลายบริษัทคู่ค้าพัฒนาแยกกันได้</td>
+                </tr>
+                <tr>
+                  <td><strong>ระบบสารสนเทศคลินิกขนาดใหญ่ (Brownfield)</strong></td>
+                  <td><span class="tag tag-warn">Hybrid (Spec + Incremental)</span></td>
+                  <td>ต้องออกแบบสถาปัตยกรรมฐานข้อมูลและความปลอดภัยล่วงหน้า แต่ฟีเจอร์หน้าจอผู้ใช้ควรพัฒนาแบบวนซ้ำ</td>
+                </tr>
+                <tr>
+                  <td><strong>เว็บแอปพลิเคชัน E-Commerce / SaaS</strong></td>
+                  <td><span class="tag tag-success">Agile / Incremental</span></td>
+                  <td>ความต้องการเปลี่ยนเร็วตามตลาด สามารถปล่อยอัปเดตผ่าน Cloud ได้ทันทีโดยไม่ติดข้อจำกัดฮาร์ดแวร์</td>
+                </tr>
+                <tr>
+                  <td><strong>เกมคอมพิวเตอร์ / แอปความบันเทิง</strong></td>
+                  <td><span class="tag tag-success">Prototyping + Agile</span></td>
+                  <td>คุณค่าอยู่ที่ประสบการณ์ผู้ใช้ (UX/Gameplay) ซึ่งไม่สามารถนิยามเป็นเอกสาร SRS ที่สมบูรณ์ล่วงหน้าได้</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ======================================================= -->
+        <!-- SECTION 4: LIMITATIONS & BOTTLENECKS -->
+        <!-- ======================================================= -->
+        <section id="sec-4" class="lecture-section">
+          <div class="section-head">
+            <div class="section-code-row">
+              <span class="section-id">04 · PRACTICAL LIMITATIONS &amp; BOTTLENECKS</span>
+              <span class="mono-code">DOOLEY &amp; KAZAKOVA CH. 2 &amp; LEAN WASTES · SOMMERVILLE CH. 2 &amp; 3</span>
+            </div>
+            <h2 class="section-title">
+              <strong>ข้อจำกัดและคอขวดในทางปฏิบัติ:</strong> เมื่อสายพานการผลิตชนกับความจริงของซอฟต์แวร์
+            </h2>
+          </div>
+
+          <p class="prose">
+            เหตุใดโมเดล Waterfall ที่ดูมีเหตุมีผลบนหน้ากระดาษจึงมักล้มเหลวเมื่อนำไปใช้กับโครงการซอฟต์แวร์ธุรกิจทั่วไป? Dooley &amp; Kazakova (2024, Chapter 2) ได้ชี้ปัญหาเชิงโครงสร้าง 2 ประการที่เป็นรากเหง้าของความล้มเหลว: <strong>ปัญหาที่ 1</strong> คือ Waterfall บังคับให้ต้องจบระยะที่ $N$ อย่างสมบูรณ์ก่อนจึงจะข้ามไประยะที่ $N+1$ ได้ และ <strong>ปัญหาที่ 2</strong> คือโมเดลนี้ไม่มีกลไกที่เป็นธรรมชาติสำหรับการย้อนกลับไปแก้ไขระยะก่อนหน้า ทั้งที่ในโลกความเป็นจริงการพัฒนาซอฟต์แวร์คือสิ่งที่นักทฤษฎีการออกแบบเรียกว่า <strong>“Wicked Problem”</strong> (ปัญหาที่ซับซ้อนและนิยามไม่สิ้นสุด) — คุณไม่มีทางรู้ทุกสิ่งที่คุณจำเป็นต้องรู้ ณ เวลาที่ต้องการรู้ได้ทั้งหมดจนกว่าจะได้ลองสร้างและเห็นระบบทำงานจริง คอขวดเชิงปฏิบัติที่เกิดขึ้นจึงสรุปได้เป็น 4 ประเด็นหลักดังนี้
+          </p>
+
+          <h3 class="subhead">4.1 Big Design Up Front (BDUF) และความลวงตาของแผนที่สมบูรณ์</h3>
+          <p class="prose">
+            การบังคับให้ต้องออกแบบสถาปัตยกรรมและรายละเอียดทั้งหมดให้เสร็จสิ้นก่อนเขียนโค้ดบรรทัดแรก หรือที่เรียกกันว่า <strong>Big Design Up Front (BDUF)</strong> ก่อให้เกิดสิ่งที่ Dooley &amp; Kazakova เรียกว่า <em>“ภาพลวงตาอันแสนอบอุ่นของแผนการ” (a warm fuzzy mirage of a plan)</em> ซึ่งทำให้ผู้บริหารรู้สึกว่าโครงการอยู่ภายใต้การควบคุม แต่ในทางปฏิบัติกลับสร้างความสูญเปล่าประเภท <strong>Extra Processing</strong> (การทำงานเอกสารและการประชุมมากเกินจำเป็น) ทีมงานใช้เวลาส่วนใหญ่ไปกับการเขียนและตรวจแก้เอกสารที่อาจไม่มีใครอ่านอีกเลยหลังจากระบบถูกสร้างเสร็จ
+          </p>
+          <p class="prose">
+            ยิ่งไปกว่านั้น แม้หลายองค์กรจะปรับปรุงเป็น <em>Modified Waterfall</em> ที่ยอมให้ถอยหลังกลับได้ 1–2 ระยะ แต่การย้อนกลับหนึ่งครั้งหมายถึงต้องย้อนกลับไปแก้เอกสาร SRS, Architecture, Detailed Design และ Test Plan ทั้งหมดให้สอดคล้องกัน ซึ่งมีต้นทุนสูงมากจนทำให้ทีมเลือกวิธี "เขียนโค้ดเลี่ยงปัญหา" แทนการแก้แบบที่ถูกต้อง
+          </p>
+
+          <h3 class="subhead">4.2 ความเสี่ยงจากการบูรณาการล่าช้า (Late Integration Risk &amp; Exponential Defect Cost)</h3>
+          <p class="prose">
+            ในกระบวนการแบบลำดับขั้น โค้ดจากหลายทีมมักถูกพัฒนาแยกส่วนกันเป็นเวลานานหลายเดือน และเพิ่งถูกนำมาประกอบรวมกัน (Integrate) ในระยะที่ 4 เกิดเป็นเหตุการณ์ที่เรียกว่า <strong>“Big Bang Integration”</strong> ความเสี่ยงที่เกิดขึ้นคือความไม่เข้ากันของอินเทอร์เฟซ สมมติฐานข้อมูลที่ขัดแย้งกัน และปัญหาด้านสมรรถนะจะถูกตรวจพบพร้อมกันทีเดียวในช่วงท้ายของโครงการ ซึ่งเป็นช่วงเวลาที่งบประมาณและเวลาใกล้หมดลงแล้ว
+          </p>
+          <p class="prose">
+            ตามหลักเศรษฐศาสตร์ของข้อบกพร่องที่ Dooley &amp; Kazakova เน้นย้ำไว้ในกรอบความสูญเปล่าแบบ Lean: <strong>“Defects become increasingly expensive to fix as detection time moves further from the defect’s inception”</strong> ข้อบกพร่องที่เกิดขึ้นตั้งแต่ขั้นตอนการเก็บความต้องการ หากถูกตรวจพบในระยะ Requirements Review อาจใช้เวลาแก้เพียงไม่กี่ชั่วโมง แต่หากหลุดรอดไปจนถึงระยะ System Testing หรือหลังส่งมอบสู่การใช้งานจริง (Production) ต้นทุนในการแก้ไขจะพุ่งสูงขึ้น 10 ถึง 100 เท่า เพราะต้องรื้อทั้งสถาปัตยกรรม โค้ด ชุดทดสอบ และเอกสารที่สร้างทับซ้อนกันขึ้นมาตลอดหลายเดือน
+          </p>
+
+          <!-- CHART: COST OF DEFECT DETECTION DELAY -->
+          <div class="chart-box">
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:var(--space-sm); margin-bottom:var(--space-sm);">
+              <div>
+                <h4 style="margin:0; font-size:1rem; font-weight:600;">แนวโน้มต้นทุนการแก้ไขข้อบกพร่องสัมพัทธ์เทียบกับระยะเวลาที่ตรวจพบ (Conceptual Cost-of-Change Curve)</h4>
+                <span class="mono-code">ILLUSTRATIVE MODEL BASED ON DOOLEY &amp; KAZAKOVA (CH. 2) &amp; SOMMERVILLE (CH. 4 &amp; 8)</span>
+              </div>
+              <span class="tag">Y-AXIS: RELATIVE REWORK COST INDEX</span>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas id="defectCostChart"></canvas>
+            </div>
+            <p class="prose-muted" style="margin:var(--space-sm) 0 0 0; font-size:0.8125rem;">
+              หมายเหตุ: กราฟแสดงแบบจำลองเชิงเปรียบเทียบแนวคิดทางวิศวกรรมซอฟต์แวร์ (Boehm / Sommerville Ch. 4: “The cost of fixing a requirements problem is much greater than repairing coding errors”) ระหว่างค่าใช้จ่ายเมื่อพบข้อผิดพลาดตั้งแต่ระยะต้นใน Waterfall กับความเสี่ยงสะสมของ Big Bang Integration เมื่อเทียบกับวงรอบป้อนกลับสั้นๆ ในการบูรณาการต่อเนื่อง
+            </p>
+          </div>
+
+          <h3 class="subhead">4.3 ความผันผวนของความต้องการ (Requirements Churn &amp; Change Control Bottleneck)</h3>
+          <p class="prose">
+            Dooley &amp; Kazakova ระบุไว้ใน Chapter 3 อย่างชัดเจนว่า <strong>ความผันผวนของความต้องการ (Requirements Churn)</strong> — การเพิ่มฟีเจอร์ใหม่ การแก้ฟีเจอร์เดิม หรือการตัดฟีเจอร์ทิ้งกลางคัน — คือสาเหตุอันดับหนึ่งที่ทำให้โครงการส่งมอบไม่ทันกำหนด มีอัตราข้อบกพร่องสูง และล้มเหลวในที่สุด ปัญหาไม่ได้เกิดจากความเอาแน่เอานอนไม่ได้ของลูกค้าเพียงอย่างเดียว แต่เกิดจากสภาพแวดล้อมทางธุรกิจและเทคโนโลยีที่เปลี่ยนไประหว่างโครงการที่กินเวลายาวนานหลายปี (Sommerville Section 1.1.1 &amp; 3.1)
+          </p>
+          <p class="prose">
+            เมื่อความต้องการเปลี่ยนในโมเดล Plan-driven ระบบจะต้องส่งคำร้องขอเปลี่ยนแปลง (Change Request) ผ่านคณะกรรมการควบคุมการเปลี่ยนแปลง (Change Control Board — CCB) เพื่อประเมินผลกระทบต่อสัญญา ราคา และตารางเวลา กระบวนการนี้สร้างคอขวด (Waiting waste) และทำลายขวัญกำลังใจของทีม หรือในกรณีที่แย่กว่านั้น ทีมพัฒนาอาจถูกกดดันให้รับงานเพิ่มโดยไม่ขยายเวลา ทำให้คุณภาพการทดสอบถูกตัดทอนลงจนเกิด <strong>Excessive Defect Rate</strong>
+          </p>
+
+          <h3 class="subhead">4.4 แรงเสียดทานจากการส่งต่อข้ามสายงาน (Handoff Friction &amp; The Two-Worlds Gap)</h3>
+          <p class="prose">
+            Waterfall ส่งเสริมให้เกิดการทำงานแบบแยกส่วนตามหน้าที่ (Functional Silos): นักวิเคราะห์ระบบเขียนเอกสารส่งต่อให้นักออกแบบ นักออกแบบส่งต่อให้นักเขียนโปรแกรม และนักเขียนโปรแกรมส่งต่อให้ทีมทดสอบอิสระ การส่งต่อเอกสารข้ามกลุ่ม (Handoffs) ก่อให้เกิดปัญหาเชิงโครงสร้าง 3 ประการ:
+          </p>
+          <ul class="prose" style="padding-left: 1.5rem;">
+            <li style="margin-bottom:var(--space-xs);"><strong>ช่องว่างระหว่างสองโลก (The Two-Worlds Gap):</strong> ดังที่ Dooley &amp; Kazakova อธิบาย ลูกค้าอาศัยอยู่ในโลกของโดเมนธุรกิจ (Application domain) ส่วนนักพัฒนาอาศัยอยู่ในโลกของเทคนิค (Technical domain) เมื่อสื่อสารกันผ่านเอกสารตัวอักษรโดยไม่มีต้นแบบหรือซอฟต์แวร์จริงมาทดลองใช้ร่วมกัน จึงเกิด <em>Misunderstood Requirements</em> อยู่เสมอ</li>
+            <li style="margin-bottom:var(--space-xs);"><strong>การสูญเสียบริบทระหว่างส่งต่อ (Motion &amp; Knowledge Decay):</strong> ความเข้าใจเชิงลึก (Tacit knowledge) ของนักวิเคราะห์มักสูญหายไประหว่างทางเมื่อแปลงเป็นเอกสารส่งต่อให้โปรแกรมเมอร์ ส่งผลให้โปรแกรมเมอร์ตีความขอบเขตงานคลาดเคลื่อน</li>
+            <li><strong>การรอคอยและการสลับงาน (Waiting &amp; Context Switching):</strong> ความล่าช้าในการรออนุมัติ Gate Reviews ทำให้นักพัฒนาต้องสลับไปทำโครงการอื่นระหว่างรอ ซึ่งเพิ่มภาระทางปัญญา (Cognitive load) และลดผลิตภาพรวม</li>
+          </ul>
+
+          <!-- INTERACTIVE ELEMENT 3: PROCESS RISK & BOTTLENECK SIMULATOR -->
+          <div class="interactive-panel" id="risk-simulator">
+            <div class="panel-header">
+              <div>
+                <span class="mono-code">INTERACTIVE SIMULATOR 03 · PROCESS FIT &amp; BOTTLENECK ANALYZER</span>
+                <h3 class="panel-title">แบบจำลองประเมินความเสี่ยงและคอขวดของ Traditional Process</h3>
+                <p class="panel-desc">ปรับคุณลักษณะของโครงการซอฟต์แวร์เพื่อดูระดับความเสี่ยงจาก BDUF, Requirements Churn, Late Integration และคำแนะนำในการเลือกใช้กระบวนการที่เหมาะสม</p>
+              </div>
+              <div class="btn-row">
+                <button type="button" class="btn btn-secondary" onclick="loadSimPreset('medical')">โหลดตัวอย่าง: เครื่องปั๊มอินซูลิน</button>
+                <button type="button" class="btn btn-secondary" onclick="loadSimPreset('saas')">โหลดตัวอย่าง: แอปธุรกิจ SaaS</button>
+                <button type="button" class="btn btn-secondary" onclick="loadSimPreset('gov')">โหลดตัวอย่าง: ระบบรัฐขนาดใหญ่</button>
+              </div>
+            </div>
+
+            <div class="controls-grid">
+              <div class="field-group">
+                <label class="field-label" for="sim-churn-slider">ความผันผวนของความต้องการ (Requirements Churn)</label>
+                <span class="field-hint">0% = นิ่งสนิทตามข้อกำหนดกายภาพ · 100% = ตลาดเปลี่ยนทุกเดือน</span>
+                <div class="slider-row">
+                  <input type="range" id="sim-churn-slider" min="0" max="100" value="65" oninput="syncSimChurnFromSlider(this.value)">
+                  <input type="number" class="number-input" id="sim-churn-num" min="0" max="100" value="65" oninput="syncSimChurnFromNumber(this.value)">
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="sim-critical-slider">ความวิกฤตต่อชีวิต/ฮาร์ดแวร์ (Safety &amp; HW Coupling)</label>
+                <span class="field-hint">0% = เว็บ/ซอฟต์แวร์ล้วน · 100% = ฝังตัวในเครื่องจักร/การแพทย์</span>
+                <div class="slider-row">
+                  <input type="range" id="sim-critical-slider" min="0" max="100" value="30" oninput="syncSimCriticalFromSlider(this.value)">
+                  <input type="number" class="number-input" id="sim-critical-num" min="0" max="100" value="30" oninput="syncSimCriticalFromNumber(this.value)">
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="sim-handoff-select">ระดับการแบ่งแยกทีมและสายบังคับบัญชา (Handoff Silos)</label>
+                <span class="field-hint">ความถี่ในการส่งต่อข้ามแผนกและการรออนุมัติ Gate Reviews</span>
+                <select id="sim-handoff-select" class="select-input" onchange="updateRiskSimulation()">
+                  <option value="low">ต่ำ — ทีมขนาดเล็ก นั่งทำงานร่วมกับตัวแทนลูกค้า</option>
+                  <option value="medium" selected>ปานกลาง — แยกทีม Dev กับ QA และมี CCB อนุมัติ</option>
+                  <option value="high">สูง — หลายบริษัทคู่ค้า ข้ามเขตเวลา และรอ Sign-off ทุกเฟส</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="sim-output-grid" aria-live="polite">
+              <div class="sim-kpi" id="sim-kpi-rework">
+                <span class="mono-code">REWORK &amp; CHURN RISK</span>
+                <div class="metric-value" id="sim-val-rework">—</div>
+                <span class="label-th" id="sim-lbl-rework">—</span>
+              </div>
+              <div class="sim-kpi" id="sim-kpi-integration">
+                <span class="mono-code">LATE INTEGRATION RISK</span>
+                <div class="metric-value" id="sim-val-integration">—</div>
+                <span class="label-th" id="sim-lbl-integration">—</span>
+              </div>
+              <div class="sim-kpi" id="sim-kpi-compliance">
+                <span class="mono-code">AUDIT / SPEC RIGOR NEED</span>
+                <div class="metric-value" id="sim-val-compliance">—</div>
+                <span class="label-th" id="sim-lbl-compliance">—</span>
+              </div>
+              <div class="sim-kpi kpi-blue" id="sim-kpi-rec">
+                <span class="mono-code">RECOMMENDED MODEL</span>
+                <div class="metric-value" style="font-size:1.25rem; font-weight:600;" id="sim-val-rec">—</div>
+                <span class="label-th" id="sim-lbl-rec">—</span>
+              </div>
+            </div>
+
+            <div class="detail-box" id="sim-diagnosis-box" aria-live="polite">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ======================================================= -->
+        <!-- SECTION 5: REAL-WORLD INDUSTRIAL CASE STUDIES -->
+        <!-- ======================================================= -->
+        <section id="sec-5" class="lecture-section">
+          <div class="section-head">
+            <div class="section-code-row">
+              <span class="section-id">05 · INDUSTRIAL CASE STUDIES &amp; POST-MORTEMS</span>
+              <span class="mono-code">SOMMERVILLE PREFACE, CH. 1, 10, 12, 19, 20</span>
+            </div>
+            <h2 class="section-title">
+              <strong>กรณีศึกษาและบทวิเคราะห์ปัญหา:</strong> บทเรียนจากระบบจริงในอุตสาหกรรมซอฟต์แวร์
+            </h2>
+          </div>
+
+          <p class="prose">
+            เพื่อให้เห็นภาพว่าทฤษฎีของ Traditional Process Models ส่งผลต่อโครงการระดับพันล้านอย่างไร ส่วนนี้จะถอดบทเรียนจากกรณีศึกษาจริงที่อ้างอิงอยู่ในตำราของ Sommerville ทั้งในด้านความล้มเหลวของการบริหารโครงการขนาดใหญ่ ความคลาดเคลื่อนระหว่าง Verification กับ Validation และตัวอย่างที่แนวทาง V-Model ร่วมกับ Formal Methods ประสบความสำเร็จ
+          </p>
+
+          <!-- CASE STUDY 1: DENVER AIRPORT -->
+          <article class="case-card case-fail">
+            <div class="case-meta-bar">
+              <span class="tag tag-error">FAILURE POST-MORTEM</span>
+              <span class="tag">SYSTEMS ENGINEERING &amp; WATERFALL RIGIDITY</span>
+              <span class="mono-code" style="align-self:center;">REF: SOMMERVILLE CH. 10 (SWARTZ 1996)</span>
+            </div>
+            <h3 style="margin:0 0 var(--space-sm) 0; font-size:1.375rem; font-weight:600;">
+              กรณีศึกษาที่ 1: ระบบจัดการสัมภาระอัตโนมัติสนามบินนานาชาติเดนเวอร์ (Denver International Airport Baggage System)
+            </h3>
+            <p class="prose">
+              <strong>บริบทโครงการ:</strong> ในช่วงต้นทศวรรษ 1990 สนามบินเดนเวอร์มีเป้าหมายสร้างระบบลำเลียงสัมภาระอัตโนมัติที่ใหญ่ที่สุดในโลก โดยใช้รถเข็นรางเดี่ยวควบคุมด้วยซอฟต์แวร์คอมพิวเตอร์เพื่อเชื่อมต่ออาคารผู้โดยสารทุกแห่งเข้าด้วยกัน อย่างไรก็ตาม โครงการไม่สามารถเปิดใช้งานได้ตามกำหนด ต้องเลื่อนการเปิดสนามบินออกไปถึง 16 เดือน และมีค่าใช้จ่ายบานปลายมหาศาล ก่อนที่ระบบอัตโนมัติเต็มรูปแบบจะถูกลดขนาดและยกเลิกการใช้งานในเวลาต่อมา
+            </p>
+            <p class="prose">
+              <strong>การวิเคราะห์รากเหง้าของปัญหา (Root Cause Analysis):</strong>
+            </p>
+            <ul class="prose" style="padding-left:1.5rem;">
+              <li style="margin-bottom:var(--space-xs);"><strong>การผลักภาระข้อจำกัดฮาร์ดแวร์ให้ซอฟต์แวร์ (System Design Failure):</strong> Sommerville (Chapter 10) ยกกรณีนี้เป็นตัวอย่างคลาสสิกของการที่ <em>“ซอฟต์แวร์ถูกคาดหวังให้จัดการกับข้อจำกัดของอุปกรณ์ฮาร์ดแวร์ที่ใช้”</em> เมื่อสายพานและเซ็นเซอร์เชิงกลเกิดปัญหาติดขัดหรือตรวจจับกระเป๋าพลาด ทีมระบบไม่ได้แก้ที่ฮาร์ดแวร์แต่สั่งให้ทีมซอฟต์แวร์เขียนโค้ดชดเชยความคลาดเคลื่อนทางกายภาพ ทำให้ซอฟต์แวร์ซับซ้อนและช้าลงจนรับภาระจริงไม่ได้</li>
+              <li style="margin-bottom:var(--space-xs);"><strong>Requirements Churn จากผู้มีส่วนได้ส่วนเสีย:</strong> สายการบินหลักขอเปลี่ยนแปลงเส้นทางและข้อกำหนดทางกลระหว่างการก่อสร้างหลายครั้ง ทำให้แบบซอฟต์แวร์ที่พยายามยึดกรอบแผนล่วงหน้าต้องถูกรื้อซ้ำแล้วซ้ำเล่า</li>
+              <li><strong>Late Integration &amp; Insufficient Full-Scale Testing:</strong> การบูรณาการซอฟต์แวร์เข้ากับรางจริงความยาวหลายสิบกิโลเมตรเกิดขึ้นช้าเกินไป และไม่สามารถจำลองภาระกระเป๋านับหมื่นใบพร้อมกันได้ล่วงหน้า ส่งผลให้ในการทดสอบระบบจริง (System Testing) เกิดเหตุการณ์รถเข็นชนกันและกระเป๋าถูกเหวี่ยงออกจากรางต่อหน้าสื่อมวลชน</li>
+            </ul>
+            <div class="callout callout-danger" style="margin-bottom:0;">
+              <p class="callout-title">บทเรียนสำคัญสำหรับนักวิศวกรรมซอฟต์แวร์</p>
+              <p>ความล้มเหลวของสนามบินเดนเวอร์ถูกสังคมเรียกว่า “ความล้มเหลวของซอฟต์แวร์” แต่ในมุมมองของ Sommerville มันคือ <strong>ความล้มเหลวของกระบวนการออกแบบระบบโดยรวม (Sociotechnical &amp; Hardware-Software Design Failure)</strong> และการละเลยการทดสอบบูรณาการอย่างต่อเนื่องตั้งแต่ระยะเริ่มต้น</p>
+            </div>
+          </article>
+
+          <!-- CASE STUDY 2: ARIANE 5 -->
+          <article class="case-card case-fail">
+            <div class="case-meta-bar">
+              <span class="tag tag-error">CATASTROPHIC VALIDATION GAP</span>
+              <span class="tag">SOFTWARE REUSE &amp; V-MODEL ASSUMPTIONS</span>
+              <span class="mono-code" style="align-self:center;">REF: SOMMERVILLE PREFACE (ARIANE 5 LAUNCHER)</span>
+            </div>
+            <h3 style="margin:0 0 var(--space-sm) 0; font-size:1.375rem; font-weight:600;">
+              กรณีศึกษาที่ 2: การระเบิดของจรวด Ariane 5 เที่ยวบินปฐมฤกษ์ 501 (Ariane 5 Flight 501, 1996)
+            </h3>
+            <p class="prose">
+              <strong>บริบทโครงการ:</strong> วันที่ 4 มิถุนายน ค.ศ. 1996 จรวดขนส่งอวกาศ Ariane 5 ขององค์การอวกาศยุโรป (ESA) เสียการทรงตัวและระเบิดกลางอากาศหลังปล่อยตัวได้เพียง 37 วินาที ส่งผลให้สูญเสียดาวเทียมวิจัยและตัวจรวดมูลค่ารวมกว่า 370 ล้านดอลลาร์สหรัฐ (Sommerville นำกรณีนี้เป็นหนึ่งใน Case Study หลักของหนังสือ)
+            </p>
+            <p class="prose">
+              <strong>การวิเคราะห์รากเหง้าของปัญหาในมุมมอง V-Model:</strong>
+            </p>
+            <ul class="prose" style="padding-left:1.5rem;">
+              <li style="margin-bottom:var(--space-xs);"><strong>Verification ผ่าน แต่ Validation ล้มเหลว:</strong> ทีมวิศวกรนำซอฟต์แวร์ระบบนำร่องเฉื่อย (Inertial Reference System — SRI) จากจรวดรุ่นเก่า Ariane 4 มาใช้ซ้ำ (Reuse) โมดูลแปลงค่าทศนิยม 64-bit เป็นจำนวนเต็ม 16-bit ทำงาน “ถูกต้องตามสเปกของ Ariane 4” ทุกประการ (Verification passed) แต่สมรรถนะการไต่ระดับในแนวราบ (Horizontal bias) ของ Ariane 5 สูงกว่า Ariane 4 มากจนค่าเกินขอบเขต 16-bit เกิด <em>Operand Error / Overflow</em></li>
+              <li style="margin-bottom:var(--space-xs);"><strong>ระบบสำรองล่มพร้อมกัน (Common-Mode Failure):</strong> เพราะทั้งคอมพิวเตอร์หลักและคอมพิวเตอร์สำรองรันซอฟต์แวร์ชุดเดียวกันทุกบรรทัด ระบบจึงปิดการทำงานของหน่วยนำร่องทั้งคู่พร้อมกันภายในเสี้ยววินาที — ขาดหลักการ Diversity ตามหลัก Dependable Systems (Sommerville Chapter 10.3)</li>
+              <li><strong>การละเลย System-Level Testing ด้วยข้อมูลจริงของ Ariane 5:</strong> ในการทดสอบบูรณาการ ฟังก์ชันปรับแนวแกนที่ก่อปัญหาถูกออกแบบมาให้ทำงานต่อเนื่องอีก 40 วินาทีหลังปล่อยตัวทั้งที่ไม่มีความจำเป็นสำหรับ Ariane 5 แต่ไม่มีการจำลองเส้นทางบินจริงของ Ariane 5 ผ่านอินพุตเข้าสู่โมดูล SRI ในระดับ Hardware-in-the-loop</li>
+            </ul>
+            <div class="callout callout-warn" style="margin-bottom:0;">
+              <p class="callout-title">บทเรียนสำคัญสำหรับนักวิศวกรรมซอฟต์แวร์</p>
+              <p>การนำซอฟต์แวร์ที่ผ่าน V-Model จากระบบหนึ่งมาใช้ในอีกระบบหนึ่ง ต้องเริ่มต้น <strong>Validation และ Hazard Analysis ใหม่ทั้งหมด</strong> ภายใต้สมมติฐานสภาพแวดล้อมของระบบใหม่ การเชื่อมั่นใน Gate Sign-off ในอดีตโดยไม่ทวนสอบขอบเขตอินพุตใหม่คือความเสี่ยงถึงชีวิต</p>
+            </div>
+          </article>
+
+          <!-- CASE STUDY 3: MEGA HEALTHCARE SYSTEMS -->
+          <article class="case-card case-fail">
+            <div class="case-meta-bar">
+              <span class="tag tag-error">MEGA-SYSTEM BDUF OVERREACH</span>
+              <span class="tag">BROWNFIELD &amp; STAKEHOLDER DIVERSITY</span>
+              <span class="mono-code" style="align-self:center;">REF: SOMMERVILLE CH. 3, 19, 20</span>
+            </div>
+            <h3 style="margin:0 0 var(--space-sm) 0; font-size:1.375rem; font-weight:600;">
+              กรณีศึกษาที่ 3: ความล่าช้าของโครงการระบบสุขภาพระดับชาติ (UK &amp; US Government Health Care Systems)
+            </h3>
+            <p class="prose">
+              <strong>บริบทโครงการ:</strong> Sommerville (Chapter 19) ชี้ให้เห็นปัญหาและความล่าช้าอย่างรุนแรงในการพัฒนาระบบสารสนเทศด้านสาธารณสุขระดับชาติทั้งในสหราชอาณาจักร (เช่น โครงการ NHS National Programme for IT) และสหรัฐอเมริกา โดยเปรียบเทียบกับความซับซ้อนเชิงสังคมและเทคนิคในกรณีศึกษา <em>Mentcare System</em> (Chapter 1.3.2)
+            </p>
+            <p class="prose">
+              <strong>การวิเคราะห์รากเหง้าของปัญหา (ทำไม BDUF และ Waterfall จึงพังทลายใน Mega-Systems):</strong>
+            </p>
+            <ul class="prose" style="padding-left:1.5rem;">
+              <li style="margin-bottom:var(--space-xs);"><strong>ความขัดแย้งของผู้มีส่วนได้ส่วนเสีย (Diverse Stakeholders):</strong> ในระบบโรงพยาบาล แพทย์ พยาบาล เจ้าหน้าที่เวชระเบียน ผู้บริหารโรงพยาบาล และหน่วยงานกำกับกฎหมายข้อมูลส่วนบุคคล มีมุมมองและความต้องการที่แตกต่างกันอย่างสิ้นเชิง (Sommerville Figure 3.13) การพยายามรวบรวมเอกสาร SRS เพียงฉบับเดียวให้ครบถ้วนตั้งแต่ต้นปีแรกจึงเป็นไปไม่ได้</li>
+              <li style="margin-bottom:var(--space-xs);"><strong>ระบบ Brownfield และกฎทางธุรกิจที่ฝังลึก:</strong> โครงการขนาดใหญ่ไม่ได้เริ่มจากศูนย์ แต่ต้องเชื่อมโยงกับระบบเดิม (Legacy systems) ที่มีกระบวนการทำงานผูกติดอยู่ (Sommerville Section 9.2) การเปลี่ยนซอฟต์แวร์โดยใช้สัญญา Plan-driven แบบเบ็ดเสร็จทำให้เกิดแรงเสียดทานทางการเมืองในองค์กรและการปฏิเสธจากผู้ใช้หน้างาน</li>
+              <li><strong>ความซับซ้อนเกินขีดจำกัดของวิธีการแบบดั้งเดิม:</strong> Sommerville สรุปในบทที่ 19 ว่าความล้มเหลวของ “Mega-systems” เกิดจากความพยายามสร้างระบบที่ใหญ่และซับซ้อนกว่าเดิมด้วยวิธีแบบ Plan-driven ที่ไม่ได้ออกแบบมาเพื่อรองรับการเปลี่ยนแปลงต่อเนื่องในระดับสังคม-เทคนิค (Sociotechnical complexity)</li>
+            </ul>
+          </article>
+
+          <!-- CASE STUDY 4: SUCCESSFUL PLAN-DRIVEN + FORMAL V-MODEL -->
+          <article class="case-card case-pass">
+            <div class="case-meta-bar">
+              <span class="tag tag-success">SUCCESSFUL APPLICATION</span>
+              <span class="tag">V-MODEL + FORMAL VERIFICATION</span>
+              <span class="mono-code" style="align-self:center;">REF: SOMMERVILLE CH. 10 &amp; 12 (SOUYRIS ET AL. 2009; BADEAU &amp; AMELOT 2005)</span>
+            </div>
+            <h3 style="margin:0 0 var(--space-sm) 0; font-size:1.375rem; font-weight:600;">
+              กรณีศึกษาเปรียบเทียบเชิงบวก: ระบบควบคุมการบิน Airbus และระบบรถไฟฟ้าอัตโนมัติ (Avionics &amp; Train Control)
+            </h3>
+            <p class="prose">
+              ในทางตรงกันข้ามกับโครงการระบบสารสนเทศภาครัฐ Sommerville (Section 10.5 &amp; 12.3) ได้อ้างอิงความสำเร็จเชิงประจักษ์ของการใช้กระบวนการ Plan-driven ร่วมกับ <strong>Formal Methods และ Model Checking</strong> ในระบบควบคุมรถไฟอัตโนมัติสาย 14 ในกรุงปารีส (Badeau and Amelot 2005) และซอฟต์แวร์การบินของบริษัท Airbus (Souyris et al. 2009) รวมถึงแบบจำลองระบบ <em>Insulin Pump Control System</em>
+            </p>
+            <p class="prose">
+              <strong>ปัจจัยความสำเร็จ:</strong> ระบบเหล่านี้มีขอบเขตหน้าที่ทางกายภาพที่ชัดเจนและคงตัว (Stable domain laws — กฎฟิสิกส์ของระยะเบรก การทรงตัวของเครื่องบิน หรือสมการระดับน้ำตาลในเลือด) ทำให้สามารถนิยาม Safety Requirements และ Formal Specification ได้ครบถ้วนล่วงหน้า กระบวนการ V-Model ที่มี <strong>Traceability matrix</strong> เชื่อมโยงทุก Hazard เข้ากับโค้ดตรวจสอบและผลการพิสูจน์ทางคณิตศาสตร์ ช่วยให้วิศวกรสามารถสร้าง Safety Case ส่งให้หน่วยงานการบินรับรองได้อย่างสมบูรณ์โดยแทบไม่พบข้อผิดพลาดหลังส่งมอบ
+            </p>
+          </article>
+        </section>
+
+        <!-- ======================================================= -->
+        <!-- SECTION 6: SYNTHESIS & SELF-ASSESSMENT -->
+        <!-- ======================================================= -->
+        <section id="sec-6" class="lecture-section">
+          <div class="section-head">
+            <div class="section-code-row">
+              <span class="section-id">06 · SYNTHESIS &amp; KNOWLEDGE CHECK</span>
+              <span class="mono-code">HYBRIDIZATION · MODULE 02 ASSESSMENT</span>
+            </div>
+            <h2 class="section-title">
+              <strong>บทสังเคราะห์สู่แนวทางสมัยใหม่:</strong> การผสมผสานกระบวนการและแบบทดสอบทบทวน
+            </h2>
+          </div>
+
+          <h3 class="subhead">6.1 จากขั้วตรงข้ามสู่การผสมผสาน (Hybridizing Plan-Driven and Agile)</h3>
+          <p class="prose">
+            ข้อสรุปสำคัญที่สุดที่ทั้ง Sommerville (Chapter 2–3) และ Dooley &amp; Kazakova (Chapter 2) เห็นพ้องต้องกันคือ <strong>อุตสาหกรรมซอฟต์แวร์ในโลกความจริงไม่ได้ทำงานแบบสุดโต่ง</strong> ระบบขนาดใหญ่มักนำข้อดีของทั้งสองโลกมาผสมผสานกัน (Hybrid Models) เช่น ใช้แนวทาง <strong>Plan-driven</strong> ในการกำหนดขอบเขตระดับสูง สถาปัตยกรรมหลัก มาตรฐานความปลอดภัย และข้อตกลงสัญญาอินเทอร์เฟซฮาร์ดแวร์ จากนั้นจึงใช้รอบการทำงานแบบ <strong>Iterative / Agile Sprints</strong> ภายในทีมพัฒนาซอฟต์แวร์เพื่อลดความเสี่ยงจาก Late Integration และรับมือกับการเรียนรู้ความต้องการจริงของผู้ใช้ได้ทันท่วงที
+          </p>
+          <p class="prose">
+            ดังนั้น การเข้าใจโครงสร้างและข้อจำกัดของ Waterfall และ V-Model อย่างถ่องแท้จึงไม่ได้มีไว้เพื่อ “ต่อต้าน” แนวทางดั้งเดิม แต่มีไว้เพื่อให้นักวิศวกรซอฟต์แวร์สามารถวินิจฉัยบริบทของปัญหาได้อย่างแม่นยำ รู้ว่าเมื่อใดควรล็อกสเปกและสร้าง Safety Case และเมื่อใดควรเปิดรับการวนซ้ำและการบูรณาการต่อเนื่อง
+          </p>
+
+          <!-- INTERACTIVE ELEMENT 4: CHECKLIST & SELF-ASSESSMENT (STATE-PERSISTED) -->
+          <div class="interactive-panel" id="assessment-panel">
+            <div class="panel-header">
+              <div>
+                <span class="mono-code">INTERACTIVE CHECKPOINT 04 · MODULE 02 MASTERY &amp; QUIZ</span>
+                <h3 class="panel-title">รายการตรวจสอบความเข้าใจและแบบทดสอบประเมินตนเอง</h3>
+                <p class="panel-desc">คำตอบและรายการทบทวนของคุณจะถูกบันทึกอัตโนมัติผ่าน State Persistence และสามารถส่งออกเป็นบันทึกสรุปการเรียนได้</p>
+              </div>
+              <div class="btn-row">
+                <button type="button" class="btn btn-secondary" onclick="exportStudyNotes()">ส่งออกสรุปบทเรียน (.txt)</button>
+                <button type="button" class="btn btn-ghost" id="reset-progress-btn" onclick="resetModuleProgress(this)">ล้างความคืบหน้า</button>
+              </div>
+            </div>
+
+            <div class="card-grid" style="grid-template-columns: minmax(0, 1fr);">
+              <div class="detail-box">
+                <span class="mono-code">PART A · LEARNING OBJECTIVES CHECKLIST</span>
+                <h4 style="margin: var(--space-xs) 0 var(--space-sm) 0;">วัตถุประสงค์การเรียนรู้ประจำบทที่ 2 (ทำเครื่องหมายเมื่อทบทวนเข้าใจแล้ว)</h4>
+                <div id="checklist-container">
+                  <label class="checklist-row">
+                    <input type="checkbox" data-check="0" onchange="toggleChecklist(0, this.checked)">
+                    <span><strong>1. Waterfall &amp; Gate Reviews:</strong> อธิบายลำดับ 5 ระยะของ Sommerville ปัญหาหลัก 2 ข้อของ Dooley &amp; Kazakova และอาการ Premature Freezing of Specs ได้</span>
+                  </label>
+                  <label class="checklist-row">
+                    <input type="checkbox" data-check="1" onchange="toggleChecklist(1, this.checked)">
+                    <span><strong>2. V-Model &amp; V&amp;V:</strong> จำแนก Verification vs. Validation (Boehm) และจับคู่ White-box, Gray-box, Black-box กับระดับการทดสอบได้ถูกต้อง</span>
+                  </label>
+                  <label class="checklist-row">
+                    <input type="checkbox" data-check="2" onchange="toggleChecklist(2, this.checked)">
+                    <span><strong>3. Appropriate Contexts:</strong> ระบุเหตุผลที่ Safety-critical, Hardware-Software Co-design และ Regulatory Compliance (Safety Cases) ต้องใช้ Plan-driven</span>
+                  </label>
+                  <label class="checklist-row">
+                    <input type="checkbox" data-check="3" onchange="toggleChecklist(3, this.checked)">
+                    <span><strong>4. Bottlenecks &amp; Waste:</strong> วิเคราะห์ผลกระทบของ Wicked Problem, BDUF, Late Integration, Requirements Churn และ Two-Worlds Gap ได้</span>
+                  </label>
+                  <label class="checklist-row" style="border-bottom:0;">
+                    <input type="checkbox" data-check="4" onchange="toggleChecklist(4, this.checked)">
+                    <span><strong>5. Industrial Cases:</strong> ถอดบทเรียนความล้มเหลวของ Denver Airport, Ariane 5 และ Mega Healthcare Systems เทียบกับ Avionics/Insulin Pump ได้</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: var(--space-lg);">
+              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:var(--space-sm); margin-bottom:var(--space-md);">
+                <div>
+                  <span class="mono-code">PART B · CONCEPTUAL &amp; SCENARIO QUIZ</span>
+                  <h4 style="margin: var(--space-xs) 0 0 0;">แบบทดสอบ 5 ข้อ (คลิกเลือกคำตอบเพื่อรับคำอธิบายทันที)</h4>
+                </div>
+                <span class="tag" id="quiz-score-badge">คะแนนสะสม: 0 / 5</span>
+              </div>
+              <div id="quiz-container">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- FOOTER / SOURCES -->
+        <footer class="lecture-footer">
+          <span class="mono-code">PRIMARY TEXTBOOK SOURCES &amp; CITATIONS</span>
+          <ul style="margin: var(--space-sm) 0 0 0; padding-left: 1.25rem; line-height: 1.6;">
+            <li><strong>Sommerville, Ian (2016).</strong> <em>Software Engineering</em> (10th Edition, Global Edition). Pearson Education. (Chapter 1: Introduction &amp; Case Studies; Chapter 2: Software Processes; Chapter 3: Agile Software Development; Chapter 8: Software Testing; Chapter 10 &amp; 12: Dependable &amp; Safety Engineering; Chapter 19: Systems Engineering; Chapter 24: Quality Management).</li>
+            <li><strong>Dooley, John F., &amp; Kazakova, Vera A. (2024).</strong> <em>Software Development, Design, and Coding</em>. Apress. (Chapter 2: Process Models, The Waterfall Model &amp; Lean Wastes; Chapter 3: Project Organization &amp; Requirements Churn; Chapter 18: Testing Levels — White/Gray/Black-Box &amp; Formal Inspection Phases).</li>
+            <li><strong>Foundational Literature Cited in Texts:</strong> Royce, W. W. (1970) <em>Managing the Development of Large Software Systems</em>; Boehm, B. (1979) <em>Verification &amp; Validation</em>; Dijkstra, E. W. (1972) <em>The Humble Programmer</em>; Swartz, J. (1996) <em>Denver Airport Baggage System</em>; Souyris et al. (2009) &amp; Badeau &amp; Amelot (2005) <em>Formal Verification in Avionics &amp; Railway</em>.</li>
+          </ul>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <api-shim></api-shim>
+  <script>
+    // =========================================================================
+    // DATA DEFINITIONS (Backtick template literals for safe string handling)
+    // =========================================================================
+    const waterfallStages = [
+      {
+        code: `PH 01 · REQUIREMENTS ANALYSIS & DEFINITION`,
+        title: `การวิเคราะห์และนิยามความต้องการ (Requirements & SRS)`,
+        inputs: `ความต้องการทางธุรกิจ ข้อจำกัดด้านกฎหมาย และความคาดหวังของผู้มีส่วนได้ส่วนเสีย`,
+        outputs: `เอกสาร System Requirements Specification (SRS) ที่ผ่าน Gate 1 Sign-off`,
+        gateRule: `Gate 1: ลูกค้าและทีมวิศวกรรมต้องลงนามรับรองว่าความต้องการ "ครบถ้วน ไม่ขัดแย้ง และทดสอบได้ (Verifiable)" ก่อนเข้าสู่ระยะออกแบบ`,
+        idealNote: `ในอุดมคติ เอกสาร SRS จะสมบูรณ์และนิ่งสนิท ทำให้สถาปนิกซอฟต์แวร์สามารถออกแบบระบบได้ทันทีโดยไม่ต้องเดาใจผู้ใช้`,
+        realityNote: `ในความเป็นจริงเกิด "Two-Worlds Gap" และ "Wicked Problem": ผู้ใช้ยังไม่เห็นภาพซอฟต์แวร์จริงจึงระบุความต้องการครบไม่ได้ เมื่อลงนามปิด Gate 1 ไปแล้วมักเกิดอาการ Premature Freezing ที่บีบให้ต้องเก็บปัญหาไว้แก้ทีหลัง`,
+        feedbackLoop: `ต้องมีวงรอบย้อนกลับจาก Design & Prototyping เพื่อปรับปรุง SRS ก่อนแช่แข็ง (Royce 1970 / Sommerville 2.1.1)`
+      },
+      {
+        code: `PH 02 · SYSTEM & SOFTWARE DESIGN`,
+        title: `การออกแบบระบบและสถาปัตยกรรม (Architectural & Detailed Design)`,
+        inputs: `เอกสาร SRS ที่ผ่าน Gate 1 และข้อจำกัดของฮาร์ดแวร์/แพลตฟอร์ม`,
+        outputs: `สถาปัตยกรรมระดับสูง (System Architecture), สคีมาฐานข้อมูล, และแบบรายละเอียดระดับมอดูล (Detailed Design)`,
+        gateRule: `Gate 2: ผ่านการทบทวนแบบ (Design Review / Formal Inspection) เพื่อตรวจ Interface ระหว่างฮาร์ดแวร์-ซอฟต์แวร์และความสอดคล้องกับ SRS`,
+        idealNote: `จัดสรรความต้องการลงสู่มอดูลและอินเทอร์เฟซได้ชัดเจน ทีมโปรแกรมเมอร์สามารถแยกกันเขียนโค้ดตามแบบพิมพ์เขียวได้อย่างมีประสิทธิภาพ`,
+        realityNote: `เสี่ยงต่อ BDUF (Big Design Up Front): การออกแบบรายละเอียดทุกคลาสก่อนทดลองเขียนโค้ดจริงมักค้นพบข้อผิดพลาดเชิงเทคนิค (เช่น คอขวดฐานข้อมูลหรือข้อจำกัดไลบรารี) เมื่อลงมือทำจริงใน PH 03 ซึ่งย้อนกลับมาแก้เอกสารยาก`,
+        feedbackLoop: `เมื่อพบข้อจำกัดทางเทคนิคใน PH 03 ต้องอนุญาตให้ปรับปรุง Detailed Design และ Architecture ทันที`
+      },
+      {
+        code: `PH 03 · IMPLEMENTATION & UNIT TESTING`,
+        title: `การพัฒนาโปรแกรมและการทดสอบหน่วย (Coding & White-Box Unit Test)`,
+        inputs: `เอกสาร Detailed Design, มาตรฐานการเขียนโค้ด และสภาพแวดล้อมพัฒนา`,
+        outputs: `ซอร์สโค้ดของแต่ละมอดูล พร้อมผลทดสอบ Unit Test (White-box) และบันทึก Formal Inspection`,
+        gateRule: `Gate 3: โค้ดผ่านเกณฑ์ Static analysis, Code inspection (หากแก้ >10% ต้องตรวจซ้ำ) และ Unit tests ผ่านทั้งหมด`,
+        idealNote: `ผู้พัฒนาแปลงแบบรายละเอียดเป็นโค้ดและตรวจยูนิตของตนเองด้วย White-box testing อย่างเป็นระบบ`,
+        realityNote: `หากพบว่าแบบใน PH 02 หรือสเปกใน PH 01 ทำจริงไม่ได้หรือแพงเกินไป แต่องค์กรห้ามแก้เอกสารย้อนหลัง โปรแกรมเมอร์จะใช้วิธี "Implementation tricks" (เขียนโค้ดลักไก่) ทำให้โค้ดรกและบำรุงรักษายาก`,
+        feedbackLoop: `ควรบูรณาการโค้ดเข้าสู่ระบบหลักอย่างสม่ำเสมอ (Continuous Integration) แทนการรอรวมทีเดียวใน PH 04`
+      },
+      {
+        code: `PH 04 · INTEGRATION & SYSTEM TESTING`,
+        title: `การบูรณาการและการทดสอบทั้งระบบ (Integration, System & Acceptance)`,
+        inputs: `มอดูลทั้งหมดจากทุกทีม, Integration Test Plan, System Test Plan`,
+        outputs: `ระบบซอฟต์แวร์บูรณาการสมบูรณ์ รายงานข้อบกพร่อง และใบรับมอบงาน (Acceptance Sign-off)`,
+        gateRule: `Gate 4: ทีมทดสอบอิสระยืนยันตาม System Spec (Black-box) และลูกค้าทำ Acceptance Testing ผ่านเกณฑ์ก่อนขึ้นระบบจริง`,
+        idealNote: `การประกอบมอดูลเป็นไปอย่างราบรื่น เพราะทุกอินเทอร์เฟซถูกออกแบบและตรวจรับมาแล้วตั้งแต่ Gate 2`,
+        realityNote: `จุดคอขวดร้ายแรงที่สุด (Late Integration Risk / Big Bang): ความเข้าใจไม่ตรงกันระหว่างทีมจะระเบิดพร้อมกันที่นี่ ต้นทุนแก้บั๊กพุ่งสูงทวีคูณ เพราะต้องย้อนไปแก้ทั้งโค้ด แบบ และสเปกภายใต้แรงกดดันของกำหนดส่งมอบ`,
+        feedbackLoop: `ต้องทดสอบอินเทอร์เฟซแบบ Gray-box ตั้งแต่มอดูลย่อยเริ่มเสร็จ และจำลองข้อมูลจริงของลูกค้าให้เร็วที่สุด`
+      },
+      {
+        code: `PH 05 · OPERATION & MAINTENANCE`,
+        title: `การใช้งานจริงและการบำรุงรักษา (Evolution & Legacy Management)`,
+        inputs: `ระบบที่ส่งมอบ (Production Release), รายงานความผิดพลาด และ Change Requests`,
+        outputs: `แพตช์แก้บั๊ก (Corrective), การปรับสภาพแวดล้อม (Adaptive), และรุ่นปรับปรุงใหม่ (Perfective)`,
+        gateRule: `การเปลี่ยนแปลงหลังส่งมอบต้องผ่าน Change Impact Analysis และ Regression Testing เพื่อไม่ให้กระทบความเสถียรเดิม`,
+        idealNote: `ระบบทำงานนิ่งตามสเปกที่วางไว้ มีเพียงการแก้ไขข้อผิดพลาดเล็กน้อยตามรอบระยะเวลา`,
+        realityNote: `เป็นระยะที่ยาวนานและมีค่าใช้จ่ายสูงสุด (มักสูงกว่าค่าพัฒนาเริ่มต้น) หากเอกสารใน PH 01–02 ไม่ถูกอัปเดตตามการแก้ไข ระบบจะค่อยๆ กลายเป็น Legacy System ที่ไม่มีใครกล้าแตะโครงสร้างเดิม`,
+        feedbackLoop: `การวิวัฒนาการระบบควรทำเป็นวงรอบย่อยต่อเนื่อง (Iterative Evolution) และ Refactor โค้ดเพื่อรักษาโครงสร้าง`
+      }
+    ];
+
+    const vModelNodes = [
+      {
+        level: `LEVEL 1 · USER NEEDS & VALIDATION`,
+        leftTitle: `Requirements Analysis & Specification (SRS)`,
+        rightTitle: `Customer / Acceptance Testing (Alpha, Beta, Operational)`,
+        testPlan: `Customer Acceptance Test Plan (จัดทำตั้งแต่ระยะ Requirements)`,
+        vvType: `Validation (“Are we building the right product?”)`,
+        boxType: `Black-Box Operational Testing`,
+        details: `ระดับสูงสุดของตัว V เชื่อมโยงความต้องการแท้จริงของผู้ใช้ (User Requirements) เข้ากับการทดสอบการยอมรับ (Acceptance Testing) ด้วยข้อมูลจริงจากลูกค้า (Sommerville Ch. 2.2.3 & Ch. 8) เพื่อพิสูจน์ว่าซอฟต์แวร์ตอบโจทย์ธุรกิจและปลอดภัยต่อการใช้งานจริง ไม่ใช่แค่ตรงตามกระดาษสเปก`
+      },
+      {
+        level: `LEVEL 2 · SYSTEM SPECIFICATION & RELEASE`,
+        leftTitle: `System Specification (Functional & Non-Functional Spec)`,
+        rightTitle: `System Testing / Release Testing`,
+        testPlan: `System Test Plan (ออกแบบคู่ขนานกับ System Specification)`,
+        vvType: `Verification & Validation (ทั้งตรงสเปกและตรวจ Emergent Properties)`,
+        boxType: `Black-Box Testing (โดยทีม QA อิสระ)`,
+        details: `ทีมทดสอบที่เป็นอิสระจากทีมพัฒนา (Separate Testing Team) ทดสอบระบบทั้งหมดในฐานะกล่องดำ (Black-box) เพื่อตรวจสอบฟังก์ชัน สมรรถนะ ความน่าเชื่อถือ และพฤติกรรมรวมที่เกิดขึ้นเมื่อทุกส่วนทำงานร่วมกัน โดยอ้างอิงตาม System Specification`
+      },
+      {
+        level: `LEVEL 3 · ARCHITECTURE & INTEGRATION`,
+        leftTitle: `System / Architectural Design (Sub-systems & Interfaces)`,
+        rightTitle: `Sub-system & System Integration Testing`,
+        testPlan: `Integration Test Plan (กำหนดเงื่อนไขการเชื่อมต่อระหว่างมอดูล)`,
+        vvType: `Verification (“Are we building the product right?”)`,
+        boxType: `Gray-Box Testing (เห็นเฉพาะขอบเขต Interface)`,
+        details: `ตามคำอธิบายของ Dooley & Kazakova (Ch. 18) การทดสอบระดับนี้เป็นแบบ Gray-box คือทีมทดสอบรู้โครงสร้างอินเทอร์เฟซและโปรโตคอลการรับส่งข้อมูลระหว่างมอดูลหรือระบบย่อย แต่ไม่เจาะจงดูโค้ดภายในแต่ละคลาส เป้าหมายหลักคือจับข้อผิดพลาดจากการสื่อสารข้ามทีม (Interface mismatch)`
+      },
+      {
+        level: `LEVEL 4 · DETAILED DESIGN & UNIT`,
+        leftTitle: `Detailed / Module Design (Classes, Algorithms, Data Structures)`,
+        rightTitle: `Unit / Component Testing`,
+        testPlan: `Unit Test Specifications & Assertions`,
+        vvType: `Verification (ตรวจสอบโค้ดเทียบแบบละเอียด)`,
+        boxType: `White-Box / Glass-Box Testing (เห็นโค้ดภายในทั้งหมด)`,
+        details: `ผู้พัฒนาทดสอบฟังก์ชัน เมธอด และคลาสของตนเองโดยตรง (มักใช้เครื่องมืออัตโนมัติเช่น JUnit) เนื่องจากผู้พัฒนาเห็นโครงสร้างภายใน เส้นทางเงื่อนไข (Branches) และชนิดข้อมูลทั้งหมด จึงออกแบบ Test cases ให้ครอบคลุมขอบเขตและกรณีผิดพลาดระดับหน่วยได้อย่างละเอียด`
+      },
+      {
+        level: `VERTEX · IMPLEMENTATION & CODING`,
+        leftTitle: `จุดบรรจบของแขนซ้ายและแขนขวา: การเขียนโปรแกรมและดีบัก`,
+        rightTitle: `Static Code Inspections & Continuous Build`,
+        testPlan: `Coding Standards & Formal Inspection Checklist (6 Phases)`,
+        vvType: `Static Verification (Code Review) ก่อนเข้าสู่ Dynamic Testing`,
+        boxType: `White-Box Inspection (Moderation, Reader, Recorder)`,
+        details: `ที่จุดฐานของตัว V การออกแบบระดับละเอียดจะถูกแปลงเป็นซอร์สโค้ดจริง ก่อนส่งขึ้นไปตามแขนขวาเพื่อทดสอบ ทีมงานควรทำ Formal Inspection (Dooley & Kazakova) เพื่อดักจับข้อผิดพลาดเชิงตรรกะตั้งแต่ในโค้ดก่อนรันทดสอบ ซึ่งช่วยลดต้นทุนการแก้บั๊กได้อย่างมหาศาล`
+      }
+    ];
+
+    const quizQuestions = [
+      {
+        q: `1. ตามบทวิเคราะห์ของ John F. Dooley และ Vera A. Kazakova (2024) ปัญหาเชิงโครงสร้างหลัก 2 ประการที่ทำให้โมเดล Waterfall ล้มเหลวในโครงการซอฟต์แวร์จริงคือข้อใด?`,
+        options: [
+          `ก. ใช้เวลาเขียนโค้ดน้อยเกินไป และไม่มีเครื่องมือทดสอบอัตโนมัติ`,
+          `ข. บังคับให้จบระยะที่ N ก่อนเริ่มระยะที่ N+1 และไม่มีกลไกย้อนกลับไปแก้ไขระยะก่อนหน้า`,
+          `ค. ขาดการใช้ภาษาโปรแกรมเชิงวัตถุ และไม่แบ่งทีมงานตามหน้าที่`,
+          `ง. ไม่มีการจัดทำเอกสารสัญญา และไม่ให้ลูกค้าเข้ามามีส่วนร่วมในขั้นตอนตรวจรับ`
+        ],
+        correct: 1,
+        explain: `ถูกต้อง: Dooley & Kazakova ระบุชัดเจนว่า Problem 1 คือ Waterfall บังคับให้ระยะ N เสร็จสมบูรณ์ก่อนข้ามไประยะ N+1 และ Problem 2 คือไม่มีกลไกย้อนกลับ (No provision for backing up) เพื่อปรับแก้ระยะก่อนหน้า ซึ่งขัดกับธรรมชาติแบบ Wicked Problem ของซอฟต์แวร์`
+      },
+      {
+        q: `2. คำนิยามของ Barry Boehm (1979) ที่กล่าวว่า "Are we building the right product?" สอดคล้องกับแนวคิดและกิจกรรมการทดสอบระดับใดใน V-Model?`,
+        options: [
+          `ก. Verification — ทดสอบด้วย White-box Unit Testing โดยผู้พัฒนา`,
+          `ข. Verification — ทดสอบด้วย Gray-box Integration Testing ระหว่างมอดูล`,
+          `ค. Validation — ทดสอบด้วย Customer / Acceptance Testing เพื่อให้มั่นใจว่าตรงความต้องการแท้จริงของผู้ใช้`,
+          `ง. Static Inspection — ตรวจนับจำนวนบรรทัดโค้ดที่แก้ไขหลังประชุม`
+        ],
+        correct: 2,
+        explain: `ถูกต้อง: "Are we building the right product?" คือคำจำกัดความของ Validation (การตรวจสอบว่าสร้างซอฟต์แวร์ตรงตามความคาดหวังและบริบทใช้งานจริงของลูกค้าหรือไม่) ซึ่งตอบโจทย์สูงสุดที่ขั้น Customer / Acceptance Testing`
+      },
+      {
+        q: `3. เหตุใดระบบควบคุมเครื่องปั๊มอินซูลิน (Insulin Pump) หรือระบบการบินจึงยังคงเหมาะสมกับโมเดล Plan-Driven / V-Model มากกว่า Agile แบบบริสุทธิ์?`,
+        options: [
+          `ก. เพราะทีมพัฒนาไม่มีทักษะในการประชุม Daily Stand-up`,
+          `ข. เพราะต้องวิเคราะห์อันตราย (Hazard Analysis) ล่วงหน้า มีข้อจำกัดฮาร์ดแวร์ และต้องสร้างเอกสาร Safety Case เพื่อรับรองตามกฎหมาย`,
+          `ค. เพราะระบบประเภทนี้มีความต้องการที่เปลี่ยนแปลงทุกสัปดาห์จึงต้องล็อกเอกสาร`,
+          `ง. เพราะเครื่องปั๊มอินซูลินไม่จำเป็นต้องทำการทดสอบระดับ Acceptance Testing`
+        ],
+        correct: 1,
+        explain: `ถูกต้อง: ตามตำรา Sommerville (บทที่ 2, 10 และ 12) ระบบ Safety-critical ต้องทำ Hazard-driven specification, เชื่อมโยงข้อกำหนดกับฮาร์ดแวร์ที่ไม่ยืดหยุ่น และจัดทำ Safety Case ที่มีหลักฐานครบถ้วนเพื่อขอใบอนุญาตจากผู้กำกับดูแล`
+      },
+      {
+        q: `4. ในกรณีศึกษาจรวด Ariane 5 เที่ยวบินที่ 501 (1996) ความผิดพลาดที่เกิดขึ้นสะท้อนช่องโหว่ข้อใดของกระบวนการทดสอบและนำซอฟต์แวร์กลับมาใช้ซ้ำ?`,
+        options: [
+          `ก. โมดูลนำร่อง (SRI) ไม่เคยผ่านการ Verification ในจรวดรุ่นก่อนหน้าเลย`,
+          `ข. โปรแกรมเมอร์ลืมเขียน Unit Test สำหรับการคูณเลขจำนวนเต็ม`,
+          `ค. ซอฟต์แวร์ผ่านการทวนสอบตามสเปกเก่าของ Ariane 4 แต่ขาดการ Validation และทดสอบบูรณาการภายใต้ขอบเขตวิถีบินจริงของ Ariane 5`,
+          `ง. เกิดจากการเปลี่ยนข้อกำหนดของลูกค้าระหว่างการปล่อยจรวด (Requirements Churn)`
+        ],
+        correct: 2,
+        explain: `ถูกต้อง: ซอฟต์แวร์ของระบบนำร่องทำงานถูกต้องตามสเปกของ Ariane 4 (Verification ผ่าน) แต่เมื่อนำมาใช้ใน Ariane 5 ที่มีความเร็วแนวราบสูงกว่ามากโดยไม่ Validate ขอบเขตอินพุตใหม่ จึงเกิด 64-bit to 16-bit overflow และทำให้ระบบหลักกับระบบสำรองล่มพร้อมกัน`
+      },
+      {
+        q: `5. ข้อใดอธิบายอาการ "Premature Freezing of Specifications" ตามแนวคิดของ Sommerville ได้ถูกต้องที่สุด?`,
+        options: [
+          `ก. การที่ลูกค้าและผู้พัฒนายอมปล่อยให้เอกสาร SRS ตายตัวไม่ยอมแก้ไขแม้พบปัญหาในระยะออกแบบ/พัฒนา เพื่อเลี่ยงความล่าช้าในการอนุมัติใหม่`,
+          `ข. การที่เซิร์ฟเวอร์ทดสอบค้างระหว่างทำ Black-box System Testing`,
+          `ค. การหยุดรับความต้องการใหม่หลังส่งมอบระบบไปแล้ว 5 ปี`,
+          `ง. การใช้เครื่องมือ Version Control แช่แข็งกิ่งโค้ดก่อนปล่อย Release`
+        ],
+        correct: 0,
+        explain: `ถูกต้อง: Sommerville (Section 2.1.1) เตือนว่าการขออนุมัติแก้เอกสาร SRS ย้อนหลังใช้เวลานาน ทำให้ลูกค้าและทีมพัฒนาแสร้งทำเป็น "แช่แข็ง" สเปกไว้ แล้วใช้วิธีเขียนโค้ดหลบปัญหา (Implementation tricks) แทน ส่งผลให้ระบบมีโครงสร้างแย่และไม่ตรงใจผู้ใช้`
+      }
+    ];
+
+    // =========================================================================
+    // STATE & PERSISTENCE (notebookAppApi)
+    // =========================================================================
+    let currentWfMode = 'ideal';
+    let currentWfStage = 0;
+    let currentVNode = 0;
+    let defectChartInstance = null;
+
+    let appState = {
+      checklist: [false, false, false, false, false],
+      quizAnswers: [null, null, null, null, null]
+    };
+
+    function getToken(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    async function persistState() {
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === 'function') {
+          await window.notebookAppApi.setAppState(appState);
+        }
+      } catch (e) {
+        // Ignore persistence errors outside sandbox
+      }
+    }
+
+    async function loadPersistedState() {
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === 'function') {
+          const saved = await window.notebookAppApi.getAppState();
+          if (saved && typeof saved === 'object') {
+            if (Array.isArray(saved.checklist) && saved.checklist.length === 5) {
+              appState.checklist = saved.checklist.map(Boolean);
+            }
+            if (Array.isArray(saved.quizAnswers) && saved.quizAnswers.length === 5) {
+              appState.quizAnswers = saved.quizAnswers.map(v => (typeof v === 'number' ? v : null));
+            }
+          }
+        }
+      } catch (e) {
+        // Fallback to default state
+      }
+    }
+
+    // =========================================================================
+    // TOC ACTIVE STATE
+    // =========================================================================
+    function setActiveToc(index) {
+      const links = document.querySelectorAll('#toc-list .toc-link');
+      links.forEach((link, idx) => {
+        if (idx === index) {
+          link.classList.add('is-active');
+        } else {
+          link.classList.remove('is-active');
+        }
+      });
+    }
+
+    // =========================================================================
+    // WATERFALL EXPLORER
+    // =========================================================================
+    function setWaterfallMode(mode) {
+      currentWfMode = mode;
+      const btnIdeal = document.getElementById('wf-mode-ideal');
+      const btnReal = document.getElementById('wf-mode-reality');
+      if (btnIdeal && btnReal) {
+        btnIdeal.classList.toggle('is-active', mode === 'ideal');
+        btnReal.classList.toggle('is-active', mode === 'reality');
+      }
+      renderWaterfallDetail();
+    }
+
+    function selectWaterfallStage(idx) {
+      currentWfStage = idx;
+      const btns = document.querySelectorAll('#wf-steps-container .wf-step-btn');
+      btns.forEach((b, i) => b.classList.toggle('is-active', i === idx));
+      renderWaterfallDetail();
+    }
+
+    function renderWaterfallDetail() {
+      const box = document.getElementById('wf-detail-box');
+      if (!box) return;
+      const s = waterfallStages[currentWfStage];
+      if (!s) return;
+
+      const isReality = currentWfMode === 'reality';
+      const analysisHeading = isReality
+        ? `ปัญหาในทางปฏิบัติ (Reality &amp; Feedback Friction)`
+        : `การทำงานตามหลักการ (Theoretical Sequential Flow)`;
+      const analysisBody = isReality ? s.realityNote : s.idealNote;
+      const borderStyle = isReality ? `var(--state-bar-red)` : `var(--state-bar-blue)`;
+
+      box.innerHTML = `
+        <span class="mono-code">${s.code}</span>
+        <h4 style="margin: var(--space-xs) 0 var(--space-md) 0; font-size: 1.125rem; font-weight: 600;">${s.title}</h4>
+        <div style="display:grid; gap: var(--space-sm); margin-bottom: var(--space-md);">
+          <div style="padding-bottom: var(--space-xs); border-bottom: var(--rule);">
+            <span class="mono-code">INPUT ARTIFACTS</span>
+            <p style="margin:2px 0 0 0; font-size:0.9375rem;">${s.inputs}</p>
+          </div>
+          <div style="padding-bottom: var(--space-xs); border-bottom: var(--rule);">
+            <span class="mono-code">EXIT DELIVERABLES</span>
+            <p style="margin:2px 0 0 0; font-size:0.9375rem;">${s.outputs}</p>
+          </div>
+          <div style="padding-bottom: var(--space-xs); border-bottom: var(--rule);">
+            <span class="mono-code">PHASE-GATE CONTROL</span>
+            <p style="margin:2px 0 0 0; font-size:0.9375rem;">${s.gateRule}</p>
+          </div>
+        </div>
+        <div style="background: var(--surface-container); padding: var(--space-md); border-left: ${borderStyle};">
+          <strong style="display:block; font-size:0.875rem; margin-bottom:4px;">${analysisHeading}</strong>
+          <p style="margin:0 0 var(--space-xs) 0; font-size:0.9375rem;">${analysisBody}</p>
+          <p style="margin:0; font-size:0.8125rem; color: var(--on-surface-variant);"><strong>แนวทางบรรเทา:</strong> ${s.feedbackLoop}</p>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // V-MODEL EXPLORER
+    // =========================================================================
+    function selectVNode(idx) {
+      currentVNode = idx;
+      const nodes = document.querySelectorAll('#vmodel-explorer .v-node');
+      nodes.forEach(n => {
+        const nodeId = parseInt(n.getAttribute('data-vnode'), 10);
+        n.classList.toggle('is-active', nodeId === idx);
+      });
+
+      for (let i = 0; i <= 3; i++) {
+        const line = document.getElementById(`v-link-${i}`);
+        if (line) {
+          if (i === idx) {
+            line.setAttribute('stroke', 'var(--primary)');
+            line.setAttribute('stroke-width', '2.5');
+          } else {
+            line.setAttribute('stroke', 'var(--outline)');
+            line.setAttribute('stroke-width', '1.5');
+          }
+        }
+      }
+      renderVNodeDetail();
+    }
+
+    function renderVNodeDetail() {
+      const box = document.getElementById('vnode-detail-box');
+      if (!box) return;
+      const d = vModelNodes[currentVNode];
+      if (!d) return;
+
+      box.innerHTML = `
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:var(--space-sm); margin-bottom:var(--space-sm);">
+          <span class="mono-code">${d.level}</span>
+          <span class="tag">${d.boxType}</span>
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap:var(--space-md); margin-bottom:var(--space-md); padding-bottom:var(--space-md); border-bottom:var(--rule);">
+          <div>
+            <span class="mono-code">LEFT ARM (DESIGN ANCHOR)</span>
+            <p style="margin:2px 0 0 0; font-weight:600;">${d.leftTitle}</p>
+          </div>
+          <div>
+            <span class="mono-code">RIGHT ARM (TEST ACTIVITY)</span>
+            <p style="margin:2px 0 0 0; font-weight:600; color:var(--primary);">${d.rightTitle}</p>
+          </div>
+        </div>
+        <p style="margin:0 0 var(--space-xs) 0; font-size:0.9375rem;"><strong>V &amp; V Classification:</strong> ${d.vvType} · <strong>Plan Link:</strong> ${d.testPlan}</p>
+        <p style="margin:0; font-size:0.9375rem; color:var(--on-surface-variant);">${d.details}</p>
+      `;
+    }
+
+    // =========================================================================
+    // CHART.JS: DEFECT DETECTION COST CURVE
+    // =========================================================================
+    function renderDefectCostChart() {
+      const canvas = document.getElementById('defectCostChart');
+      if (!canvas || typeof Chart === 'undefined') return;
+
+      const data1 = getToken('--data-1') || '#0f62fe';
+      const data3 = getToken('--data-3') || '#005d5d';
+      const data4 = getToken('--data-4') || '#9f1853';
+      const outlineVar = getToken('--outline-variant') || '#e0e0e0';
+      const textMuted = getToken('--on-surface-variant') || '#525252';
+      const textMain = getToken('--on-surface') || '#161616';
+      const bgWhite = getToken('--background') || '#ffffff';
+
+      if (defectChartInstance) {
+        defectChartInstance.destroy();
+      }
+
+      defectChartInstance = new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: [
+            `Requirements (SRS)`,
+            `System Design`,
+            `Coding / Unit Test`,
+            `Integration Test`,
+            `System Test`,
+            `Production / Ops`
+          ],
+          datasets: [
+            {
+              label: `Traditional Waterfall (ต้นทุนแก้บั๊กสัมพัทธ์เมื่อพบล่าช้า)`,
+              data: [1, 3, 6, 15, 35, 100],
+              backgroundColor: data4,
+              borderRadius: 0,
+              barPercentage: 0.72
+            },
+            {
+              label: `Continuous Integration + Early Reviews (ควบคุมช่วงป้อนกลับสั้น)`,
+              data: [1, 2.5, 4, 7, 12, 22],
+              backgroundColor: data1,
+              borderRadius: 0,
+              barPercentage: 0.72
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              align: 'start',
+              labels: {
+                color: textMain,
+                boxWidth: 12,
+                boxHeight: 12,
+                font: { family: `'Noto Sans Thai', 'IBM Plex Sans', sans-serif`, size: 12 }
+              }
+            },
+            tooltip: {
+              backgroundColor: bgWhite,
+              titleColor: textMain,
+              bodyColor: textMain,
+              borderColor: outlineVar,
+              borderWidth: 1,
+              cornerRadius: 0,
+              padding: 10
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: textMuted,
+                font: { family: `'IBM Plex Mono', monospace`, size: 11 }
+              }
+            },
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: `RELATIVE REWORK COST (INDEX = 1 AT SRS)`,
+                color: textMuted,
+                font: { family: `'IBM Plex Mono', monospace`, size: 11 }
+              },
+              grid: { color: outlineVar },
+              ticks: {
+                color: textMuted,
+                font: { family: `'IBM Plex Mono', monospace`, size: 11 }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // INTERACTIVE RISK & BOTTLENECK SIMULATOR
+    // =========================================================================
+    function syncSimChurnFromSlider(val) {
+      const numEl = document.getElementById('sim-churn-num');
+      if (numEl) numEl.value = val;
+      updateRiskSimulation();
+    }
+
+    function syncSimChurnFromNumber(val) {
+      const clamped = Math.max(0, Math.min(100, Number(val) || 0));
+      const sliderEl = document.getElementById('sim-churn-slider');
+      if (sliderEl) sliderEl.value = clamped;
+      updateRiskSimulation();
+    }
+
+    function syncSimCriticalFromSlider(val) {
+      const numEl = document.getElementById('sim-critical-num');
+      if (numEl) numEl.value = val;
+      updateRiskSimulation();
+    }
+
+    function syncSimCriticalFromNumber(val) {
+      const clamped = Math.max(0, Math.min(100, Number(val) || 0));
+      const sliderEl = document.getElementById('sim-critical-slider');
+      if (sliderEl) sliderEl.value = clamped;
+      updateRiskSimulation();
+    }
+
+    function loadSimPreset(type) {
+      const churnSlider = document.getElementById('sim-churn-slider');
+      const churnNum = document.getElementById('sim-churn-num');
+      const critSlider = document.getElementById('sim-critical-slider');
+      const critNum = document.getElementById('sim-critical-num');
+      const handoffSel = document.getElementById('sim-handoff-select');
+      if (!churnSlider || !churnNum || !critSlider || !critNum || !handoffSel) return;
+
+      if (type === 'medical') {
+        churnSlider.value = 10; churnNum.value = 10;
+        critSlider.value = 95; critNum.value = 95;
+        handoffSel.value = 'medium';
+      } else if (type === 'saas') {
+        churnSlider.value = 85; churnNum.value = 85;
+        critSlider.value = 15; critNum.value = 15;
+        handoffSel.value = 'low';
+      } else if (type === 'gov') {
+        churnSlider.value = 70; churnNum.value = 70;
+        critSlider.value = 60; critNum.value = 60;
+        handoffSel.value = 'high';
+      }
+      updateRiskSimulation();
+    }
+
+    function updateRiskSimulation() {
+      const churnEl = document.getElementById('sim-churn-slider');
+      const critEl = document.getElementById('sim-critical-slider');
+      const handoffEl = document.getElementById('sim-handoff-select');
+      if (!churnEl || !critEl || !handoffEl) return;
+
+      const churn = Number(churnEl.value);
+      const critical = Number(critEl.value);
+      const handoffMap = { low: 15, medium: 50, high: 85 };
+      const handoffScore = handoffMap[handoffEl.value] || 50;
+
+      // Compute illustrative diagnostic indices (0-100)
+      const reworkRisk = Math.min(100, Math.round(churn * 0.72 + handoffScore * 0.28));
+      const lateIntRisk = Math.min(100, Math.round(handoffScore * 0.55 + churn * 0.30 + critical * 0.15));
+      const auditNeed = Math.min(100, Math.round(critical * 0.80 + handoffScore * 0.20));
+
+      const valRework = document.getElementById('sim-val-rework');
+      const lblRework = document.getElementById('sim-lbl-rework');
+      const kpiRework = document.getElementById('sim-kpi-rework');
+
+      const valInt = document.getElementById('sim-val-integration');
+      const lblInt = document.getElementById('sim-lbl-integration');
+      const kpiInt = document.getElementById('sim-kpi-integration');
+
+      const valComp = document.getElementById('sim-val-compliance');
+      const lblComp = document.getElementById('sim-lbl-compliance');
+      const kpiComp = document.getElementById('sim-kpi-compliance');
+
+      const valRec = document.getElementById('sim-val-rec');
+      const lblRec = document.getElementById('sim-lbl-rec');
+      const diagBox = document.getElementById('sim-diagnosis-box');
+
+      if (!valRework || !valInt || !valComp || !valRec || !diagBox) return;
+
+      valRework.textContent = `${reworkRisk}/100`;
+      kpiRework.className = `sim-kpi ${reworkRisk >= 65 ? 'kpi-red' : reworkRisk >= 35 ? 'kpi-amber' : 'kpi-green'}`;
+      lblRework.textContent = reworkRisk >= 65
+        ? `วิกฤต: Waterfall จะเกิดการแก้ซ้ำมหาศาล`
+        : reworkRisk >= 35 ? `ปานกลาง: ต้องมี Change Control ที่คล่องตัว` : `ต่ำ: สเปกนิ่งพอที่จะล็อกล่วงหน้าได้`;
+
+      valInt.textContent = `${lateIntRisk}/100`;
+      kpiInt.className = `sim-kpi ${lateIntRisk >= 65 ? 'kpi-red' : lateIntRisk >= 35 ? 'kpi-amber' : 'kpi-green'}`;
+      lblInt.textContent = lateIntRisk >= 65
+        ? `เสี่ยงสูงต่อ Big Bang Integration ท้ายโครงการ`
+        : lateIntRisk >= 35 ? `ควรแทรกรอบ Integration Testing รายระยะ` : `ควบคุมอินเทอร์เฟซได้ง่าย`;
+
+      valComp.textContent = `${auditNeed}/100`;
+      kpiComp.className = `sim-kpi ${auditNeed >= 65 ? 'kpi-blue' : 'kpi-green'}`;
+      lblComp.textContent = auditNeed >= 65
+        ? `สูง: จำเป็นต้องมี Safety Case & Gate Traceability`
+        : `ต่ำ-ปานกลาง: ไม่ต้องทำเอกสารรับรองเข้มงวด`;
+
+      let recModel = ``;
+      let recSub = ``;
+      let diagHtml = ``;
+
+      if (critical >= 65 && churn <= 35) {
+        recModel = `V-Model + Formal Spec`;
+        recSub = `Plan-Driven เต็มรูปแบบเหมาะสมที่สุด`;
+        diagHtml = `
+          <span class="mono-code">DIAGNOSIS · SAFETY &amp; HARDWARE DOMINATED</span>
+          <p style="margin:var(--space-xs) 0 0 0;">
+            เนื่องจากระบบมีความวิกฤตสูง (${critical}%) และความต้องการค่อนข้างนิ่ง (${churn}%) โครงสร้าง <strong>V-Model</strong> พร้อมการวิเคราะห์อันตรายล่วงหน้า (Hazard-driven SRS) และ Gate Inspections จะช่วยสร้างหลักฐาน Safety Case ให้ผู้กำกับดูแลได้อย่างสมบูรณ์โดยไม่ติดคอขวด Churn มากนัก
+          </p>
+        `;
+      } else if (critical >= 50 && churn > 35) {
+        recModel = `Hybrid Stage-Gate + Agile`;
+        recSub = `ล็อกสถาปัตยกรรมและ Safety แล้ววนซ้ำในซอฟต์แวร์ย่อย`;
+        diagHtml = `
+          <span class="mono-code">DIAGNOSIS · HIGH COMPLEXITY &amp; CHURN TENSION</span>
+          <p style="margin:var(--space-xs) 0 0 0;">
+            โครงการนี้มีความขัดแย้งสูงเหมือน <em>Brownfield / Mega-System</em> (ต้องการการกำกับสูง ${auditNeed}/100 แต่ความต้องการก็ผันผวน ${churn}%) หากใช้ Waterfall ล้วนจะพังเพราะ Premature Freezing และการรออนุมัติข้ามสายงาน จึงต้องใช้ <strong>Plan-Driven</strong> เฉพาะระดับสถาปัตยกรรม/อินเทอร์เฟซฮาร์ดแวร์ แล้วพัฒนาส่วนที่ยังไม่นิ่งด้วยรอบสั้น (Incremental) พร้อมระบบบูรณาการต่อเนื่อง
+          </p>
+        `;
+      } else if (churn >= 55 && critical < 50) {
+        recModel = `Agile / Incremental`;
+        recSub = `หลีกเลี่ยง Waterfall และ BDUF โดยเด็ดขาด`;
+        diagHtml = `
+          <span class="mono-code">DIAGNOSIS · MARKET VOLATILITY &amp; WICKED PROBLEM</span>
+          <p style="margin:var(--space-xs) 0 0 0;">
+            การบังคับใช้ Waterfall กับโครงการที่มี Churn สูง (${churn}%) จะสร้างความสูญเปล่าแบบ Extra Processing จาก BDUF และทำให้งบบานปลายเพราะต้นทุนแก้บั๊กทวีคูณในระยะท้าย ควรใช้วิธีการพัฒนาแบบ <strong>Incremental / Agile</strong> เพื่อส่งมอบซอฟต์แวร์ที่ใช้ได้จริงให้ผู้ใช้ทดสอบเร็วที่สุด ลดช่องว่าง Two-Worlds Gap
+          </p>
+        `;
+      } else {
+        recModel = `Modified Waterfall / Iterative V`;
+        recSub = `ใช้โครงสร้าง Gate แบบยืดหยุ่นพร้อม Prototype`;
+        diagHtml = `
+          <span class="mono-code">DIAGNOSIS · BALANCED RISK PROFILE</span>
+          <p style="margin:var(--space-xs) 0 0 0;">
+            ความเสี่ยงอยู่ในระดับสมดุล สามารถใช้โครงสร้างเอกสารและการตรวจสอบย้อนกลับแบบ V-Model เป็นแกนกลาง แต่ควรแทรก <strong>Prototyping</strong> ในระยะความต้องการ (PH 01) และทำ Integration Testing เป็นระยะย่อยเพื่อลดความเสี่ยงจาก Late Integration
+          </p>
+        `;
+      }
+
+      valRec.textContent = recModel;
+      lblRec.textContent = recSub;
+      diagBox.innerHTML = diagHtml;
+    }
+
+    // =========================================================================
+    // CHECKLIST & QUIZ (STATE-PERSISTED)
+    // =========================================================================
+    function toggleChecklist(idx, checked) {
+      appState.checklist[idx] = Boolean(checked);
+      updateProgressUI();
+      persistState();
+    }
+
+    function selectQuizOption(qIdx, optIdx) {
+      appState.quizAnswers[qIdx] = optIdx;
+      renderQuiz();
+      updateProgressUI();
+      persistState();
+    }
+
+    function renderChecklistFromState() {
+      const inputs = document.querySelectorAll('#checklist-container input[type="checkbox"]');
+      inputs.forEach((inp, idx) => {
+        inp.checked = Boolean(appState.checklist[idx]);
+      });
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      const scoreBadge = document.getElementById('quiz-score-badge');
+      if (!container) return;
+
+      let score = 0;
+      let html = ``;
+
+      quizQuestions.forEach((item, qIdx) => {
+        const chosen = appState.quizAnswers[qIdx];
+        const hasAnswered = typeof chosen === 'number';
+        const isCorrect = hasAnswered && chosen === item.correct;
+        if (isCorrect) score++;
+
+        let optsHtml = ``;
+        item.options.forEach((optText, optIdx) => {
+          let cls = `quiz-opt-btn`;
+          if (hasAnswered) {
+            if (optIdx === item.correct) cls += ` is-correct`;
+            else if (optIdx === chosen) cls += ` is-wrong`;
+          }
+          optsHtml += `
+            <button type="button" class="${cls}" onclick="selectQuizOption(${qIdx}, ${optIdx})">
+              ${optText}
+            </button>
+          `;
+        });
+
+        const fbClass = hasAnswered ? `quiz-feedback is-visible` : `quiz-feedback`;
+        const fbStyle = hasAnswered
+          ? (isCorrect ? `border-left: var(--state-bar-green);` : `border-left: var(--state-bar-red);`)
+          : ``;
+
+        html += `
+          <div class="quiz-item">
+            <p style="margin:0; font-weight:600;">${item.q}</p>
+            <div class="quiz-options">${optsHtml}</div>
+            <div class="${fbClass}" style="${fbStyle}">
+              ${hasAnswered ? (isCorrect ? `<strong>ถูกต้อง — </strong>` : `<strong>ยังไม่ถูกต้อง — </strong>`) + item.explain : ``}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      if (scoreBadge) {
+        scoreBadge.textContent = `คะแนนสะสม: ${score} / ${quizQuestions.length}`;
+      }
+    }
+
+    function updateProgressUI() {
+      const checkedCount = appState.checklist.filter(Boolean).length;
+      const answeredCount = appState.quizAnswers.filter(v => typeof v === 'number').length;
+      const totalItems = appState.checklist.length + quizQuestions.length;
+      const pct = Math.round(((checkedCount + answeredCount) / totalItems) * 100);
+
+      const pctEl = document.getElementById('sidebar-progress-pct');
+      const fillEl = document.getElementById('sidebar-progress-fill');
+      const textEl = document.getElementById('sidebar-progress-text');
+
+      if (pctEl) pctEl.textContent = `${pct}%`;
+      if (fillEl) fillEl.style.width = `${pct}%`;
+      if (textEl) {
+        textEl.textContent = `ทบทวนหัวข้อ ${checkedCount}/5 · ทำแบบทดสอบ ${answeredCount}/5 ข้อ`;
+      }
+    }
+
+    function resetModuleProgress(btn) {
+      if (!btn) return;
+      if (btn.dataset.armed !== 'true') {
+        btn.dataset.armed = 'true';
+        btn.textContent = `คลิกอีกครั้งเพื่อยืนยันการล้างข้อมูล`;
+        return;
+      }
+      btn.dataset.armed = 'false';
+      btn.textContent = `ล้างความคืบหน้า`;
+      appState = {
+        checklist: [false, false, false, false, false],
+        quizAnswers: [null, null, null, null, null]
+      };
+      renderChecklistFromState();
+      renderQuiz();
+      updateProgressUI();
+      persistState();
+    }
+
+    function exportStudyNotes() {
+      const checkedCount = appState.checklist.filter(Boolean).length;
+      let score = 0;
+      quizQuestions.forEach((q, idx) => {
+        if (appState.quizAnswers[idx] === q.correct) score++;
+      });
+
+      const content = [
+        `MODULE 2: TRADITIONAL SOFTWARE PROCESS MODELS & THEIR LIMITATIONS`,
+        `เอกสารสรุปผลการเรียนรู้ (อ้างอิง Sommerville 10e & Dooley & Kazakova 2024)`,
+        `================================================================`,
+        `ความคืบหน้าหัวข้อทบทวน: ${checkedCount} / 5 หัวข้อ`,
+        `คะแนนแบบทดสอบประเมินตนเอง: ${score} / ${quizQuestions.length} ข้อ`,
+        ``,
+        `ประเด็นสำคัญที่ต้องจดจำ:`,
+        `1. Waterfall Model (Royce 1970): แบ่งเป็น 5 ระยะหลัก (SRS -> Design -> Implementation -> Testing -> Maintenance) ควบคุมด้วย Gate Reviews และ Formal Inspections (ประชุม <= 2 ชม., แก้ >10% ต้องตรวจซ้ำ)`,
+        `2. V-Model & V&V (Boehm 1979): Verification ("สร้างถูกวิธี") vs. Validation ("สร้างถูกตัว") จับคู่ White-box (Unit), Gray-box (Integration), Black-box (System/Acceptance)`,
+        `3. บริบทที่เหมาะสม: Safety-critical systems (Safety Case & Formal Methods), Hardware-Software Co-design, และ Regulatory Compliance`,
+        `4. ข้อจำกัดในทางปฏิบัติ: Wicked Problem, Big Design Up Front (BDUF), Premature Freezing of Specs, Late Integration Risk, Requirements Churn และ Handoff Friction`,
+        `5. บทเรียนอุตสาหกรรม: Denver Airport (System/HW-SW design flaw), Ariane 5 (Reuse validation failure), Mega Healthcare (BDUF overreach)`
+      ].join(`\n`);
+
+      if (window.notebookAppApi && typeof window.notebookAppApi.triggerFileDownload === 'function') {
+        window.notebookAppApi.triggerFileDownload({
+          content: content,
+          contentType: `text/plain`,
+          encoding: `UTF-8`,
+          filename: `module2_traditional_process_summary.txt`
+        });
+      }
+    }
+
+    // =========================================================================
+    // SCROLLSPY FOR SIDEBAR TOC
+    // =========================================================================
+    function initScrollSpy() {
+      const sections = document.querySelectorAll('.lecture-section');
+      if (!sections.length || typeof IntersectionObserver === 'undefined') return;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('id');
+            if (!id) return;
+            const num = parseInt(id.replace('sec-', ''), 10) - 1;
+            if (!isNaN(num)) setActiveToc(num);
+          }
+        });
+      }, { rootMargin: '-15% 0px -70% 0px', threshold: 0.05 });
+
+      sections.forEach(sec => observer.observe(sec));
+    }
+
+    // =========================================================================
+    // INITIALIZATION
+    // =========================================================================
+    async function initApp() {
+      await loadPersistedState();
+
+      renderWaterfallDetail();
+      renderVNodeDetail();
+      renderDefectCostChart();
+      updateRiskSimulation();
+      renderChecklistFromState();
+      renderQuiz();
+      updateProgressUI();
+      initScrollSpy();
+
+      if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === 'function') {
+        window.notebookAppApi.notifyAppReady();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
